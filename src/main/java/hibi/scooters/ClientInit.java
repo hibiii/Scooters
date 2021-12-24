@@ -1,21 +1,21 @@
 package hibi.scooters;
 
 import net.fabricmc.api.ClientModInitializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.util.Identifier;
 
+@Environment(EnvType.CLIENT)
 public class ClientInit implements ClientModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LogManager.getLogger("scooters");
+	
+	public static final EntityModelLayer SCOOTER_MODEL_LAYER = new EntityModelLayer(new Identifier("scooters", "scooter"), "main");
 
 	@Override
 	public void onInitializeClient() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
-
-		LOGGER.info("Hello Fabric world!");
+		EntityModelLayerRegistry.registerModelLayer(SCOOTER_MODEL_LAYER, ScooterEntityModel::model);
+		EntityRendererRegistry.register(Common.SCOOTER_TYPE, ScooterEntityRenderer::new);
 	}
 }

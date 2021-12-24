@@ -17,13 +17,13 @@
 
   "environment": "*",
   "entrypoints": {
+    "main": [
+      "hibi.scooters.Common"
+    ],
     "client": [
       "hibi.scooters.ClientInit"
     ]
   },
-  "mixins": [
-    "scooters.mixins.json"
-  ],
 
   "depends": {
     "fabricloader": ">=0.11.3",
