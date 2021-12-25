@@ -24,6 +24,9 @@
       "hibi.scooters.ClientInit"
     ]
   },
+  "mixins": [
+    "scooters.mixin.json"
+  ],
 
   "depends": {
     "fabricloader": ">=0.11.3",

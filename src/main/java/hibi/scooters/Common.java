@@ -15,7 +15,7 @@ public class Common implements ModInitializer {
 		new Identifier("scooters", "scooter"),
 		FabricEntityTypeBuilder.create(SpawnGroup.MISC, ScooterEntity::new)
 			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
-			.trackRangeBlocks(1)
+			.trackRangeBlocks(10)
 			.build()
 	);
 

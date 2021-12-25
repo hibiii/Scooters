@@ -28,7 +28,7 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 	public void render(ScooterEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
-		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f - yaw));
+		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f + yaw));
 		matrices.translate(0d, -1.5d, 0d);
 		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.texture));
 		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 0, 0, 0, 1);
