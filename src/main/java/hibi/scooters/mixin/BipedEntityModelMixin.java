@@ -13,11 +13,7 @@ import net.minecraft.entity.Entity;
 
 @Mixin(BipedEntityModel.class)
 public class BipedEntityModelMixin {
-    @Shadow public @Final ModelPart head;
-    @Shadow public @Final ModelPart hat;
-    @Shadow public @Final ModelPart body;
-    @Shadow public @Final ModelPart rightArm;
-    @Shadow public @Final ModelPart leftArm;
+
     @Shadow public @Final ModelPart rightLeg;
     @Shadow public @Final ModelPart leftLeg;
 
