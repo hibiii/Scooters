@@ -4,7 +4,9 @@
   "package": "hibi.scooters.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "ClientPlayerEntityMixin"
+    "ClientPlayerEntityMixin",
+    "PlayerEntityModelMixin",
+    "BipedEntityModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

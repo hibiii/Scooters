@@ -26,7 +26,7 @@ public class ScooterEntity extends Entity {
 
 	public ScooterEntity(EntityType<?> type, World world) {
 		super(type, world);
-		this.inanimate = true;
+		// this.inanimate = true;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class ScooterEntity extends Entity {
 				this.setYaw(this.getYaw() + this.yawVelocity);
 				this.setVelocity(MathHelper.sin(-this.getYaw() * 0.017453293f) * xzSpeed, vel.y, MathHelper.cos(this.getYaw() * 0.017453293f) * xzSpeed);
 			}
-			this.move(MovementType.SELF, this.getVelocity());
+			this.move(MovementType.SELF, this.getVelocity());	
 		}
 		else {
 			this.setVelocity(Vec3d.ZERO);
@@ -104,6 +104,29 @@ public class ScooterEntity extends Entity {
 			this.discard();
 			return true;
 		}
+
+	@Override
+	public double getMountedHeightOffset() {
+		return 0.5d;
+	}
+
+	@Override
+	public void updatePassengerPosition(Entity passenger) {
+		if(!this.hasPassenger(passenger)) return;
+		passenger.setYaw(passenger.getYaw() + this.yawVelocity);
+		passenger.setBodyYaw(this.getYaw());
+		float f = MathHelper.wrapDegrees(passenger.getYaw() - this.getYaw());
+        float g = MathHelper.clamp(f, -105.0f, 105.0f);
+        passenger.prevYaw += g - f;
+        passenger.setYaw(passenger.getYaw() + g - f);
+        passenger.setHeadYaw(passenger.getYaw());
+		super.updatePassengerPosition(passenger);
+	}
+
+	@Override
+	protected MoveEffect getMoveEffect() {
+		return MoveEffect.NONE;
+	}
 	
 	@Override
 	public Entity getPrimaryPassenger() {
