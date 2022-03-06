@@ -22,11 +22,12 @@ public class ScooterEntity extends Entity {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
-	protected float xzSpeed;
+	protected double speed;
+	protected double inertia;
 
 	public ScooterEntity(EntityType<?> type, World world) {
 		super(type, world);
-		// this.inanimate = true;
+		this.stepHeight = 0.5f;
 	}
 
 	@Override
@@ -37,30 +38,37 @@ public class ScooterEntity extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
-		Vec3d vel = this.getVelocity();
-		/* Update Movement */ {
-			this.xzSpeed = (float) vel.multiply(0.995d, 0d, 0.995d).length();
-			this.setVelocity(MathHelper.sin(-this.getYaw() * 0.017453293f) * xzSpeed, vel.y, MathHelper.cos(this.getYaw() * 0.017453293f) * xzSpeed);
-			this.yawVelocity *= 0.55f;
-		}
+		this.speed = this.getVelocity().length();
+		this.inertia = 0.98f;
+		this.yawVelocity *= 0.8f;
 		if(this.isLogicalSideForUpdatingMovement()) {
-			if(this.world.isClient) /* Update Riding */ {
-				if(this.keyW && this.xzSpeed < 0.35f) {
-					this.xzSpeed += 0.01f;
+			if(this.world.isClient) {
+				if(this.keyW && this.speed < 0.35) {
+					this.speed += 0.02f;
 				}
 				if(this.keyS) {
-					this.xzSpeed *= 0.92f;
+					this.inertia = 0.92f;
 				}
 				if(this.keyA) {
-					this.yawVelocity -= Math.min(3.5f / (xzSpeed * 1.7), 4f);
+					this.yawVelocity -= 1.2f;
 				}
 				if(this.keyD) {
-					this.yawVelocity += Math.min(3.5f / (xzSpeed * 1.7), 4f);
+					this.yawVelocity += 1.2f;
 				}
 				this.setYaw(this.getYaw() + this.yawVelocity);
-				this.setVelocity(MathHelper.sin(-this.getYaw() * 0.017453293f) * xzSpeed, vel.y, MathHelper.cos(this.getYaw() * 0.017453293f) * xzSpeed);
 			}
-			this.move(MovementType.SELF, this.getVelocity());	
+			if(!this.hasNoGravity()) {
+				this.setVelocity(this.getVelocity().add(0, -0.04, 0));
+			}
+			if(!this.hasPassengers()){
+				this.setVelocity(this.getVelocity().multiply(0.6, 1, 0.6));
+			} else {
+				this.setVelocity(
+					MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * this.inertia,
+					this.getVelocity().y,
+					MathHelper.cos(this.getYaw() * 0.017453293f) * speed * this.inertia);
+			}
+			this.move(MovementType.SELF, this.getVelocity());
 		}
 		else {
 			this.setVelocity(Vec3d.ZERO);
