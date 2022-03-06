@@ -22,12 +22,20 @@ public class ScooterEntity extends Entity {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
-	protected double speed;
 	protected double inertia;
+
+	protected final double maxSpeed;
+	protected final double acceleration;
+	protected final double brakeForce;
+	protected final double baseInertia;
 
 	public ScooterEntity(EntityType<?> type, World world) {
 		super(type, world);
 		this.stepHeight = 0.5f;
+		this.maxSpeed = 0.4d;
+		this.acceleration = 0.02d;
+		this.brakeForce = 0.93d;
+		this.baseInertia = 0.98d;
 	}
 
 	@Override
@@ -38,16 +46,16 @@ public class ScooterEntity extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
-		this.speed = this.getVelocity().multiply(1, 0, 1).length();
-		this.inertia = 0.98f;
+		double speed = this.getVelocity().multiply(1, 0, 1).length();
 		this.yawVelocity *= 0.8f;
+		this.inertia = this.baseInertia;
 		if(this.isLogicalSideForUpdatingMovement()) {
 			if(this.world.isClient) {
-				if(this.keyW && this.speed < 0.35) {
-					this.speed += 0.02f;
+				if(this.keyW && speed < this.maxSpeed) {
+					speed += this.acceleration;
 				}
 				if(this.keyS) {
-					this.inertia = 0.92f;
+					this.inertia *= this.brakeForce;
 				}
 				if(this.keyA) {
 					this.yawVelocity -= 1.2f;
@@ -108,7 +116,7 @@ public class ScooterEntity extends Entity {
 		public boolean damage(DamageSource source, float amount) {
 			if(this.isInvulnerableTo(source)) return false;
 			if(this.world.isClient || this.isRemoved()) return true;
-			this.emitGameEvent(GameEvent.ENTITY_DAMAGED, source.getAttacker());
+			this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
 			this.discard();
 			return true;
 		}

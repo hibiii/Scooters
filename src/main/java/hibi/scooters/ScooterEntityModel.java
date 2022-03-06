@@ -24,7 +24,7 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 		ModelData meshdefinition = new ModelData();
 		ModelPartData partdefinition = meshdefinition.getRoot();
 
-		partdefinition.addChild("Back", ModelPartBuilder.create().uv(0, 0).cuboid(-2.0F, -2.0F, -7.0F, 4.0F, 1.0F, 14.0F, Dilation.NONE)
+		partdefinition.addChild("Back", ModelPartBuilder.create().uv(0, 0).cuboid(-2.0F, -1.9F, -7.0F, 4.0F, 1.0F, 14.0F, Dilation.NONE)
 		.uv(0, 17).cuboid(-0.5F, -3.0F, 8.0F, 1.0F, 3.0F, 3.0F, Dilation.NONE)
 		.uv(4, 0).cuboid(-1.0F, -4.0F, 7.0F, 2.0F, 3.0F, 3.0F, Dilation.NONE), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
