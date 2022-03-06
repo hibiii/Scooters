@@ -38,7 +38,7 @@ public class ScooterEntity extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
-		this.speed = this.getVelocity().length();
+		this.speed = this.getVelocity().multiply(1, 0, 1).length();
 		this.inertia = 0.98f;
 		this.yawVelocity *= 0.8f;
 		if(this.isLogicalSideForUpdatingMovement()) {

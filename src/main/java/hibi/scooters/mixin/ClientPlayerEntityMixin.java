@@ -28,7 +28,8 @@ public abstract class ClientPlayerEntityMixin extends Entity {
 
 	@Inject(
 		method = "tickRiding()V",
-		at = @At("TAIL"))
+		at = @At("TAIL")
+	)
 	private void tickRiding(CallbackInfo info) {
 		Entity vehicle = this.getVehicle();
 		if(vehicle instanceof ScooterEntity) {

@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Scooters",
-  "description": "This is a pre-alpha build of the Scooters mod, and is not representative of the quality of the final product. NOTE: vertical movement has not yet been implemented. Avoid elevation changes as otherwise you'll be floating in mid air. HOWTO: To spawn a scooter, run `/summon scooters:scooter`. NOTE: cornering at high speeds will be nerfed a little.",
+  "description": "This is an alpha build of the Scooters mod, and is not representative of the quality of the final product. HOWTO: To spawn a scooter, run `/summon scooters:scooter`.",
   "authors": [
     "Hibi"
   ],
@@ -31,7 +31,7 @@
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
-    "minecraft": "1.18.x",
+    "minecraft": ">=1.18",
     "java": ">=17"
   }
 }
