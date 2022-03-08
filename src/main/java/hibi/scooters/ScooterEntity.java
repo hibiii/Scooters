@@ -15,6 +15,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
@@ -29,13 +30,22 @@ public class ScooterEntity extends Entity {
 	protected final double brakeForce;
 	protected final double baseInertia;
 
-	public ScooterEntity(EntityType<?> type, World world) {
+	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
 		this.stepHeight = 0.5f;
 		this.maxSpeed = 0.4d;
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;
 		this.baseInertia = 0.98d;
+	}
+
+	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, World world, Vec3d pos) {
+		ScooterEntity out = new ScooterEntity(type, world);
+		out.setPosition(pos);
+		out.prevX = pos.x;
+		out.prevY = pos.y;
+		out.prevZ = pos.z;
+		return out;
 	}
 
 	@Override
@@ -117,6 +127,9 @@ public class ScooterEntity extends Entity {
 			if(this.isInvulnerableTo(source)) return false;
 			if(this.world.isClient || this.isRemoved()) return true;
 			this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
+			boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
+			if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
+				this.dropItem(Common.SCOOTER_ITEM);
 			this.discard();
 			return true;
 		}

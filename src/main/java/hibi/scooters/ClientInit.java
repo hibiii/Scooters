@@ -16,6 +16,6 @@ public class ClientInit implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		EntityModelLayerRegistry.registerModelLayer(SCOOTER_MODEL_LAYER, ScooterEntityModel::model);
-		EntityRendererRegistry.register(Common.SCOOTER_TYPE, ScooterEntityRenderer::new);
+		EntityRendererRegistry.register(Common.SCOOTER_ENTITY, ScooterEntityRenderer::new);
 	}
 }
