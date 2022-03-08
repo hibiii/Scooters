@@ -34,7 +34,7 @@ public abstract class ClientPlayerEntityMixin extends Entity {
 		Entity vehicle = this.getVehicle();
 		if(vehicle instanceof ScooterEntity) {
 			((ScooterEntity)vehicle).setInputs(this.input.pressingForward, this.input.pressingBack, this.input.pressingLeft, this.input.pressingRight);
-			this.riding = vehicle.getVelocity().length() > 0.02d;
+			this.riding = vehicle.getVelocity().lengthSquared() > 0.0009d; // 0.03d^2
 		}
 	}
 }

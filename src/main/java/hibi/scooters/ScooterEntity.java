@@ -3,6 +3,7 @@ package hibi.scooters;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
@@ -24,6 +26,9 @@ public class ScooterEntity extends Entity {
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
 	protected double inertia;
+	protected int interpTicks;
+	protected double x, y, z;
+	protected float yaw;
 
 	protected final double maxSpeed;
 	protected final double acceleration;
@@ -55,10 +60,11 @@ public class ScooterEntity extends Entity {
 
 	@Override
 	public void tick() {
-		super.tick();
 		double speed = this.getVelocity().multiply(1, 0, 1).length();
 		this.yawVelocity *= 0.8f;
 		this.inertia = this.baseInertia;
+		super.tick();
+		this.interp();
 		if(this.isLogicalSideForUpdatingMovement()) {
 			if(this.world.isClient) {
 				if(this.keyW && speed < this.maxSpeed) {
@@ -79,8 +85,9 @@ public class ScooterEntity extends Entity {
 				this.setVelocity(this.getVelocity().add(0, -0.04, 0));
 			}
 			if(!this.hasPassengers()){
-				this.setVelocity(this.getVelocity().multiply(0.6, 1, 0.6));
-			} else {
+				this.setVelocity(this.getVelocity().multiply(0.7, 1, 0.7));
+			}
+			else {
 				this.setVelocity(
 					MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * this.inertia,
 					this.getVelocity().y,
@@ -91,13 +98,49 @@ public class ScooterEntity extends Entity {
 		else {
 			this.setVelocity(Vec3d.ZERO);
 		}
+		if(this.hasPassengers() && this.isSubmergedInWater()) {
+			this.removeAllPassengers();
+		}
 		this.checkBlockCollision();
+		List<Entity> others = this.world.getOtherEntities(this, this.getBoundingBox().expand(0.2f, 0f, 0.2f), EntityPredicates.canBePushedBy(this));
+		if(!others.isEmpty()) {
+			for (Entity e : others) {
+				this.pushAwayFrom(e);
+			}
+		}
+	}
+
+	protected void interp() {
+		if(this.isLogicalSideForUpdatingMovement()) {
+			this.interpTicks = 0;
+			this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
+			return;
+		}
+		if(this.interpTicks <= 0) return;
+		double xoff = this.getX() + (this.x - this.getX()) / (double)this.interpTicks;
+        double yoff = this.getY() + (this.y - this.getY()) / (double)this.interpTicks;
+        double zoff = this.getZ() + (this.z - this.getZ()) / (double)this.interpTicks;
+        float yawoff = (float) MathHelper.wrapDegrees(this.yaw - (double)this.getYaw());
+		this.setYaw(this.getYaw() + yawoff / (float)this.interpTicks);
+		this.setPosition(xoff, yoff, zoff);
+		// this.setRotation(this.getYaw(), this.getPitch());
+		this.interpTicks--;
+	}
+
+	@Override
+	public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.yaw = yaw;
+		this.interpTicks = 10;
 	}
 
 	// ---- Interaction ---- //
 		@Override
 		public ActionResult interact(PlayerEntity player, Hand hand) {
 			if(player.shouldCancelInteraction() || this.hasPassengers()) return ActionResult.PASS;
+			if(this.isTouchingWater()) return ActionResult.PASS;
 			if(!this.world.isClient)
 				return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
 			return ActionResult.SUCCESS;
@@ -154,7 +197,7 @@ public class ScooterEntity extends Entity {
 
 	@Override
 	protected MoveEffect getMoveEffect() {
-		return MoveEffect.NONE;
+		return MoveEffect.EVENTS;
 	}
 	
 	@Override
@@ -168,6 +211,11 @@ public class ScooterEntity extends Entity {
 		this.keyA = left;
 		this.keyS = back;
 		this.keyD = right;
+	}
+
+	@Override
+	public float getEyeHeight(EntityPose pose) {
+		return 0.5f;
 	}
 
 	@Override
