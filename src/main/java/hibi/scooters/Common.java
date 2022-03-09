@@ -22,7 +22,17 @@ public class Common implements ModInitializer {
 			.build()
 	);
 
+	public static final EntityType<ElectricScooterEntity> ELECTRIC_SCOOTER_ENTITY = Registry.register(
+		Registry.ENTITY_TYPE,
+		new Identifier("scooters", "electric_scooter"),
+		FabricEntityTypeBuilder.create(SpawnGroup.MISC, ElectricScooterEntity::new)
+			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
+			.trackRangeBlocks(10)
+			.build()
+	);
+
 	public static final Item SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "kick_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
+	public static final Item ELECTRIC_SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "electric_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
 
 	@Override
 	public void onInitialize() {

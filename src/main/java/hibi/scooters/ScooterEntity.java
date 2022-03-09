@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -25,15 +26,15 @@ public class ScooterEntity extends Entity {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
-	protected double inertia;
 	protected int interpTicks;
 	protected double x, y, z;
 	protected float yaw;
 
-	protected final double maxSpeed;
-	protected final double acceleration;
-	protected final double brakeForce;
-	protected final double baseInertia;
+	protected double maxSpeed;
+	protected double acceleration;
+	protected double brakeForce;
+	protected double baseInertia;
+	protected Item item;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -42,10 +43,11 @@ public class ScooterEntity extends Entity {
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;
 		this.baseInertia = 0.98d;
+		this.item = Common.SCOOTER_ITEM;
 	}
 
 	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, World world, Vec3d pos) {
-		ScooterEntity out = new ScooterEntity(type, world);
+		ScooterEntity out = type.create(world);
 		out.setPosition(pos);
 		out.prevX = pos.x;
 		out.prevY = pos.y;
@@ -60,38 +62,18 @@ public class ScooterEntity extends Entity {
 
 	@Override
 	public void tick() {
-		double speed = this.getVelocity().multiply(1, 0, 1).length();
 		this.yawVelocity *= 0.8f;
-		this.inertia = this.baseInertia;
 		super.tick();
 		this.interp();
 		if(this.isLogicalSideForUpdatingMovement()) {
 			if(this.world.isClient) {
-				if(this.keyW && speed < this.maxSpeed) {
-					speed += this.acceleration;
-				}
-				if(this.keyS) {
-					this.inertia *= this.brakeForce;
-				}
-				if(this.keyA) {
-					this.yawVelocity -= 1.2f;
-				}
-				if(this.keyD) {
-					this.yawVelocity += 1.2f;
-				}
-				this.setYaw(this.getYaw() + this.yawVelocity);
+				this.drive();
 			}
 			if(!this.hasNoGravity()) {
 				this.setVelocity(this.getVelocity().add(0, -0.04, 0));
 			}
 			if(!this.hasPassengers()){
 				this.setVelocity(this.getVelocity().multiply(0.7, 1, 0.7));
-			}
-			else {
-				this.setVelocity(
-					MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * this.inertia,
-					this.getVelocity().y,
-					MathHelper.cos(this.getYaw() * 0.017453293f) * speed * this.inertia);
 			}
 			this.move(MovementType.SELF, this.getVelocity());
 		}
@@ -102,12 +84,34 @@ public class ScooterEntity extends Entity {
 			this.removeAllPassengers();
 		}
 		this.checkBlockCollision();
-		List<Entity> others = this.world.getOtherEntities(this, this.getBoundingBox().expand(0.2f, 0f, 0.2f), EntityPredicates.canBePushedBy(this));
+		List<Entity> others = this.world.getOtherEntities(this, this.getBoundingBox(), EntityPredicates.canBePushedBy(this));
 		if(!others.isEmpty()) {
 			for (Entity e : others) {
 				this.pushAwayFrom(e);
 			}
 		}
+	}
+
+	protected void drive() {
+		double speed = this.getVelocity().multiply(1, 0, 1).length();
+		double inertia = this.baseInertia;
+		if(this.keyW && speed < this.maxSpeed) {
+			speed += this.acceleration;
+		}
+		if(this.keyS) {
+			inertia *= this.brakeForce;
+		}
+		if(this.keyA) {
+			this.yawVelocity -= 1.2f;
+		}
+		if(this.keyD) {
+			this.yawVelocity += 1.2f;
+		}
+		this.setYaw(this.getYaw() + this.yawVelocity);
+		this.setVelocity(
+			MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * inertia,
+			this.getVelocity().y,
+			MathHelper.cos(this.getYaw() * 0.017453293f) * speed * inertia);
 	}
 
 	protected void interp() {
@@ -123,7 +127,6 @@ public class ScooterEntity extends Entity {
         float yawoff = (float) MathHelper.wrapDegrees(this.yaw - (double)this.getYaw());
 		this.setYaw(this.getYaw() + yawoff / (float)this.interpTicks);
 		this.setPosition(xoff, yoff, zoff);
-		// this.setRotation(this.getYaw(), this.getPitch());
 		this.interpTicks--;
 	}
 
@@ -172,7 +175,8 @@ public class ScooterEntity extends Entity {
 			this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
 			boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
 			if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
-				this.dropItem(Common.SCOOTER_ITEM);
+				this.dropItem(this.item);
+			this.removeAllPassengers();
 			this.discard();
 			return true;
 		}

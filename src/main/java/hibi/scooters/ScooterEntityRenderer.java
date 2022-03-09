@@ -12,7 +12,8 @@ import net.minecraft.util.math.Vec3f;
 public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 
 	protected final ScooterEntityModel model;
-	protected final Identifier texture = new Identifier("scooters", "textures/entity/kick_scooter.png");
+	protected final Identifier kick_texture = new Identifier("scooters", "textures/entity/kick_scooter.png");
+	protected final Identifier electric_texture = new Identifier("scooters", "textures/entity/electric_scooter.png");
 
 	protected ScooterEntityRenderer(Context ctx) {
 		super(ctx);
@@ -21,7 +22,9 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 
 	@Override
 	public Identifier getTexture(ScooterEntity entity) {
-		return this.texture;
+		if(entity instanceof ElectricScooterEntity)
+			return this.electric_texture;
+		return this.kick_texture;
 	}
 
 	@Override
@@ -30,7 +33,7 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
 		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f + yaw));
 		matrices.translate(0d, -1.5d, 0d);
-		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.texture));
+		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.getTexture(entity)));
 		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 0, 0, 0, 1);
 		matrices.pop();
 		super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);

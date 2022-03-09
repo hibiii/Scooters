@@ -1,4 +1,6 @@
 {
 	"entity.scooters.kick_scooter": "Scooter",
-	"item.scooters.kick_scooter": "Scooter"
+	"entity.scooters.electric_scooter": "Electric Scooter",
+	"item.scooters.kick_scooter": "Scooter",
+	"item.scooters.electric_scooter": "Electric Scooter"
 }
