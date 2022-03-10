@@ -9,6 +9,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -139,47 +140,46 @@ public class ScooterEntity extends Entity {
 		this.interpTicks = 10;
 	}
 
-	// ---- Interaction ---- //
-		@Override
-		public ActionResult interact(PlayerEntity player, Hand hand) {
-			if(player.shouldCancelInteraction() || this.hasPassengers()) return ActionResult.PASS;
-			if(this.isTouchingWater()) return ActionResult.PASS;
-			if(!this.world.isClient)
-				return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
-			return ActionResult.SUCCESS;
-		}
+	@Override
+	public ActionResult interact(PlayerEntity player, Hand hand) {
+		if(player.shouldCancelInteraction() || this.hasPassengers()) return ActionResult.PASS;
+		if(this.isTouchingWater()) return ActionResult.PASS;
+		if(!this.world.isClient)
+			return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
+		return ActionResult.SUCCESS;
+	}
 
-		@Override
-		public boolean isPushable() {
-			return true;
-		}
-		@Override
-		public boolean isCollidable() {
-			return false;
-		}
+	@Override
+	public boolean isPushable() {
+		return true;
+	}
+	@Override
+	public boolean isCollidable() {
+		return false;
+	}
 
-		@Override
-		public boolean collides() {
-			return !this.isRemoved();
-		}
+	@Override
+	public boolean collides() {
+		return !this.isRemoved();
+	}
 
-		@Override
-		public Box getVisibilityBoundingBox() {
-			return this.getBoundingBox();
-		}
+	@Override
+	public Box getVisibilityBoundingBox() {
+		return this.getBoundingBox();
+	}
 
-		@Override
-		public boolean damage(DamageSource source, float amount) {
-			if(this.isInvulnerableTo(source)) return false;
-			if(this.world.isClient || this.isRemoved()) return true;
-			this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
-			boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
-			if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
-				this.dropItem(this.item);
-			this.removeAllPassengers();
-			this.discard();
-			return true;
-		}
+	@Override
+	public boolean damage(DamageSource source, float amount) {
+		if(this.isInvulnerableTo(source)) return false;
+		if(this.world.isClient || this.isRemoved()) return true;
+		this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
+		boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
+		if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
+			this.dropItem(this.item);
+		this.removeAllPassengers();
+		this.discard();
+		return true;
+	}
 
 	@Override
 	public double getMountedHeightOffset() {
@@ -197,6 +197,11 @@ public class ScooterEntity extends Entity {
         passenger.setYaw(passenger.getYaw() + g - f);
         passenger.setHeadYaw(passenger.getYaw());
 		super.updatePassengerPosition(passenger);
+	}
+
+	@Override
+	public ItemStack getPickBlockStack() {
+		return this.item.getDefaultStack();
 	}
 
 	@Override

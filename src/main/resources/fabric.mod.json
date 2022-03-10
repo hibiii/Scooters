@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Scooters",
-  "description": "This is an alpha build of the Scooters mod, and is not representative of the quality of the final product. HOWTO: To spawn a scooter, run `/summon scooters:scooter`.",
+  "description": "This is an alpha build of the Scooters mod, and is not representative of the quality of the final product.",
   "authors": [
     "Hibi"
   ],

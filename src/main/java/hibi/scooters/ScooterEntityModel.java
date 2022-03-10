@@ -36,7 +36,7 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 
 		Steering.addChild("Brake_r1", ModelPartBuilder.create().uv(13, 17).cuboid(0.0F, -0.5F, -0.5F, 5.0F, 1.0F, 1.0F, Dilation.NONE), ModelTransform.of(1.0F, -16.0F, 0.0F, 0.0F, 0.1745F, 0.0873F));
 
-		Steering.addChild("Throttle_r1", ModelPartBuilder.create().uv(26,15).cuboid(-0.5F, -1.0F, -0.5F, 1.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.of(-1.5F, 16.5F, 0.75F, 0.3491F, 0.0F, 0.0F));
+		Steering.addChild("Throttle_r1", ModelPartBuilder.create().uv(26,15).cuboid(-0.5F, -1.0F, -0.5F, 1.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.of(-1.5F, -16.5F, 0.75F, 0.3491F, 0.0F, 0.0F));
 
 		return TexturedModelData.of(meshdefinition, 64, 64);
 	}

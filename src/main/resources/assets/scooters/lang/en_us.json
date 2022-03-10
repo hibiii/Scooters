@@ -1,4 +1,5 @@
 {
+	"block.scooters.charging_station": "Charging Station",
 	"entity.scooters.kick_scooter": "Scooter",
 	"entity.scooters.electric_scooter": "Electric Scooter",
 	"item.scooters.kick_scooter": "Scooter",
