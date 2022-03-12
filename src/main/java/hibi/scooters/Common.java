@@ -3,8 +3,10 @@ package hibi.scooters;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -38,6 +40,7 @@ public class Common implements ModInitializer {
 	public static final Item ELECTRIC_SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "electric_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
 
 	public static final DockBlock DOCK_BLOCK = new DockBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+	public static final BlockEntityType<DockBlockEntity> DOCK_BLOCK_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("scooters", "charging_station"), FabricBlockEntityTypeBuilder.create(DockBlockEntity::new, DOCK_BLOCK).build(null));
 
 	@Override
 	public void onInitialize() {

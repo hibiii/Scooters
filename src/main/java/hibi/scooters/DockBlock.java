@@ -3,23 +3,33 @@ package hibi.scooters;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class DockBlock
-extends Block {
+extends BlockWithEntity {
 
 	private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(0f, 0f, 11f, 16f, 16f, 16f);
 	private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(0f, 0f, 0f, 5f, 16f, 16f);
@@ -27,7 +37,7 @@ extends Block {
 	private static final VoxelShape WEST_SHAPE = Block.createCuboidShape(11f, 0f, 0f, 16f, 16f, 16f);
 	public static final BooleanProperty POWERED = Properties.POWERED;
 	public static final BooleanProperty CHARGING = BooleanProperty.of("charging");
-	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
 	public DockBlock(Settings settings) {
 		super(settings);
@@ -59,14 +69,15 @@ extends Block {
 			if(hasPower)
 				world.createAndScheduleBlockTick(pos, this, 4);
 			else
-				world.setBlockState(pos, state.cycle(POWERED), 2);
+				world.setBlockState(pos, state.cycle(POWERED));
 		}
+		DockBlockEntity.validateCharging(state, (ServerWorld)world, pos, (DockBlockEntity)world.getBlockEntity(pos));
 	}
 
 	@Override
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 		if(state.get(POWERED) && !world.isReceivingRedstonePower(pos))
-			world.setBlockState(pos, state.cycle(POWERED), 2);
+			world.setBlockState(pos, state.cycle(POWERED));
 	}
 
 	@Override
@@ -89,4 +100,23 @@ extends Block {
 		return state.rotate(mirror.getRotation(state.get(FACING)));
 	}
 
+	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		return DockBlockEntity.use(state, world, pos, player, hand, hit, (DockBlockEntity)world.getBlockEntity(pos));
+	}
+
+	@Override
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new DockBlockEntity(pos, state);
+	}
+
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		return BlockWithEntity.checkType(type, Common.DOCK_BLOCK_ENTITY_TYPE, DockBlockEntity::tick);
+	}
 }
