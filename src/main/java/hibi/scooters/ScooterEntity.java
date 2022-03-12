@@ -183,7 +183,7 @@ public class ScooterEntity extends Entity {
 
 	@Override
 	public double getMountedHeightOffset() {
-		return 0.5d;
+		return 0.45d;
 	}
 
 	@Override

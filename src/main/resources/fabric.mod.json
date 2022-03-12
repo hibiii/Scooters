@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Scooters",
-  "description": "This is an alpha build of the Scooters mod, and is not representative of the quality of the final product.",
+  "description": "This is a beta build of the Scooters mod, and is not representative of the quality of the final product.",
   "authors": [
     "Hibi"
   ],
