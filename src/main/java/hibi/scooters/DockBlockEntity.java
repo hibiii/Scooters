@@ -14,12 +14,13 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class DockBlockEntity
 extends BlockEntity {
 
-	private static final Box CHARGING_AREA = Box.of(Vec3d.ZERO, 1.0d, 0.2d, 1.0d);
+	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 2d, 0.5d, 2d);
 	private UUID chargee = null;
 
 	public DockBlockEntity(BlockPos pos, BlockState state) {

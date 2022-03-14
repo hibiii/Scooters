@@ -31,10 +31,8 @@ import net.minecraft.world.World;
 public class DockBlock
 extends BlockWithEntity {
 
-	private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(0f, 0f, 11f, 16f, 16f, 16f);
-	private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(0f, 0f, 0f, 5f, 16f, 16f);
-	private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(0f, 0f, 0f, 16f, 16f, 5f);
-	private static final VoxelShape WEST_SHAPE = Block.createCuboidShape(11f, 0f, 0f, 16f, 16f, 16f);
+	private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(2f, 0f, 5f, 14f, 16f, 11f);
+	private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(5f, 0f, 2f, 11f, 16f, 14f);
 	public static final BooleanProperty POWERED = Properties.POWERED;
 	public static final BooleanProperty CHARGING = BooleanProperty.of("charging");
 	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
@@ -50,14 +48,12 @@ extends BlockWithEntity {
 	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		switch(state.get(FACING)) {
 			case EAST:
+			case WEST:
 				return EAST_SHAPE;
 			case NORTH:
-				return NORTH_SHAPE;
-			case WEST:
-				return WEST_SHAPE;
-			default:
 			case SOUTH:
-				return SOUTH_SHAPE;
+			default:
+				return NORTH_SHAPE;
 		}
 	}
 

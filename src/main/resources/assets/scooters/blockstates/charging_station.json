@@ -6,7 +6,10 @@
 		"powered=true,charging=false,facing=south": {
 			"model": "scooters:block/charging_station_powered"
 		},
-		"powered=false,facing=south": {
+		"powered=false,charging=true,facing=south": {
+			"model": "scooters:block/charging_station_connected"
+		},
+		"powered=false,charging=false,facing=south": {
 			"model": "scooters:block/charging_station_off"
 		},
 		"powered=true,charging=true,facing=west": {
@@ -17,7 +20,11 @@
 			"model": "scooters:block/charging_station_powered",
 			"y": 90
 		},
-		"powered=false,facing=west": {
+		"powered=false,charging=true,facing=west": {
+			"model": "scooters:block/charging_station_connected",
+			"y": 90
+		},
+		"powered=false,charging=false,facing=west": {
 			"model": "scooters:block/charging_station_off",
 			"y": 90
 		},
@@ -29,7 +36,11 @@
 			"model": "scooters:block/charging_station_powered",
 			"y": 180
 		},
-		"powered=false,facing=north": {
+		"powered=false,charging=true,facing=north": {
+			"model": "scooters:block/charging_station_connected",
+			"y": 180
+		},
+		"powered=false,charging=false,facing=north": {
 			"model": "scooters:block/charging_station_off",
 			"y": 180
 		},
@@ -41,7 +52,11 @@
 			"model": "scooters:block/charging_station_powered",
 			"y": 270
 		},
-		"powered=false,facing=east": {
+		"powered=false,charging=true,facing=east": {
+			"model": "scooters:block/charging_station_connected",
+			"y": 270
+		},
+		"powered=false,charging=false,facing=east": {
 			"model": "scooters:block/charging_station_off",
 			"y": 270
 		}

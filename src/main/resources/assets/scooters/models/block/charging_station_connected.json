@@ -1,0 +1,9 @@
+{
+	"parent": "scooters:block/template_charging_station",
+	"textures": {
+		"front": "scooters:block/charging_station_front_connected",
+		"back": "scooters:block/charging_station_back",
+		"side": "scooters:block/charging_station_side",
+		"end": "scooters:block/charging_station_end"
+	}
+}

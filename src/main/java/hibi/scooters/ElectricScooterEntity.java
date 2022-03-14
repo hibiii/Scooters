@@ -21,7 +21,7 @@ extends ScooterEntity {
 
 	public ElectricScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
-		this.maxSpeed = 0.6d;
+		this.maxSpeed = 0.66d;
 		this.acceleration = 0.015d;
 		this.brakeForce = 0.88d;
 		this.baseInertia = 0.995d;
@@ -37,6 +37,9 @@ extends ScooterEntity {
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
 			if(this.charging && this.world.getTime() % 20 == 0) {
 				if(!this.checkCharger()) this.detachFromCharger();
+				BlockPos charger = this.dataTracker.get(CHARGER);
+				if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
+					DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
 			}
 		}
 	}
