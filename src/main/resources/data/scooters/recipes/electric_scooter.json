@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"  L",
+		"TSR",
+		"NNR"
+	],
+	"key": {
+		"L": {
+			"item": "minecraft:lever"
+		},
+		"T": {
+			"item": "minecraft:redstone_torch"
+		},
+		"S": {
+			"item": "scooters:kick_scooter"
+		},
+		"R": {
+			"item": "minecraft:redstone"
+		},
+		"N": {
+			"item": "minecraft:netherite_scrap"
+		}
+	},
+	"result": {
+		"item": "scooters:electric_scooter",
+		"count": 1
+	}
+}

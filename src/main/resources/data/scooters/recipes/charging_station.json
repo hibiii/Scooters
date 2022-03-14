@@ -1,0 +1,25 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"RGQ",
+		"SSS"
+	],
+	"key": {
+		"R": {
+			"item": "minecraft:redstone"
+		},
+		"G": {
+			"item": "minecraft:gold_ingot"
+		},
+		"Q": {
+			"item": "minecraft:quartz"
+		},
+		"S": {
+			"item": "minecraft:stone"
+		}
+	},
+	"result": {
+		"item": "scooters:charging_station",
+		"count": 1
+	}
+}

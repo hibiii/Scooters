@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"  W",
+		"I B",
+		"WPW"
+	],
+	"key": {
+		"W": {
+			"tag": "minecraft:wool"
+		},
+		"B": {
+			"item": "minecraft:iron_bars"
+		},
+		"P": {
+			"item": "minecraft:heavy_weighted_pressure_plate"
+		},
+		"I": {
+			"item": "minecraft:iron_ingot"
+		}
+	},
+	"result": {
+		"item": "scooters:kick_scooter",
+		"count": 1
+	}
+}
