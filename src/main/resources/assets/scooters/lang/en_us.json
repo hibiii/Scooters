@@ -2,6 +2,8 @@
 	"block.scooters.charging_station": "Charging Station",
 	"entity.scooters.kick_scooter": "Scooter",
 	"entity.scooters.electric_scooter": "Electric Scooter",
+	"item.scooters.tire": "Tire",
+	"item.scooters.raw_tire": "Raw Tire",
 	"item.scooters.kick_scooter": "Scooter",
 	"item.scooters.electric_scooter": "Electric Scooter"
 }

@@ -39,7 +39,7 @@ public class ScooterEntity extends Entity {
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
-		this.stepHeight = 0.5f;
+		this.stepHeight = 0.6f;
 		this.maxSpeed = 0.4d;
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;

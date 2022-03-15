@@ -1,0 +1,14 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "scooters:item/tire"
+	},
+	"overrides": [
+		{
+			"predicate": {
+				"damage": 1
+			},
+			"model": "scooters:item/flat_tire"
+		}
+	]
+}

@@ -25,7 +25,6 @@ extends ScooterEntity {
 		this.acceleration = 0.015d;
 		this.brakeForce = 0.88d;
 		this.baseInertia = 0.995d;
-		this.stepHeight = 0.7f;
 		this.item = Common.ELECTRIC_SCOOTER_ITEM;
 	}
 	
