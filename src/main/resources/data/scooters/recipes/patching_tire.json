@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"group": "scooters:tire",
+	"ingredients": [
+		{
+			"tag": "minecraft:wool"
+		},
+		{
+			"item": "minecraft:coal_block"
+		},
+		{
+			"item": "scooters:tire"
+		}
+	],
+	"result": {
+		"item": "scooters:raw_tire"
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "scooters:tire",
+	"pattern": [
+		"ABA",
+		"B#B",
+		"ABA"
+	],
+	"key": {
+		"#": {
+			"item": "minecraft:iron_bars"
+		},
+		"B": {
+			"item": "minecraft:coal_block"
+		},
+		"A": {
+			"tag": "minecraft:wool"
+		}
+	},
+	"result": {
+		"item": "scooters:raw_tire"
+	}
+}

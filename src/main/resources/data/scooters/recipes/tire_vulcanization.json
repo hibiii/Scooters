@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:blasting",
+	"group": "scooters:tire",
+	"ingredient": {
+		"item": "scooters:raw_tire"
+	},
+	"result": "scooters:tire",
+	"cookingtime": 300
+}
