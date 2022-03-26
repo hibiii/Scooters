@@ -16,7 +16,7 @@ public class GrindstoneScreenHandlerMixin {
 		method = "updateResult",
 		at = @At(
 			value = "INVOKE",
-			target = "grind(Lnet/minecraft/item/ItemStack;II)Lnet/minecraft/item/ItemStack;"
+			target = "Lnet/minecraft/screen/GrindstoneScreenHandler;grind(Lnet/minecraft/item/ItemStack;II)Lnet/minecraft/item/ItemStack;"
 		)
 	)
 	private void buffGrind(Args args) {
