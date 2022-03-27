@@ -8,12 +8,17 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
@@ -23,7 +28,8 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-public class ScooterEntity extends Entity {
+public class ScooterEntity extends Entity
+implements NamedScreenHandlerFactory {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
@@ -142,8 +148,13 @@ public class ScooterEntity extends Entity {
 
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(player.shouldCancelInteraction() || this.hasPassengers()) return ActionResult.PASS;
+		if(this.hasPassengers()) return ActionResult.PASS;
 		if(this.isTouchingWater()) return ActionResult.PASS;
+		if(player.shouldCancelInteraction()) {
+			if(!this.world.isClient)
+				((ServerPlayerEntity)player).openHandledScreen(this);
+			return ActionResult.success(this.world.isClient);
+		}
 		if(!this.world.isClient)
 			return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
 		return ActionResult.SUCCESS;
@@ -238,5 +249,14 @@ public class ScooterEntity extends Entity {
 	@Override
 	protected void writeCustomDataToNbt(NbtCompound nbt) {
 	}
-	
+
+	@Override
+	public ScreenHandler createMenu(int sid, PlayerInventory pi, PlayerEntity pe) {
+		return new ScooterScreenHandler(sid, pi, this);
+	}
+
+	@Override
+	public Text getDisplayName() {
+		return this.hasCustomName()? this.getCustomName() : this.getDefaultName();
+	}
 }
