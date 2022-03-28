@@ -47,7 +47,7 @@ public class Common implements ModInitializer {
 	public static final Item TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","tire"), new Item(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxDamage(128)));
 	public static final Item RAW_TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","raw_tire"), new Item(new FabricItemSettings().group(ItemGroup.MATERIALS).maxCount(16)));
 
-	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
+	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.BLOCK, new Identifier("scooters", "charging_station"), DOCK_BLOCK);

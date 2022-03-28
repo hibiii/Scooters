@@ -2,6 +2,7 @@ package hibi.scooters;
 
 import java.util.List;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
@@ -13,9 +14,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -29,7 +30,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
 public class ScooterEntity extends Entity
-implements NamedScreenHandlerFactory {
+implements ExtendedScreenHandlerFactory {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
@@ -258,5 +259,10 @@ implements NamedScreenHandlerFactory {
 	@Override
 	public Text getDisplayName() {
 		return this.hasCustomName()? this.getCustomName() : this.getDefaultName();
+	}
+
+	@Override
+	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+		buf.writeInt(this.getId());
 	}
 }
