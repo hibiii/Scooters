@@ -10,9 +10,14 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.InventoryChangedListener;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -30,7 +35,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
 public class ScooterEntity extends Entity
-implements ExtendedScreenHandlerFactory {
+implements ExtendedScreenHandlerFactory,
+InventoryChangedListener {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity;
@@ -42,7 +48,22 @@ implements ExtendedScreenHandlerFactory {
 	protected double acceleration;
 	protected double brakeForce;
 	protected double baseInertia;
+	protected double tireMult;
+
 	protected Item item;
+
+	public boolean frontTire = true;
+	public boolean rearTire = true;
+
+	/**
+	 * <ul>
+	 * <li>Slot 0 - Front Tyre</li>
+	 * <li>Slot 1 - Rear Tyre</li>
+	 * <li>Slot 2 - Charged Battery</li>
+	 * <li>Slot 3 - Discharged Battery</li>
+	 * </ul>
+	 */
+	public SimpleInventory items;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -52,6 +73,8 @@ implements ExtendedScreenHandlerFactory {
 		this.brakeForce = 0.93d;
 		this.baseInertia = 0.98d;
 		this.item = Common.SCOOTER_ITEM;
+		this.items = new SimpleInventory(2);
+		this.items.addListener(this);
 	}
 
 	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, World world, Vec3d pos) {
@@ -104,7 +127,7 @@ implements ExtendedScreenHandlerFactory {
 		double speed = this.getVelocity().multiply(1, 0, 1).length();
 		double inertia = this.baseInertia;
 		if(this.keyW && speed < this.maxSpeed) {
-			speed += this.acceleration;
+			speed += this.acceleration * this.tireMult;
 		}
 		if(this.keyS) {
 			inertia *= this.brakeForce;
@@ -244,11 +267,30 @@ implements ExtendedScreenHandlerFactory {
 	}
 
 	@Override
-	protected void readCustomDataFromNbt(NbtCompound nbt) {		
+	protected void readCustomDataFromNbt(NbtCompound nbt) {
+		if(nbt.contains("TireItems", NbtElement.LIST_TYPE)) {
+			NbtList list = nbt.getList("TireItems", NbtElement.COMPOUND_TYPE);
+			this.items.setStack(0, ItemStack.fromNbt(list.getCompound(0)));
+			this.items.setStack(1, ItemStack.fromNbt(list.getCompound(1)));
+		}
+		this.onInventoryChanged(this.items);
 	}
 
 	@Override
 	protected void writeCustomDataToNbt(NbtCompound nbt) {
+		NbtList tiresNbt = new NbtList();
+		// unrolled loop
+		NbtCompound compound = new NbtCompound();
+		ItemStack is = this.items.getStack(0);
+		if(!is.isEmpty())
+			is.writeNbt(compound);
+		tiresNbt.add(compound);
+		compound = new NbtCompound();
+		is = this.items.getStack(1);
+		if(!is.isEmpty())
+			is.writeNbt(compound);
+		tiresNbt.add(compound);
+		nbt.put("TireItems", tiresNbt);
 	}
 
 	@Override
@@ -264,5 +306,20 @@ implements ExtendedScreenHandlerFactory {
 	@Override
 	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
 		buf.writeInt(this.getId());
+	}
+
+	@Override
+	public void onInventoryChanged(Inventory inv) {
+		if(this.world.isClient) {
+			this.tireMult = 1.0;
+			ItemStack is = inv.getStack(0);
+			this.frontTire = !is.isEmpty();
+			if(!this.frontTire || is.getDamage() == is.getMaxDamage())
+				this.tireMult *= 0.3;
+			is = inv.getStack(1);
+			this.rearTire = !is.isEmpty();
+			if(!this.rearTire || is.getDamage() == is.getMaxDamage())
+				this.tireMult *= 0.3;
+		}
 	}
 }

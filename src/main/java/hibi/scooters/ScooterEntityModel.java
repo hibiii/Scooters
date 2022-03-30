@@ -14,10 +14,14 @@ import net.minecraft.client.util.math.MatrixStack;
 public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 	private final ModelPart Back;
 	private final ModelPart Steering;
+	private final ModelPart rearTire;
+	private final ModelPart frontTire;
 
 	public ScooterEntityModel(ModelPart root) {
 		this.Back = root.getChild("Back");
 		this.Steering = root.getChild("Steering");
+		this.rearTire = root.getChild("rtire");
+		this.frontTire = root.getChild("ftire");
 	}
 
 	public static TexturedModelData model() {
@@ -26,15 +30,19 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 
 		modelPartData.addChild("Back", ModelPartBuilder.create()
 			.uv(0, 0).cuboid(-2.0F, -1.9F, -7.0F, 4.0F, 1.0F, 14.0F, Dilation.NONE) // Platform
-			.uv(0, 17).cuboid(-0.5F, -3.0F, 8.0F, 1.0F, 3.0F, 3.0F, Dilation.NONE)  // Back tire
 			.uv(4, 0).cuboid(-1.0F, -4.0F, 7.0F, 2.0F, 3.0F, 3.0F, Dilation.NONE),  // Tire cover
 		ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
+		modelPartData.addChild("rtire", ModelPartBuilder.create() // Back Tire
+			.uv(0, 17).cuboid(-0.5F, -3.0F, 8.0F, 1.0F, 3.0F, 3.0F, Dilation.NONE), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
+
 		ModelPartData Steering = modelPartData.addChild("Steering", ModelPartBuilder.create()
 			.uv(0, 15).cuboid(-6.0F, -16.75F, 1.25F, 12.0F, 1.0F, 1.0F, Dilation.NONE) // Handle bar
-			.uv(8, 17).cuboid(-0.5F, -3.0F, -4.0F, 1.0F, 3.0F, 3.0F, Dilation.NONE)    // Front tire
 			.uv(4, 6).cuboid(-1.0F, -4.0F, -3.0F, 2.0F, 3.0F, 3.0F, Dilation.NONE),    // Tire cover
 		ModelTransform.pivot(0.0F, 24.0F, -7.0F));
+	
+		modelPartData.addChild("ftire", ModelPartBuilder.create() // Front Tire
+			.uv(8, 17).cuboid(-0.5F, -3.0F, -4.0F, 1.0F, 3.0F, 3.0F, Dilation.NONE),ModelTransform.pivot(0.0F, 24.0F, -7.0F));
 
 		Steering.addChild("Bar", ModelPartBuilder.create()
 			.uv(0, 0).cuboid(-0.5F, -12.5F, -0.5F, 1.0F, 13.0F, 1.0F, Dilation.NONE), // Steering Column
@@ -53,11 +61,15 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 
 	@Override
 	public void setAngles(ScooterEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+		this.rearTire.visible = entity.rearTire;
+		this.frontTire.visible = entity.frontTire;
 	}
 
 	@Override
 	public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
 		Back.render(matrices, vertices, light, overlay);
 		Steering.render(matrices, vertices, light, overlay);
+		frontTire.render(matrices, vertices, light, overlay);
+		rearTire.render(matrices, vertices, light, overlay);
 	}
 }

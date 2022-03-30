@@ -7,6 +7,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -91,5 +92,15 @@ extends ScooterEntity {
 		BlockPos charger = this.dataTracker.get(CHARGER);
 		BlockState cached = this.world.getBlockState(charger);
 		return cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING);
+	}
+
+	@Override
+	protected void writeCustomDataToNbt(NbtCompound nbt) {
+		super.writeCustomDataToNbt(nbt);
+	}
+
+	@Override
+	protected void readCustomDataFromNbt(NbtCompound nbt) {
+		super.readCustomDataFromNbt(nbt);
 	}
 }
