@@ -38,13 +38,14 @@ public class Common implements ModInitializer {
 			.build()
 	);
 
+	public static final Identifier PACKET_INVENTORY_CHANGED = new Identifier("scooters","invchange");
 	public static final Item SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "kick_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
 	public static final Item ELECTRIC_SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "electric_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
 
 	public static final DockBlock DOCK_BLOCK = new DockBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
 	public static final BlockEntityType<DockBlockEntity> DOCK_BLOCK_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("scooters", "charging_station"), FabricBlockEntityTypeBuilder.create(DockBlockEntity::new, DOCK_BLOCK).build(null));
 
-	public static final Item TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","tire"), new Item(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxDamage(128)));
+	public static final Item TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","tire"), new Item(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxDamage(640)));
 	public static final Item RAW_TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","raw_tire"), new Item(new FabricItemSettings().group(ItemGroup.MATERIALS).maxCount(16)));
 
 	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);

@@ -2,6 +2,9 @@ package hibi.scooters;
 
 import java.util.List;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
@@ -24,9 +27,11 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -42,6 +47,7 @@ InventoryChangedListener {
 	protected float yawVelocity;
 	protected int interpTicks;
 	protected double x, y, z;
+	protected double oldx, oldz;
 	protected float yaw;
 
 	protected double maxSpeed;
@@ -75,6 +81,8 @@ InventoryChangedListener {
 		this.item = Common.SCOOTER_ITEM;
 		this.items = new SimpleInventory(2);
 		this.items.addListener(this);
+		this.oldx = this.getX();
+		this.oldz = this.getZ();
 	}
 
 	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, World world, Vec3d pos) {
@@ -109,6 +117,18 @@ InventoryChangedListener {
 			this.move(MovementType.SELF, this.getVelocity());
 		}
 		else {
+			if(!this.world.isClient && this.hasPassengers()) {
+				Entity e = this.getPrimaryPassenger();
+				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative() && this.world.getTime() % 40 == 0) {
+					double displx = this.oldx - this.getX();
+					double displz = this.oldz - this.getZ();
+					double displ = displx * displx + displz * displz;
+					if(displ > 0.001225 && displ < 25) // 0.7 m/s, 500 m/s
+						this.damageTires(false);
+				}
+				this.oldx = this.getX();
+				this.oldz = this.getZ();
+			}
 			this.setVelocity(Vec3d.ZERO);
 		}
 		if(this.hasPassengers() && this.isSubmergedInWater()) {
@@ -125,7 +145,7 @@ InventoryChangedListener {
 
 	protected void drive() {
 		double speed = this.getVelocity().multiply(1, 0, 1).length();
-		double inertia = this.baseInertia;
+		double inertia = this.baseInertia * this.tireMult;
 		if(this.keyW && speed < this.maxSpeed) {
 			speed += this.acceleration * this.tireMult;
 		}
@@ -143,6 +163,9 @@ InventoryChangedListener {
 			MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * inertia,
 			this.getVelocity().y,
 			MathHelper.cos(this.getYaw() * 0.017453293f) * speed * inertia);
+		if(this.world.getTime() % 40 == 0) {
+			System.out.println(inertia + " | " + this.tireMult + " | " + this.world.isClient);
+		}
 	}
 
 	protected void interp() {
@@ -181,6 +204,7 @@ InventoryChangedListener {
 		}
 		if(!this.world.isClient)
 			return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
+		this.onInventoryChanged(this.items);
 		return ActionResult.SUCCESS;
 	}
 
@@ -311,15 +335,56 @@ InventoryChangedListener {
 	@Override
 	public void onInventoryChanged(Inventory inv) {
 		if(this.world.isClient) {
+			this.items = (SimpleInventory) inv;
 			this.tireMult = 1.0;
 			ItemStack is = inv.getStack(0);
 			this.frontTire = !is.isEmpty();
 			if(!this.frontTire || is.getDamage() == is.getMaxDamage())
-				this.tireMult *= 0.3;
+				this.tireMult *= 0.85;
 			is = inv.getStack(1);
 			this.rearTire = !is.isEmpty();
 			if(!this.rearTire || is.getDamage() == is.getMaxDamage())
-				this.tireMult *= 0.3;
+				this.tireMult *= 0.85;
+		}
+	}
+
+	protected void damageTires(boolean abrasive) {
+		ItemStack stack = this.items.getStack(0);
+		int damage = abrasive? 3 : 1;
+		boolean popped = stack.getDamage() == stack.getMaxDamage();
+		boolean markDirty = false;
+		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
+			stack.damage(damage, this.random, null);
+		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
+			markDirty = true;
+			this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.7f);
+		}
+		stack = this.items.getStack(1);
+		popped = stack.getDamage() == stack.getMaxDamage();
+		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
+			stack.damage(damage, this.random, null);
+		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
+			markDirty = true;
+			this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.7f);
+		}
+		if(markDirty)
+			this.updateClientScootersInventory();
+	}
+
+	protected double getTireMult() {
+		return 0;
+	}
+
+	protected void updateClientScootersInventory() {
+		PacketByteBuf buf = PacketByteBufs.create();
+		buf.writeInt(this.getId());
+		List<ItemStack> contents = DefaultedList.ofSize(this.items.size(), ItemStack.EMPTY);
+		for (int i = 0; i < contents.size(); ++i) {
+			contents.set(i, this.items.getStack(i));
+		}
+		buf.writeCollection(contents, PacketByteBuf::writeItemStack);
+		for(ServerPlayerEntity player : PlayerLookup.tracking(this)) {
+			ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
 		}
 	}
 }
