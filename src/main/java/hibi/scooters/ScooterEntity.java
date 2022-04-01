@@ -119,12 +119,14 @@ InventoryChangedListener {
 		else {
 			if(!this.world.isClient && this.hasPassengers()) {
 				Entity e = this.getPrimaryPassenger();
-				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative() && this.world.getTime() % 40 == 0) {
+				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative() && this.world.getTime() % 20 == 0) {
+					boolean abrasive = this.isOnAbrasive();
+					if(!abrasive && this.world.getTime() % 40 == 0) return;
 					double displx = this.oldx - this.getX();
 					double displz = this.oldz - this.getZ();
 					double displ = displx * displx + displz * displz;
 					if(displ > 0.001225 && displ < 25) // 0.7 m/s, 500 m/s
-						this.damageTires(false);
+						this.damageTires(abrasive);
 				}
 				this.oldx = this.getX();
 				this.oldz = this.getZ();
@@ -163,9 +165,6 @@ InventoryChangedListener {
 			MathHelper.sin(-this.getYaw() * 0.017453293f) * speed * inertia,
 			this.getVelocity().y,
 			MathHelper.cos(this.getYaw() * 0.017453293f) * speed * inertia);
-		if(this.world.getTime() % 40 == 0) {
-			System.out.println(inertia + " | " + this.tireMult + " | " + this.world.isClient);
-		}
 	}
 
 	protected void interp() {
@@ -350,7 +349,7 @@ InventoryChangedListener {
 
 	protected void damageTires(boolean abrasive) {
 		ItemStack stack = this.items.getStack(0);
-		int damage = abrasive? 3 : 1;
+		int damage = abrasive? 2 : 1;
 		boolean popped = stack.getDamage() == stack.getMaxDamage();
 		boolean markDirty = false;
 		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
@@ -371,8 +370,8 @@ InventoryChangedListener {
 			this.updateClientScootersInventory();
 	}
 
-	protected double getTireMult() {
-		return 0;
+	protected boolean isOnAbrasive() {
+		return !this.getLandingBlockState().isAir() && this.world.getBlockState(this.getVelocityAffectingPos()).isIn(Common.ABRASIVE_BLOCKS);
 	}
 
 	protected void updateClientScootersInventory() {
