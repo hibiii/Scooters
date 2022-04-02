@@ -61,8 +61,6 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 
 	@Override
 	public void setAngles(ScooterEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.rearTire.visible = entity.rearTire;
-		this.frontTire.visible = entity.frontTire;
 	}
 
 	@Override
@@ -71,5 +69,10 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 		Steering.render(matrices, vertices, light, overlay);
 		frontTire.render(matrices, vertices, light, overlay);
 		rearTire.render(matrices, vertices, light, overlay);
+	}
+
+	public void setTires(boolean front, boolean rear) {
+		frontTire.visible = front;
+		rearTire.visible = rear;
 	}
 }

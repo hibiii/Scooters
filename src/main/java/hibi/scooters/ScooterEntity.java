@@ -96,7 +96,18 @@ InventoryChangedListener {
 
 	@Override
 	public Packet<?> createSpawnPacket() {
-		return new EntitySpawnS2CPacket(this);
+		int tires = 0;
+		if(!this.items.getStack(0).isEmpty()) tires |= 1;
+		if(!this.items.getStack(1).isEmpty()) tires |= 2;
+		return new EntitySpawnS2CPacket(this, tires);
+	}
+
+	@Override
+	public void onSpawnPacket(EntitySpawnS2CPacket packet) {
+		super.onSpawnPacket(packet);
+		int tires = packet.getEntityData();
+		this.frontTire = (tires & 1) == 1;
+		this.rearTire = (tires & 2) == 2;
 	}
 
 	@Override

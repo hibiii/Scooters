@@ -32,8 +32,12 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		matrices.push();
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
 		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f + yaw));
-		matrices.translate(0d, -1.5d, 0d);
+		if(!(entity.frontTire || entity.rearTire))
+			matrices.translate(0d, -1.445d, 0d);
+		else
+			matrices.translate(0d, -1.5d, 0d);
 		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.getTexture(entity)));
+		this.model.setTires(entity.frontTire, entity.rearTire);
 		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 0, 0, 0, 1);
 		matrices.pop();
 		super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
