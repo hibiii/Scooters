@@ -212,9 +212,11 @@ InventoryChangedListener {
 				((ServerPlayerEntity)player).openHandledScreen(this);
 			return ActionResult.success(this.world.isClient);
 		}
-		if(!this.world.isClient)
+		if(!this.world.isClient) {
+			if(this.items.getStack(0).isEmpty() || this.items.getStack(1).isEmpty())
+				return ActionResult.PASS;
 			return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
-		this.onInventoryChanged(this.items);
+		}
 		return ActionResult.SUCCESS;
 	}
 

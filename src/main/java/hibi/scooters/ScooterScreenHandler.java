@@ -36,7 +36,9 @@ extends ScreenHandler {
 
 	@Override
 	public boolean canUse(PlayerEntity player) {
-		return true;
+		if(this.scooter.hasPassengers())
+			return false;
+		return this.scooter.squaredDistanceTo(player) < 64d;
 	}
 
 	private void addScooterSlots(Inventory inventory) {

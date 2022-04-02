@@ -52,7 +52,7 @@ extends ScooterEntity {
 
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(player.shouldCancelInteraction() || this.hasPassengers()) return ActionResult.PASS;
+		if(this.hasPassengers()) return ActionResult.PASS;
 		if(this.charging) {
 			BlockPos charger = this.dataTracker.get(CHARGER);
 			BlockState cached = this.world.getBlockState(charger);
