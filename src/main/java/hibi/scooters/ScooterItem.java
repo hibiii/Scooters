@@ -20,7 +20,7 @@ extends Item {
 		if(context.getSide() == Direction.DOWN)
 			return ActionResult.FAIL;
 		World world = context.getWorld();
-		ScooterEntity scooter = ScooterEntity.create(this.asItem() == Common.ELECTRIC_SCOOTER_ITEM? Common.ELECTRIC_SCOOTER_ENTITY: Common.SCOOTER_ENTITY, context.getWorld(), context.getHitPos());
+		ScooterEntity scooter = ScooterEntity.create(this.asItem() == Common.ELECTRIC_SCOOTER_ITEM? Common.ELECTRIC_SCOOTER_ENTITY: Common.SCOOTER_ENTITY, context);
 		if(!world.isSpaceEmpty(scooter, scooter.getBoundingBox()) || !world.getOtherEntities(scooter, scooter.getBoundingBox()).isEmpty())
 			return ActionResult.FAIL;
 		scooter.setYaw(context.getPlayerYaw());

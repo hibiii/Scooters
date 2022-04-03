@@ -7,6 +7,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -27,6 +28,8 @@ extends ScooterEntity {
 		this.brakeForce = 0.88d;
 		this.baseInertia = 0.995d;
 		this.item = Common.ELECTRIC_SCOOTER_ITEM;
+		this.items = new SimpleInventory(4);
+		this.items.addListener(this);
 	}
 	
 	@Override

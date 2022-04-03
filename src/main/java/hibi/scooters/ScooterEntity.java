@@ -18,6 +18,7 @@ import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -85,12 +86,37 @@ InventoryChangedListener {
 		this.oldz = this.getZ();
 	}
 
-	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, World world, Vec3d pos) {
-		ScooterEntity out = type.create(world);
+	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, ItemUsageContext context) {
+		Vec3d pos = context.getHitPos();
+		ScooterEntity out = type.create(context.getWorld());
 		out.setPosition(pos);
 		out.prevX = pos.x;
 		out.prevY = pos.y;
 		out.prevZ = pos.z;
+		ItemStack stack = context.getStack();
+		if(!stack.hasNbt()) {
+			out.items.setStack(0, Common.TIRE_ITEM.getDefaultStack());
+			out.items.setStack(1, Common.TIRE_ITEM.getDefaultStack());
+		}
+		else {
+			NbtCompound nbt = stack.getNbt();
+			NbtElement reg;
+			if((reg = nbt.get("Tires")) instanceof NbtList) {
+				out.items.setStack(0, ItemStack.fromNbt(((NbtList)reg).getCompound(0)));
+				out.items.setStack(1, ItemStack.fromNbt(((NbtList)reg).getCompound(1)));
+			}
+			if(out instanceof ElectricScooterEntity) {
+				if((reg = nbt.get("Batteries")) instanceof NbtList) {
+					ItemStack charged = ItemStack.fromNbt(((NbtList)reg).getCompound(2));
+					ItemStack discharged = ItemStack.fromNbt(((NbtList)reg).getCompound(3));
+					int maxStack = Math.min(charged.getMaxCount(), discharged.getMaxCount());
+					if(charged.getCount() + discharged.getCount() <= maxStack) {
+						out.items.setStack(2, charged);
+						out.items.setStack(3, charged);
+					}
+				}
+			}
+		}
 		return out;
 	}
 
@@ -215,7 +241,11 @@ InventoryChangedListener {
 		if(!this.world.isClient) {
 			if(this.items.getStack(0).isEmpty() || this.items.getStack(1).isEmpty())
 				return ActionResult.PASS;
-			return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
+			if(player.startRiding(this)) {
+				this.updateClientScootersInventory((ServerPlayerEntity)player);
+				return ActionResult.CONSUME;
+			}
+			return ActionResult.PASS;
 		}
 		return ActionResult.SUCCESS;
 	}
@@ -388,6 +418,18 @@ InventoryChangedListener {
 	}
 
 	protected void updateClientScootersInventory() {
+		PacketByteBuf buf = this.inventoryChangedPacket();
+		for(ServerPlayerEntity player : PlayerLookup.tracking(this)) {
+			ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
+		}
+	}
+
+	protected void updateClientScootersInventory(ServerPlayerEntity player) {
+		PacketByteBuf buf = this.inventoryChangedPacket();
+		ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
+	}
+
+	protected PacketByteBuf inventoryChangedPacket() {
 		PacketByteBuf buf = PacketByteBufs.create();
 		buf.writeInt(this.getId());
 		List<ItemStack> contents = DefaultedList.ofSize(this.items.size(), ItemStack.EMPTY);
@@ -395,8 +437,6 @@ InventoryChangedListener {
 			contents.set(i, this.items.getStack(i));
 		}
 		buf.writeCollection(contents, PacketByteBuf::writeItemStack);
-		for(ServerPlayerEntity player : PlayerLookup.tracking(this)) {
-			ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
-		}
+		return buf;
 	}
 }
