@@ -44,13 +44,14 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 				if(y != 0) {
 					this.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
 				}
-				this.drawTexture(matrices, lmost + 115, tmost + 26,36, 175, 9, 28);
-				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 203, 35, 18);
+				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18);
 			}
 			else {
-				this.drawTexture(matrices, lmost + 115, tmost + 26,36, 175, 9, 28);
 				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
 			}
+			int p = (int) (((ElectricScooterEntity)this.entity).getChargeProgress() * 29);
+			this.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 9, 28);
+			this.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 9, p);
 		}
 		ScooterScreen.drawEntity(lmost + 36, tmost + 60, 22, 110f, -24f, this.entity);
 	}

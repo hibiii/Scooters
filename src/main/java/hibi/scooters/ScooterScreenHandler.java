@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
@@ -15,7 +16,6 @@ extends ScreenHandler {
 	public final int scooterId;
 	public final ScooterEntity scooter;
 	public final boolean electric;
-	private int batteryCount;
 	private Slot chgBty, disBty;
 	
 
@@ -59,45 +59,9 @@ extends ScreenHandler {
 			}
 		});
 		if(this.electric) {
-			this.addSlot(new Slot(inventory, 2, 98, 18){
-				public boolean canInsert(ItemStack stack) {
-					return stack.isOf(Items.POTATO);
-				}
-				@Override
-				public void setStack(ItemStack stack) {
-					ItemStack stack2 = stack.copy();
-					int placed = Math.min(this.getMaxItemCount(), stack.getCount());
-					stack2.setCount(placed);
-					stack.setCount(stack.getCount() - placed);
-					this.inventory.setStack(2, stack2);
-					this.inventory.markDirty();
-					batteryCount = this.getStack().getCount() + disBty.getStack().getCount();
-				}
-				@Override
-				public int getMaxItemCount() {
-					return 64 - batteryCount + this.getStack().getCount();
-				}
-			});
+			this.addSlot(new LinkedSlot(inventory, 2, 98, 18, this.chgBty, Items.POTATO));
 			this.chgBty = this.slots.get(this.slots.size() - 1);
-			this.addSlot(new Slot(inventory, 3, 98, 54){
-				public boolean canInsert(ItemStack stack) {
-					return stack.isOf(Items.POISONOUS_POTATO);
-				}
-				@Override
-				public void setStack(ItemStack stack) {
-					ItemStack stack2 = stack.copy();
-					int placed = Math.min(this.getMaxItemCount(), stack.getCount());
-					stack2.setCount(placed);
-					stack.setCount(stack.getCount() - placed);
-					this.inventory.setStack(3, stack2);
-					this.inventory.markDirty();
-					batteryCount = this.getStack().getCount() + chgBty.getStack().getCount();
-				}
-				@Override
-				public int getMaxItemCount() {
-					return 64 - batteryCount + this.getStack().getCount();
-				}
-			});
+			this.addSlot(new LinkedSlot(inventory, 2, 98, 54, this.disBty, Items.POISONOUS_POTATO));
 			this.disBty = this.slots.get(this.slots.size() - 1);
 		}
 	}
@@ -141,5 +105,35 @@ extends ScreenHandler {
 			}
 		}
 		return itemStack;
+	}
+
+	private class LinkedSlot
+	extends Slot {
+		private static int shared;
+		private final LinkedSlot other;
+		private final Item input;
+		public LinkedSlot(Inventory inventory, int index, int x, int y, Slot other, Item input) {
+			super(inventory, index, x, y);
+			this.other = (LinkedSlot)other;
+			this.input = input;
+		}
+		@Override
+		public boolean canInsert(ItemStack stack) {
+			return stack.isOf(this.input);
+		}
+		@Override
+		public void setStack(ItemStack stack) {
+			ItemStack stack2 = stack.copy();
+			int placed = Math.min(this.getMaxItemCount(), stack.getCount());
+			stack2.setCount(placed);
+			stack.setCount(stack.getCount() - placed);
+			this.inventory.setStack(2, stack2);
+			this.inventory.markDirty();
+			shared = this.getStack().getCount() + this.other.getStack().getCount();
+		}
+		@Override
+		public int getMaxItemCount() {
+			return 64 - shared + this.getStack().getCount();
+		}
 	}
 }

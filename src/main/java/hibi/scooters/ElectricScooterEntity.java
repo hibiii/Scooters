@@ -19,6 +19,7 @@ public class ElectricScooterEntity
 extends ScooterEntity {
 
 	private static final TrackedData<BlockPos> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
+	private static final TrackedData<Float> CHARGE_PROGRESS = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.FLOAT);
 	private boolean charging = false;
 
 	public ElectricScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
@@ -38,11 +39,19 @@ extends ScooterEntity {
 		if(!this.world.isClient) {
 			if(this.submergedInWater)
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
-			if(this.charging && this.world.getTime() % 20 == 0) {
-				if(!this.checkCharger()) this.detachFromCharger();
-				BlockPos charger = this.dataTracker.get(CHARGER);
-				if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
-					DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
+			if(this.charging) {
+				float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
+				chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
+				if(chargeProgress > 1f) {
+					chargeProgress = 0;
+				}
+				this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
+				if(this.world.getTime() % 20 == 0) {
+					if(!this.checkCharger()) this.detachFromCharger();
+					BlockPos charger = this.dataTracker.get(CHARGER);
+					if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
+						DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
+				}
 			}
 		}
 	}
@@ -50,6 +59,7 @@ extends ScooterEntity {
 	@Override
 	protected void initDataTracker() {
 		this.dataTracker.startTracking(CHARGER, null);
+		this.dataTracker.startTracking(CHARGE_PROGRESS, 0f);
 		super.initDataTracker();
 	}
 
@@ -95,6 +105,10 @@ extends ScooterEntity {
 		BlockPos charger = this.dataTracker.get(CHARGER);
 		BlockState cached = this.world.getBlockState(charger);
 		return cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING);
+	}
+
+	public float getChargeProgress() {
+		return this.dataTracker.get(CHARGE_PROGRESS);
 	}
 
 	@Override
