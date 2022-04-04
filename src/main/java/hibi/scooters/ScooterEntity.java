@@ -45,7 +45,7 @@ implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
-	protected float yawVelocity;
+	protected float yawVelocity, yawAccel;
 	protected int interpTicks;
 	protected double x, y, z;
 	protected double oldx, oldz;
@@ -79,6 +79,7 @@ InventoryChangedListener {
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;
 		this.baseInertia = 0.98d;
+		this.yawAccel = 1.2f;
 		this.item = Common.SCOOTER_ITEM;
 		this.items = new SimpleInventory(2);
 		this.items.addListener(this);
@@ -192,10 +193,10 @@ InventoryChangedListener {
 			inertia *= this.brakeForce;
 		}
 		if(this.keyA) {
-			this.yawVelocity -= 1.2f;
+			this.yawVelocity -= this.yawAccel;
 		}
 		if(this.keyD) {
-			this.yawVelocity += 1.2f;
+			this.yawVelocity += this.yawAccel;
 		}
 		this.setYaw(this.getYaw() + this.yawVelocity);
 		this.setVelocity(

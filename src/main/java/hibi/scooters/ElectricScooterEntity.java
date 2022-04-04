@@ -24,10 +24,11 @@ extends ScooterEntity {
 
 	public ElectricScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
-		this.maxSpeed = 0.66d;
-		this.acceleration = 0.015d;
+		this.maxSpeed = 0.7d;
+		this.acceleration = 0.022d;
 		this.brakeForce = 0.88d;
 		this.baseInertia = 0.995d;
+		this.yawAccel = 1.33f;
 		this.item = Common.ELECTRIC_SCOOTER_ITEM;
 		this.items = new SimpleInventory(4);
 		this.items.addListener(this);
