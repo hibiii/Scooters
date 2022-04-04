@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -13,7 +14,10 @@ public class ScooterScreenHandler
 extends ScreenHandler {
 	public final int scooterId;
 	public final ScooterEntity scooter;
-	public ItemStack frontTire, rearTire;
+	public final boolean electric;
+	private int batteryCount;
+	private Slot chgBty, disBty;
+	
 
 	// Client Init
 	public ScooterScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
@@ -21,6 +25,7 @@ extends ScreenHandler {
 		this.scooterId = buf.readInt();
 		MinecraftClient inst = MinecraftClient.getInstance();
 		this.scooter = (ScooterEntity) inst.world.getEntityById(scooterId);
+		this.electric = this.scooter instanceof ElectricScooterEntity;
 		this.addScooterSlots(this.scooter.items);
 		this.addPlayerInventory(playerInventory);
 	}
@@ -30,6 +35,7 @@ extends ScreenHandler {
 		super(Common.SCOOTER_SCREEN_HANDLER, syncId);
 		this.scooter = entity;
 		this.scooterId = entity.getId();
+		this.electric = this.scooter instanceof ElectricScooterEntity;
 		this.addScooterSlots(this.scooter.items);
 		this.addPlayerInventory(playerInventory);
 	}
@@ -52,6 +58,48 @@ extends ScreenHandler {
 				return stack.isOf(Common.TIRE_ITEM);
 			}
 		});
+		if(this.electric) {
+			this.addSlot(new Slot(inventory, 2, 98, 18){
+				public boolean canInsert(ItemStack stack) {
+					return stack.isOf(Items.POTATO);
+				}
+				@Override
+				public void setStack(ItemStack stack) {
+					ItemStack stack2 = stack.copy();
+					int placed = Math.min(this.getMaxItemCount(), stack.getCount());
+					stack2.setCount(placed);
+					stack.setCount(stack.getCount() - placed);
+					this.inventory.setStack(2, stack2);
+					this.inventory.markDirty();
+					batteryCount = this.getStack().getCount() + disBty.getStack().getCount();
+				}
+				@Override
+				public int getMaxItemCount() {
+					return 64 - batteryCount + this.getStack().getCount();
+				}
+			});
+			this.chgBty = this.slots.get(this.slots.size() - 1);
+			this.addSlot(new Slot(inventory, 3, 98, 54){
+				public boolean canInsert(ItemStack stack) {
+					return stack.isOf(Items.POISONOUS_POTATO);
+				}
+				@Override
+				public void setStack(ItemStack stack) {
+					ItemStack stack2 = stack.copy();
+					int placed = Math.min(this.getMaxItemCount(), stack.getCount());
+					stack2.setCount(placed);
+					stack.setCount(stack.getCount() - placed);
+					this.inventory.setStack(3, stack2);
+					this.inventory.markDirty();
+					batteryCount = this.getStack().getCount() + chgBty.getStack().getCount();
+				}
+				@Override
+				public int getMaxItemCount() {
+					return 64 - batteryCount + this.getStack().getCount();
+				}
+			});
+			this.disBty = this.slots.get(this.slots.size() - 1);
+		}
 	}
 
 	private void addPlayerInventory(PlayerInventory pi) {

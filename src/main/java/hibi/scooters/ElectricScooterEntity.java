@@ -56,7 +56,7 @@ extends ScooterEntity {
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
 		if(this.hasPassengers()) return ActionResult.PASS;
-		if(this.charging) {
+		if(this.charging && !player.shouldCancelInteraction()) {
 			BlockPos charger = this.dataTracker.get(CHARGER);
 			BlockState cached = this.world.getBlockState(charger);
 			if(cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING)) {
@@ -88,7 +88,7 @@ extends ScooterEntity {
 	}
 
 	public boolean isCharging() {
-		return this.charging;
+		return this.charging || this.dataTracker.get(CHARGER) != null;
 	}
 
 	public boolean checkCharger() {

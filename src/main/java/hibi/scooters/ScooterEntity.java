@@ -276,10 +276,18 @@ InventoryChangedListener {
 		this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
 		boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
 		if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
-			this.dropItem(this.item);
+			this.dropStack(this.asItemStack());
 		this.removeAllPassengers();
 		this.discard();
 		return true;
+	}
+
+	protected ItemStack asItemStack() {
+		NbtCompound nbt = new NbtCompound();
+		ItemStack out = this.item.getDefaultStack();
+		this.writeCustomDataToNbt(nbt);
+		out.setNbt(nbt);
+		return out;
 	}
 
 	@Override
@@ -302,7 +310,7 @@ InventoryChangedListener {
 
 	@Override
 	public ItemStack getPickBlockStack() {
-		return this.item.getDefaultStack();
+		return this.asItemStack();
 	}
 
 	@Override
@@ -334,8 +342,8 @@ InventoryChangedListener {
 
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
-		if(nbt.contains("TireItems", NbtElement.LIST_TYPE)) {
-			NbtList list = nbt.getList("TireItems", NbtElement.COMPOUND_TYPE);
+		if(nbt.contains("Tires", NbtElement.LIST_TYPE)) {
+			NbtList list = nbt.getList("Tires", NbtElement.COMPOUND_TYPE);
 			this.items.setStack(0, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(1, ItemStack.fromNbt(list.getCompound(1)));
 		}
@@ -356,7 +364,7 @@ InventoryChangedListener {
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
-		nbt.put("TireItems", tiresNbt);
+		nbt.put("Tires", tiresNbt);
 	}
 
 	@Override
