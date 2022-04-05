@@ -5,11 +5,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -24,7 +26,9 @@ extends ScooterEntity {
 
 	private static final TrackedData<BlockPos> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
 	private static final TrackedData<Float> CHARGE_PROGRESS = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.FLOAT);
+	private static final TrackedData<Boolean> CAN_CHARGE = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	private boolean charging = false;
+	private boolean canCharge = false;
 
 	public ElectricScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -45,18 +49,36 @@ extends ScooterEntity {
 			if(this.submergedInWater)
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
 			if(this.charging) {
-				float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
-				chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
-				if(chargeProgress > 1f) {
-					chargeProgress = 0;
+				if(!this.items.getStack(3).isEmpty() && this.canCharge) {
+					float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
+					chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
+					if(chargeProgress > 1f) {
+						chargeProgress = 0f;
+						this.items.getStack(3).decrement(1);
+						ItemStack charged = this.items.getStack(2);
+						if(charged.isEmpty()) {
+							charged = Items.POTATO.getDefaultStack();
+							charged.setCount(1);
+						}
+						else {
+							charged.increment(1);
+						}
+						this.items.setStack(2, charged);
+					}
+					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
-				this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				if(this.world.getTime() % 20 == 0) {
-					if(!this.checkCharger()) this.detachFromCharger();
-					BlockPos charger = this.dataTracker.get(CHARGER);
-					if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
-						DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
+					if(this.checkCharger()) {
+						BlockPos charger = this.dataTracker.get(CHARGER);
+						if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
+							DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
+					}
+					else
+						this.detachFromCharger();
 				}
+			}
+			if(this.items.getStack(3).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) != 0f) {
+				this.dataTracker.set(CHARGE_PROGRESS, 0f);
 			}
 		}
 	}
@@ -65,6 +87,7 @@ extends ScooterEntity {
 	protected void initDataTracker() {
 		this.dataTracker.startTracking(CHARGER, null);
 		this.dataTracker.startTracking(CHARGE_PROGRESS, 0f);
+		this.dataTracker.startTracking(CAN_CHARGE, false);
 		super.initDataTracker();
 	}
 
@@ -92,6 +115,9 @@ extends ScooterEntity {
 			this.removeAllPassengers();
 			this.charging = true;
 			this.dataTracker.set(CHARGER, pos);
+			boolean b = state.get(DockBlock.POWERED);
+			if(b != this.dataTracker.get(CAN_CHARGE))
+				this.dataTracker.set(CAN_CHARGE, b);
 			this.playSound(SoundEvents.BLOCK_TRIPWIRE_ATTACH, 1.0f, 1.0f);
 		}
 	}
@@ -109,11 +135,20 @@ extends ScooterEntity {
 	public boolean checkCharger() {
 		BlockPos charger = this.dataTracker.get(CHARGER);
 		BlockState cached = this.world.getBlockState(charger);
+		boolean b = cached.get(DockBlock.POWERED);
+		if(b != this.canCharge) {
+			this.canCharge = b;
+			this.dataTracker.set(CAN_CHARGE, b);
+		}
 		return cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING);
 	}
 
 	public float getChargeProgress() {
 		return this.dataTracker.get(CHARGE_PROGRESS);
+	}
+
+	public boolean getCanCharge() {
+		return this.dataTracker.get(CAN_CHARGE);
 	}
 
 	@Override

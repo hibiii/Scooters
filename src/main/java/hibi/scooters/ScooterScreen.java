@@ -37,17 +37,20 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
         int tmost = (this.height - this.backgroundHeight) / 2;
         this.drawTexture(matrices, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
 		if(this.electric) {
-			this.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);
-			this.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14);
-			if (((ElectricScooterEntity)this.entity).isCharging()) {
-				int y = (int) (this.entity.world.getTime() % 15);
-				if(y != 0) {
-					this.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
+			this.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);  // Slot
+			this.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14); // Spark background
+			ElectricScooterEntity e = (ElectricScooterEntity)this.entity;
+			if (e.isCharging()) {
+				if(e.getCanCharge()) {
+					int y = (int) (this.entity.world.getTime() % 15);
+					if(y != 0) {
+						this.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y); // Spark foreground
+					}
 				}
-				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18);
+				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18); // Cord and charger
 			}
 			else {
-				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
+				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18); // Charger
 			}
 			int p = (int) (((ElectricScooterEntity)this.entity).getChargeProgress() * 29);
 			this.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 9, 28);
