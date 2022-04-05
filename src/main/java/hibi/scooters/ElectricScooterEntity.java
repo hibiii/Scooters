@@ -7,8 +7,12 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -114,11 +118,34 @@ extends ScooterEntity {
 
 	@Override
 	protected void writeCustomDataToNbt(NbtCompound nbt) {
+		NbtList batteriesNbt = new NbtList();
+		// unrolled loop
+		NbtCompound compound = new NbtCompound();
+		ItemStack is = this.items.getStack(2);
+		if(!is.isEmpty())
+			is.writeNbt(compound);
+		batteriesNbt.add(compound);
+		compound = new NbtCompound();
+		is = this.items.getStack(3);
+		if(!is.isEmpty())
+			is.writeNbt(compound);
+		batteriesNbt.add(compound);
+		nbt.put("Batteries", batteriesNbt);
 		super.writeCustomDataToNbt(nbt);
 	}
 
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
+		if(nbt.contains("Batteries", NbtElement.LIST_TYPE)) {
+			NbtList list = nbt.getList("Batteries", NbtElement.COMPOUND_TYPE);
+			this.items.setStack(2, ItemStack.fromNbt(list.getCompound(0)));
+			this.items.setStack(3, ItemStack.fromNbt(list.getCompound(1)));
+		}
 		super.readCustomDataFromNbt(nbt);
+	}
+
+	@Override
+	public void onInventoryChanged(Inventory inv) {
+		super.onInventoryChanged(inv);
 	}
 }

@@ -16,7 +16,6 @@ extends ScreenHandler {
 	public final int scooterId;
 	public final ScooterEntity scooter;
 	public final boolean electric;
-	private Slot chgBty, disBty;
 	
 
 	// Client Init
@@ -59,10 +58,12 @@ extends ScreenHandler {
 			}
 		});
 		if(this.electric) {
-			this.addSlot(new LinkedSlot(inventory, 2, 98, 18, this.chgBty, Items.POTATO));
-			this.chgBty = this.slots.get(this.slots.size() - 1);
-			this.addSlot(new LinkedSlot(inventory, 2, 98, 54, this.disBty, Items.POISONOUS_POTATO));
-			this.disBty = this.slots.get(this.slots.size() - 1);
+			LinkedSlot a = new LinkedSlot(inventory, 2, 98, 18, Items.POTATO);
+			LinkedSlot b = new LinkedSlot(inventory, 3, 98, 54, Items.POISONOUS_POTATO);
+			a.linkWith(b);
+			b.linkWith(a);
+			this.addSlot(a);
+			this.addSlot(b);
 		}
 	}
 
@@ -95,6 +96,10 @@ extends ScreenHandler {
 					return ItemStack.EMPTY;
 				else if(this.getSlot(1).canInsert(itemStack2) && !this.getSlot(1).hasStack() && !this.insertItem(itemStack2, 1, 2, false))
 					return ItemStack.EMPTY;
+				else if(this.getSlot(2).canInsert(itemStack2) && !this.getSlot(2).hasStack() && !this.insertItem(itemStack2, 2, 3, false))
+					return ItemStack.EMPTY;
+				else if(this.getSlot(3).canInsert(itemStack2) && !this.getSlot(3).hasStack() && !this.insertItem(itemStack2, 3, 4, false))
+					return ItemStack.EMPTY;
 				else
 					return ItemStack.EMPTY;
 			}
@@ -109,31 +114,22 @@ extends ScreenHandler {
 
 	private class LinkedSlot
 	extends Slot {
-		private static int shared;
-		private final LinkedSlot other;
+		private LinkedSlot other;
 		private final Item input;
-		public LinkedSlot(Inventory inventory, int index, int x, int y, Slot other, Item input) {
+		public LinkedSlot(Inventory inventory, int index, int x, int y, Item input) {
 			super(inventory, index, x, y);
-			this.other = (LinkedSlot)other;
 			this.input = input;
+		}
+		public void linkWith(Slot slot) {
+			this.other = (LinkedSlot)slot;
 		}
 		@Override
 		public boolean canInsert(ItemStack stack) {
 			return stack.isOf(this.input);
 		}
 		@Override
-		public void setStack(ItemStack stack) {
-			ItemStack stack2 = stack.copy();
-			int placed = Math.min(this.getMaxItemCount(), stack.getCount());
-			stack2.setCount(placed);
-			stack.setCount(stack.getCount() - placed);
-			this.inventory.setStack(2, stack2);
-			this.inventory.markDirty();
-			shared = this.getStack().getCount() + this.other.getStack().getCount();
-		}
-		@Override
 		public int getMaxItemCount() {
-			return 64 - shared + this.getStack().getCount();
+			return 64 - this.other.getStack().getCount();
 		}
 	}
 }
