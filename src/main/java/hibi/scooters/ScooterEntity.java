@@ -100,23 +100,7 @@ InventoryChangedListener {
 			out.items.setStack(1, Common.TIRE_ITEM.getDefaultStack());
 		}
 		else {
-			NbtCompound nbt = stack.getNbt();
-			NbtElement reg;
-			if((reg = nbt.get("Tires")) instanceof NbtList) {
-				out.items.setStack(0, ItemStack.fromNbt(((NbtList)reg).getCompound(0)));
-				out.items.setStack(1, ItemStack.fromNbt(((NbtList)reg).getCompound(1)));
-			}
-			if(out instanceof ElectricScooterEntity) {
-				if((reg = nbt.get("Batteries")) instanceof NbtList) {
-					ItemStack charged = ItemStack.fromNbt(((NbtList)reg).getCompound(2));
-					ItemStack discharged = ItemStack.fromNbt(((NbtList)reg).getCompound(3));
-					int maxStack = Math.min(charged.getMaxCount(), discharged.getMaxCount());
-					if(charged.getCount() + discharged.getCount() <= maxStack) {
-						out.items.setStack(2, charged);
-						out.items.setStack(3, charged);
-					}
-				}
-			}
+			out.readCustomDataFromNbt(stack.getNbt());
 		}
 		return out;
 	}

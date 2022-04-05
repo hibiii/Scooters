@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -46,24 +45,17 @@ extends ScooterEntity {
 	public void tick() {
 		super.tick();
 		if(!this.world.isClient) {
-			if(this.submergedInWater)
+			if(this.submergedInWater) {
+				this.dischageItem(64);
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
+			}
 			if(this.charging) {
 				if(!this.items.getStack(3).isEmpty() && this.canCharge) {
 					float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
 					chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
 					if(chargeProgress > 1f) {
 						chargeProgress = 0f;
-						this.items.getStack(3).decrement(1);
-						ItemStack charged = this.items.getStack(2);
-						if(charged.isEmpty()) {
-							charged = Items.POTATO.getDefaultStack();
-							charged.setCount(1);
-						}
-						else {
-							charged.increment(1);
-						}
-						this.items.setStack(2, charged);
+						this.chargeItem(1);
 					}
 					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
@@ -182,5 +174,33 @@ extends ScooterEntity {
 	@Override
 	public void onInventoryChanged(Inventory inv) {
 		super.onInventoryChanged(inv);
+	}
+
+	private void chargeItem(int amount) {
+		ItemStack discharged = this.items.getStack(3);
+		ItemStack charged = this.items.getStack(2);
+		if(charged.isEmpty()) {
+			charged = Items.POTATO.getDefaultStack();
+			charged.setCount(Math.min(amount, discharged.getCount()));
+		}
+		else {
+			charged.increment(Math.min(amount, discharged.getCount()));
+		}
+		discharged.decrement(amount);
+		this.items.setStack(2, charged);
+	}
+
+	private void dischageItem(int amount) {
+		ItemStack charged = this.items.getStack(2);
+		ItemStack discharged = this.items.getStack(3);
+		if(discharged.isEmpty()) {
+			discharged = Items.POISONOUS_POTATO.getDefaultStack();
+			discharged.setCount(Math.min(amount, charged.getCount()));
+		}
+		else {
+			discharged.increment(Math.min(amount, charged.getCount()));
+		}
+		charged.decrement(amount);
+		this.items.setStack(3, discharged);
 	}
 }

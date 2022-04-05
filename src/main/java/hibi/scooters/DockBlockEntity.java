@@ -34,9 +34,11 @@ extends BlockEntity {
 	}
 
 	public static ActionResult use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, DockBlockEntity that) {
+		if(world.isClient)
+			return ActionResult.success(true);
 		if(that.isCharging()) {
 			detachScooter(state, world, pos, that);
-			return ActionResult.success(world.isClient);
+			return ActionResult.CONSUME;
 		}
 		boolean succeeded = false;
 		for (Entity entity : world.getOtherEntities(null, CHARGING_AREA.offset(pos))) {
@@ -47,7 +49,7 @@ extends BlockEntity {
 			succeeded = true;
 			break;
 		}
-		return succeeded ? ActionResult.success(world.isClient): ActionResult.PASS;
+		return succeeded ? ActionResult.CONSUME: ActionResult.PASS;
 	}
 
 	public static void validateCharging(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
