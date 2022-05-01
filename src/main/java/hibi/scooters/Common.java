@@ -1,5 +1,7 @@
 package hibi.scooters;
 
+import hibi.scooters.recipes.ElectricScooterRecipe;
+import hibi.scooters.recipes.KickScooterRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -15,6 +17,8 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -53,6 +57,9 @@ public class Common implements ModInitializer {
 	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
 
 	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier("scooters", "abrasive"));
+
+	public static final SpecialRecipeSerializer<KickScooterRecipe> SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:kick_scooter_craft", new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new));
+	public static final SpecialRecipeSerializer<ElectricScooterRecipe> ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:electric_scooter_craft", new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new));
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.BLOCK, new Identifier("scooters", "charging_station"), DOCK_BLOCK);
