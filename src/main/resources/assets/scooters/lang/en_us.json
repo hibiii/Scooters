@@ -5,5 +5,9 @@
 	"item.scooters.tire": "Tire",
 	"item.scooters.raw_tire": "Raw Tire",
 	"item.scooters.kick_scooter": "Scooter",
-	"item.scooters.electric_scooter": "Electric Scooter"
+	"item.scooters.electric_scooter": "Electric Scooter",
+	"subtitles.entity.scooter.roll": "Scooter rolls",
+	"subtitles.entity.scooter.tire_pop": "Tire explodes",
+	"subtitles.scooters.charger.connect": "Charger connected",
+	"subtitles.scooters.charger.disconnect": "Charger disconnected"
 }

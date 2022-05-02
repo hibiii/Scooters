@@ -20,6 +20,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -60,9 +61,18 @@ public class Common implements ModInitializer {
 
 	public static final SpecialRecipeSerializer<KickScooterRecipe> SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:kick_scooter_craft", new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new));
 	public static final SpecialRecipeSerializer<ElectricScooterRecipe> ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:electric_scooter_craft", new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new));
+	
+	public static final SoundEvent SCOOTER_ROLLING = new SoundEvent(new Identifier("scooters", "entity.roll"));
+	public static final SoundEvent SCOOTER_TIRE_POP = new SoundEvent(new Identifier("scooters", "entity.tire_pop"));
+	public static final SoundEvent CHARGER_CONNECT = new SoundEvent(new Identifier("scooters", "charger.connect"));
+	public static final SoundEvent CHARGER_DISCONNECT = new SoundEvent(new Identifier("scooters", "charger.disconnect"));
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.BLOCK, new Identifier("scooters", "charging_station"), DOCK_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier("scooters", "charging_station"), new BlockItem(DOCK_BLOCK, new FabricItemSettings().group(ItemGroup.TRANSPORTATION)));
+		Registry.register(Registry.SOUND_EVENT, SCOOTER_ROLLING.getId(), SCOOTER_ROLLING);
+		Registry.register(Registry.SOUND_EVENT, SCOOTER_TIRE_POP.getId(), SCOOTER_TIRE_POP);
+		Registry.register(Registry.SOUND_EVENT, CHARGER_CONNECT.getId(), CHARGER_CONNECT);
+		Registry.register(Registry.SOUND_EVENT, CHARGER_DISCONNECT.getId(), CHARGER_DISCONNECT);
 	}
 }

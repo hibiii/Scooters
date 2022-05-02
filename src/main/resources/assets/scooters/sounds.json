@@ -1,0 +1,35 @@
+{
+	"entity.roll": {
+		"subtitle": "subtitles.entity.scooter.roll",
+		"sounds": [
+			"scooters:roll1",
+			"scooters:roll2",
+			"scooters:roll3",
+			"scooters:roll4",
+			"scooters:roll5",
+			"scooters:roll6",
+			"scooters:roll7",
+			"scooters:roll8"
+		]
+	},
+	"entity.tire_pop": {
+		"subtitle": "subtitles.entity.scooter.tire_pop",
+		"sounds": [
+			"scooters:tire_pop1",
+			"scooters:tire_pop2",
+			"scooters:tire_pop3"
+		]
+	},
+	"charger.connect": {
+		"subtitle": "subtitles.scooters.charger.connect",
+		"sounds": [
+			"minecraft:random/click"
+		]
+	},
+	"charger.disconnect": {
+		"subtitle": "subtitles.scooters.charger.disconnect",
+		"sounds": [
+			"minecraft:random/pop"
+		]
+	}
+}

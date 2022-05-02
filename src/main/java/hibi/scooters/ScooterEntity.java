@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
@@ -28,11 +29,11 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -300,7 +301,12 @@ InventoryChangedListener {
 
 	@Override
 	protected MoveEffect getMoveEffect() {
-		return MoveEffect.EVENTS;
+		return MoveEffect.ALL;
+	}
+
+	@Override
+	protected void playStepSound(BlockPos pos, BlockState state) {
+		this.playSound(Common.SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat(0.1f));
 	}
 	
 	@Override
@@ -392,7 +398,7 @@ InventoryChangedListener {
 			stack.damage(damage, this.random, null);
 		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
 			markDirty = true;
-			this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.7f);
+			this.playSound(Common.SCOOTER_TIRE_POP, 0.7f, 1.5f);
 		}
 		stack = this.items.getStack(1);
 		popped = stack.getDamage() == stack.getMaxDamage();
@@ -400,7 +406,7 @@ InventoryChangedListener {
 			stack.damage(damage, this.random, null);
 		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
 			markDirty = true;
-			this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.7f);
+			this.playSound(Common.SCOOTER_TIRE_POP, 1.0f, 0.7f);
 		}
 		if(markDirty)
 			this.updateClientScootersInventory();

@@ -14,7 +14,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -97,6 +96,11 @@ extends ScooterEntity {
 		return super.interact(player, hand);
 	}
 
+	@Override
+	protected void playStepSound(BlockPos pos, BlockState state) {
+		this.playSound(Common.SCOOTER_ROLLING, 0.75f, 0.75f);
+	}
+
 	public boolean chargingAt(BlockPos pos) {
 		return this.dataTracker.get(CHARGER) == pos;
 	}
@@ -110,14 +114,14 @@ extends ScooterEntity {
 			boolean b = state.get(DockBlock.POWERED);
 			if(b != this.dataTracker.get(CAN_CHARGE))
 				this.dataTracker.set(CAN_CHARGE, b);
-			this.playSound(SoundEvents.BLOCK_TRIPWIRE_ATTACH, 1.0f, 1.0f);
+			this.playSound(Common.CHARGER_CONNECT, 1.0f, 1.0f);
 		}
 	}
 
 	public void detachFromCharger() {
 		this.charging = false;
 		this.dataTracker.set(CHARGER, null);
-		this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
+		this.playSound(Common.CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
 
 	public boolean isCharging() {
