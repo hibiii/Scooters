@@ -1,6 +1,9 @@
 package hibi.scooters;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -14,8 +17,11 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -178,6 +184,12 @@ extends ScooterEntity {
 	@Override
 	public void onInventoryChanged(Inventory inv) {
 		super.onInventoryChanged(inv);
+		if(this.items.getStack(2).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) < 0f) {
+			this.acceleration = 0d;
+		}
+		else {
+			this.acceleration = 0.022d;
+		}
 	}
 
 	private void chargeItem(int amount) {
@@ -206,5 +218,48 @@ extends ScooterEntity {
 		}
 		charged.decrement(amount);
 		this.items.setStack(3, discharged);
+	}
+
+	@Override
+	public void setInputs(boolean forward, boolean back, boolean left, boolean right) {
+		if(forward != this.keyW) {
+			this.sendThrottlePacket(forward);
+		}
+		super.setInputs(forward, back, left, right);
+	}
+
+	@Override
+	protected void wearTear(double displ) {
+		this.damageTires(displ);
+		if(this.keyW) {
+			float charge = this.dataTracker.get(CHARGE_PROGRESS);
+			charge -= 1f/90f;
+			if(charge <= 0f) {
+				if(!this.items.getStack(2).isEmpty()) {
+					charge = 1f;
+					this.dischageItem(1);
+				}
+				else {
+					this.updateClientScootersInventory();
+				}
+			}
+			this.dataTracker.set(CHARGE_PROGRESS, charge);
+		}
+	}
+	
+	protected void sendThrottlePacket(boolean throttle) {
+		if(!this.world.isClient) return;
+		PacketByteBuf buf = PacketByteBufs.create();
+		buf.writeInt(this.getId());
+		buf.writeBoolean(throttle);
+		ClientPlayNetworking.send(new Identifier("scooters", "esctup"), buf);
+	}
+
+	public static void updateThrottle(ServerWorld world, PacketByteBuf buf) {
+		int id = buf.readInt();
+		Entity e = world.getEntityById(id);
+		if(e instanceof ElectricScooterEntity) {
+			((ElectricScooterEntity)e).keyW = buf.readBoolean();
+		}
 	}
 }

@@ -4,6 +4,7 @@ import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -74,5 +75,8 @@ public class Common implements ModInitializer {
 		Registry.register(Registry.SOUND_EVENT, SCOOTER_TIRE_POP.getId(), SCOOTER_TIRE_POP);
 		Registry.register(Registry.SOUND_EVENT, CHARGER_CONNECT.getId(), CHARGER_CONNECT);
 		Registry.register(Registry.SOUND_EVENT, CHARGER_DISCONNECT.getId(), CHARGER_DISCONNECT);
+		ServerPlayNetworking.registerGlobalReceiver(new Identifier("scooters", "esctup"), (server, player, handler, buf, responseSender) -> {
+			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
+		});
 	}
 }

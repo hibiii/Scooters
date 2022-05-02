@@ -142,14 +142,11 @@ InventoryChangedListener {
 		else {
 			if(!this.world.isClient && this.hasPassengers()) {
 				Entity e = this.getPrimaryPassenger();
-				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative() && this.world.getTime() % 20 == 0) {
-					boolean abrasive = this.isOnAbrasive();
-					if(!abrasive && this.world.getTime() % 40 == 0) return;
+				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative()) {
 					double displx = this.oldx - this.getX();
 					double displz = this.oldz - this.getZ();
 					double displ = displx * displx + displz * displz;
-					if(displ > 0.001225 && displ < 25) // 0.7 m/s, 500 m/s
-						this.damageTires(abrasive);
+					this.wearTear(displ);
 				}
 				this.oldx = this.getX();
 				this.oldz = this.getZ();
@@ -389,7 +386,17 @@ InventoryChangedListener {
 		}
 	}
 
-	protected void damageTires(boolean abrasive) {
+	protected void wearTear(double displ) {
+		this.damageTires(displ);
+		ServerPlayerEntity p = (ServerPlayerEntity) this.getPrimaryPassenger();
+		p.addExhaustion(0.0028f);
+	}
+
+	protected void damageTires(double displ) {
+		if(displ < 0.001225 || displ > 25) return;
+		if(this.world.getTime() % 20 != 0) return;
+		boolean abrasive = this.isOnAbrasive();
+		if(!abrasive && this.world.getTime() % 40 == 0) return;
 		ItemStack stack = this.items.getStack(0);
 		int damage = abrasive? 2 : 1;
 		boolean popped = stack.getDamage() == stack.getMaxDamage();

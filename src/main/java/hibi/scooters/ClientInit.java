@@ -29,7 +29,6 @@ public class ClientInit implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(Common.PACKET_INVENTORY_CHANGED, (client, handler, buf, responseSender) -> {
 			int id = buf.readInt();
 			ScooterEntity scoot = (ScooterEntity)client.world.getEntityById(id);
-			assert scoot == client.world.getEntityById(id);
 			if(scoot == null) return;
 			List<ItemStack> contents = buf.readCollection(s -> new ArrayList<ItemStack>(s), PacketByteBuf::readItemStack);
 			client.execute(()->{
