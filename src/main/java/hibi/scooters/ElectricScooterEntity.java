@@ -40,6 +40,7 @@ extends ScooterEntity {
 		this.acceleration = 0.022d;
 		this.brakeForce = 0.88d;
 		this.baseInertia = 0.995d;
+		this.coastInertia = 0.9991d;
 		this.yawAccel = 1.33f;
 		this.item = Common.ELECTRIC_SCOOTER_ITEM;
 		this.items = new SimpleInventory(4);

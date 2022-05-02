@@ -56,6 +56,7 @@ InventoryChangedListener {
 	protected double acceleration;
 	protected double brakeForce;
 	protected double baseInertia;
+	protected double coastInertia;
 	protected double tireMult;
 
 	protected Item item;
@@ -80,6 +81,7 @@ InventoryChangedListener {
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;
 		this.baseInertia = 0.98d;
+		this.coastInertia = 0.986d;
 		this.yawAccel = 1.2f;
 		this.item = Common.SCOOTER_ITEM;
 		this.items = new SimpleInventory(2);
@@ -167,12 +169,16 @@ InventoryChangedListener {
 
 	protected void drive() {
 		double speed = this.getVelocity().multiply(1, 0, 1).length();
-		double inertia = this.baseInertia * this.tireMult;
-		if(this.keyW && speed < this.maxSpeed) {
-			speed += this.acceleration * this.tireMult;
-		}
+		double inertia = this.tireMult;
 		if(this.keyS) {
-			inertia *= this.brakeForce;
+			inertia *= this.brakeForce * this.baseInertia;
+		}
+		else if(this.keyW && speed < this.maxSpeed) {
+			speed += this.acceleration * this.tireMult;
+			inertia *= this.baseInertia;
+		}
+		else {
+			inertia *= this.coastInertia;
 		}
 		if(this.keyA) {
 			this.yawVelocity -= this.yawAccel;
