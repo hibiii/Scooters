@@ -53,8 +53,8 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18); // Charger
 			}
 			int p = (int) (((ElectricScooterEntity)this.entity).getChargeProgress() * 29);
-			this.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 9, 28);
-			this.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 9, p);
+			this.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 10, 28);
+			this.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 10, p);
 		}
 		ScooterScreen.drawEntity(lmost + 36, tmost + 60, 22, 110f, -24f, this.entity);
 	}
