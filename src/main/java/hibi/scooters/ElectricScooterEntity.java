@@ -3,6 +3,7 @@ package hibi.scooters;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtFloat;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
@@ -169,6 +171,14 @@ extends ScooterEntity {
 			is.writeNbt(compound);
 		batteriesNbt.add(compound);
 		nbt.put("Batteries", batteriesNbt);
+		NbtFloat prog = NbtFloat.of(this.dataTracker.get(CHARGE_PROGRESS));
+		nbt.put("ChargeProgress", prog);
+		BlockPos chargerPos = this.dataTracker.get(CHARGER);
+		if(chargerPos != null) {
+			nbt.putInt("ChargerX", chargerPos.getX());
+			nbt.putInt("ChargerY", chargerPos.getY());
+			nbt.putInt("ChargerZ", chargerPos.getZ());
+		}
 		super.writeCustomDataToNbt(nbt);
 	}
 
@@ -178,6 +188,16 @@ extends ScooterEntity {
 			NbtList list = nbt.getList("Batteries", NbtElement.COMPOUND_TYPE);
 			this.items.setStack(2, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(3, ItemStack.fromNbt(list.getCompound(1)));
+		}
+		if(nbt.contains("ChargeProgress", NbtElement.FLOAT_TYPE)) {
+			this.dataTracker.set(CHARGE_PROGRESS, nbt.getFloat("ChargeProgress"));
+		}
+		if(nbt.contains("ChargerX") && nbt.contains("ChargerY" ) && nbt.contains("ChargerZ")) {
+			BlockPos charger = new BlockPos(nbt.getInt("ChargerX"), nbt.getInt("ChargerY"), nbt.getInt("ChargerZ"));
+			BlockEntity be = this.world.getBlockEntity(charger);
+			if(be instanceof DockBlockEntity) {
+				DockBlockEntity.attachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)be, this);
+			}
 		}
 		super.readCustomDataFromNbt(nbt);
 	}
