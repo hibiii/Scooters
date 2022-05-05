@@ -9,5 +9,7 @@
 	"subtitles.entity.scooter.roll": "Scooter rolls",
 	"subtitles.entity.scooter.tire_pop": "Tire explodes",
 	"subtitles.scooters.charger.connect": "Charger connected",
-	"subtitles.scooters.charger.disconnect": "Charger disconnected"
+	"subtitles.scooters.charger.disconnect": "Charger disconnected",
+	"modmenu.descriptionTranslation.scooters": "This mod adds two-wheeled stand-up scooters to the game, push scooters and electric ones. Designed to compliment the vanilla game, this mod has no settings that can be set.",
+	"modmenu.summaryTranslation.scooters": "Miners need mobility too"
 }

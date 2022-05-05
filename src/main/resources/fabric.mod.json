@@ -4,12 +4,14 @@
   "version": "${version}",
 
   "name": "Scooters",
-  "description": "This is a beta build of the Scooters mod, and is not representative of the quality of the final product.",
+  "description": "This mod adds two-wheeled stand-up scooters to the game, push scooters and electric ones. Designed to compliment the vanilla game, this mod has no settings that can be set.",
   "authors": [
     "Hibi"
   ],
   "contact": {
-    "sources": "https://github.com/Hibiii/Scooters"
+    "homepage": "https://hibiscus.pet/mods/scooters",
+    "sources": "https://github.com/Hibiii/Scooters",
+    "issues": "https://github.com/Hibiii/Scooters/issues"
   },
 
   "license": "Unlicense",
@@ -27,11 +29,18 @@
   "mixins": [
     "scooters.mixin.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.13.3",
     "fabric": "*",
     "minecraft": ">=1.18.2",
     "java": ">=17"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.github_releases": "https://github.com/Hibiii/Scooters/releases/",
+        "modmenu.discord": "https://discord.gg/Zef3c27dN2"
+      }
+    }
   }
 }
