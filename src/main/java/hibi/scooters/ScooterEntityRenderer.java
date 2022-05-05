@@ -58,22 +58,22 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 					VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(RenderLayer.getLineStrip());
 					MatrixStack.Entry entry2 = matrices.peek();
 					// unrolled loop
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.0f, 0.1f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.1f, 0.2f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.2f, 0.3f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.3f, 0.4f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.4f, 0.5f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.5f, 0.6f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.6f, 0.7f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.7f, 0.8f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.8f, 0.9f);
-					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.9f, 1.0f);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.0f, 0.1f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.1f, 0.2f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.2f, 0.3f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.3f, 0.4f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.4f, 0.5f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.5f, 0.6f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.6f, 0.7f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.7f, 0.8f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.8f, 0.9f, light);
+					ScooterEntityRenderer.renderChagingCable(u, v, w, vertexConsumer2, entry2, 0.9f, 1.0f, light);
 				}
 			}
 		}
 	}
 
-	private static void renderChagingCable(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry matrices, float segmentStart, float segmentEnd) {
+	private static void renderChagingCable(float x, float y, float z, VertexConsumer buffer, MatrixStack.Entry matrices, float segmentStart, float segmentEnd, int q) {
 		float f = x * segmentStart;
 		float g = y * (segmentStart * segmentStart + segmentStart) * 0.5f + 0.1f;
 		float h = z * segmentStart;
@@ -81,6 +81,6 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		float j = y * (segmentEnd * segmentEnd + segmentEnd) * 0.5f + 0.1f - g;
 		float k = z * segmentEnd - h;
 		float l = MathHelper.sqrt(i * i + j * j + k * k);
-		buffer.vertex(matrices.getPositionMatrix(), f , g, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i /= l, j /= l, k /= l).next();
+		buffer.vertex(matrices.getPositionMatrix(), f , g, h).color(20, 20, 20, 255).normal(matrices.getNormalMatrix(), i /= l, j /= l, k /= l).light(q).next();
 	}
 }

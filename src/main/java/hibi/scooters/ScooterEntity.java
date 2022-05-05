@@ -275,6 +275,9 @@ InventoryChangedListener {
 		NbtCompound nbt = new NbtCompound();
 		ItemStack out = this.item.getDefaultStack();
 		this.writeCustomDataToNbt(nbt);
+		nbt.remove("ChargerX");
+		nbt.remove("ChargerY");
+		nbt.remove("ChargerZ");
 		out.setNbt(nbt);
 		return out;
 	}
@@ -395,12 +398,13 @@ InventoryChangedListener {
 	protected void wearTear(double displ) {
 		this.damageTires(displ);
 		ServerPlayerEntity p = (ServerPlayerEntity) this.getPrimaryPassenger();
-		p.addExhaustion(0.0028f);
+		p.addExhaustion(0.028f * (float)displ);
 	}
 
 	protected void damageTires(double displ) {
 		if(displ < 0.001225 || displ > 25) return;
 		if(this.world.getTime() % 20 != 0) return;
+		if(!this.onGround) return;
 		boolean abrasive = this.isOnAbrasive();
 		if(!abrasive && this.world.getTime() % 40 == 0) return;
 		ItemStack stack = this.items.getStack(0);

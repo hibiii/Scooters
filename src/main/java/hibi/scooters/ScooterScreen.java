@@ -11,8 +11,10 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
@@ -36,8 +38,17 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
         int lmost = (this.width - this.backgroundWidth) / 2;
         int tmost = (this.height - this.backgroundHeight) / 2;
         this.drawTexture(matrices, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		DefaultedList<Slot> slots = this.getScreenHandler().slots;
+		if(!slots.get(0).hasStack())
+			this.drawTexture(matrices, lmost + 61, tmost + 35, 0, 166, 18, 18);
+		if(!slots.get(1).hasStack())
+			this.drawTexture(matrices, lmost + 61, tmost + 53, 0, 166, 18, 18);
 		if(this.electric) {
-			this.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);  // Slot
+			this.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);  // Slots
+			if(!slots.get(2).hasStack())
+				this.drawTexture(matrices, lmost + 97, tmost + 17, 0, 184, 18, 18);
+			if(!slots.get(3).hasStack())
+				this.drawTexture(matrices, lmost + 97, tmost + 53, 0, 202, 18, 18);
 			this.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14); // Spark background
 			ElectricScooterEntity e = (ElectricScooterEntity)this.entity;
 			if (e.isCharging()) {

@@ -205,7 +205,7 @@ extends ScooterEntity {
 	@Override
 	public void onInventoryChanged(Inventory inv) {
 		super.onInventoryChanged(inv);
-		if(this.items.getStack(2).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) < 0f) {
+		if(this.items.getStack(2).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) <= 0f) {
 			this.acceleration = 0d;
 		}
 		else {

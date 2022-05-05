@@ -49,7 +49,7 @@ extends BlockEntity {
 			succeeded = true;
 			break;
 		}
-		return succeeded ? ActionResult.CONSUME: ActionResult.PASS;
+		return succeeded ? ActionResult.CONSUME: ActionResult.FAIL;
 	}
 
 	public static void validateCharging(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
