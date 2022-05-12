@@ -21,6 +21,7 @@ public class DockBlockEntity
 extends BlockEntity {
 
 	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 2d, 0.5d, 2d);
+	// TODO Use network ID as that's much faster than willy-nilly UUIDs
 	private UUID chargee = null;
 
 	public DockBlockEntity(BlockPos pos, BlockState state) {
@@ -29,6 +30,7 @@ extends BlockEntity {
 
 	public static void tick(World world, BlockPos pos, BlockState state, DockBlockEntity that) {
 		if(world.isClient) return;
+		// TODO Optimize this so it doesn't waste precious server CPU cycles
 		if(((ServerWorld)world).getEntity(that.chargee) == null)
 			detachScooter(state, world, pos, that);
 	}
@@ -36,10 +38,13 @@ extends BlockEntity {
 	public static ActionResult use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, DockBlockEntity that) {
 		if(world.isClient)
 			return ActionResult.success(true);
+
+		// Detach an e-scooter if there's one connected to it.
 		if(that.isCharging()) {
 			detachScooter(state, world, pos, that);
 			return ActionResult.CONSUME;
 		}
+
 		boolean succeeded = false;
 		for (Entity entity : world.getOtherEntities(null, CHARGING_AREA.offset(pos))) {
 			if(!(entity instanceof ElectricScooterEntity)) continue;
@@ -52,6 +57,10 @@ extends BlockEntity {
 		return succeeded ? ActionResult.CONSUME: ActionResult.FAIL;
 	}
 
+	/**
+	 * Checks if a charger is actually charging something.
+	 * Detaching is also handled here in case of discontinuity.
+	 */
 	public static void validateCharging(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
 		if(world.isClient) return;
 		Entity e = ((ServerWorld)world).getEntity(that.chargee);
@@ -67,6 +76,10 @@ extends BlockEntity {
 		}
 	}
 
+	/**
+	 * Detach the e-scooter connected to this charger.
+	 * Detaching should be made here, but it's perfectly okay to do on the scooter, as there are provisions for discontinuity.
+	 */
 	public static void detachScooter(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
 		if(world.isClient) return;
 		validateCharging(state, world, pos, that);
@@ -79,11 +92,18 @@ extends BlockEntity {
 		}
 	}
 
+	/**
+	 * Attach an e-scooter to a charger.
+	 * Attaching <b>must<b> be done here.
+	 */
 	public static void attachScooter(BlockState state, World world, BlockPos pos, DockBlockEntity that, ElectricScooterEntity entity) {
 		if(world.isClient) return;
+
+		// Sanity checks
 		validateCharging(state, world, pos, that);
 		if(that.isCharging()) return;
 		if(entity.isCharging()) return;
+
 		entity.attachToCharher(pos);
 		that.chargee = entity.getUuid();
 		world.setBlockState(pos, state.with(DockBlock.CHARGING, true));

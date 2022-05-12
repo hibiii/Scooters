@@ -1,5 +1,8 @@
 package hibi.scooters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
 import net.fabricmc.api.ModInitializer;
@@ -26,7 +29,11 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+// TODO public static finalize all Identifiers
+// TODO Organize this mess
 public class Common implements ModInitializer {
+
+	public static final Logger LOGGER = LoggerFactory.getLogger("scooters");
 
 	public static final EntityType<ScooterEntity> SCOOTER_ENTITY = Registry.register(
 		Registry.ENTITY_TYPE,

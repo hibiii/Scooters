@@ -26,14 +26,24 @@ public class ClientInit implements ClientModInitializer {
 		EntityRendererRegistry.register(Common.SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		EntityRendererRegistry.register(Common.ELECTRIC_SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		ScreenRegistry.register(Common.SCOOTER_SCREEN_HANDLER, ScooterScreen::new);
+
+		// Register Scooter Inventory Changed Packet
 		ClientPlayNetworking.registerGlobalReceiver(Common.PACKET_INVENTORY_CHANGED, (client, handler, buf, responseSender) -> {
+			// Silently drop the packet if the scooter wasn't found
 			int id = buf.readInt();
 			ScooterEntity scoot = (ScooterEntity)client.world.getEntityById(id);
 			if(scoot == null) return;
+
+			// Assume the server isn't malicious and the scooter inventory 
 			List<ItemStack> contents = buf.readCollection(s -> new ArrayList<ItemStack>(s), PacketByteBuf::readItemStack);
 			client.execute(()->{
-				for (int i = 0; i < scoot.items.size(); i++) {
-					scoot.items.setStack(i, contents.get(i));
+				try {
+					for (int i = 0; i < scoot.items.size(); i++) {
+						scoot.items.setStack(i, contents.get(i));
+					}
+				}
+				catch (IndexOutOfBoundsException e) {
+					Common.LOGGER.warn("Received inventory packet with bad size for entity id {}", id);
 				}
 				scoot.onInventoryChanged(scoot.items);
 			});

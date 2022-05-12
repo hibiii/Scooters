@@ -23,12 +23,16 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public boolean matches(CraftingInventory inv, World w) {
+		// The anchor is the bottomost row because it's the same flipped
 		if(!(
 			INPUT[6].test(inv.getStack(6)) &&
 			INPUT[7].test(inv.getStack(7)) &&
 			INPUT[8].test(inv.getStack(8))))
 			return false;
+
 		boolean flip = this.isFlipped(inv);
+		
+		// Check the other two rows
 		for (int j = 0; j < 2; j++) {
 			for (int i = 0; i < 3; i++) {
 				if(!INPUT[j * 3 + i].test(inv.getStack(flip? j * 3 + 2 - i : j * 3 + i)))
@@ -43,13 +47,14 @@ extends SpecialCraftingRecipe {
 		ItemStack iout = this.getOutput();
 		boolean flip = this.isFlipped(inv);
 		NbtList tires = new NbtList();
-		// unrolled loop
-		NbtCompound compound = new NbtCompound();
-		inv.getStack(flip? 6: 8).writeNbt(compound);
-		tires.add(compound);
-		compound = new NbtCompound();
-		inv.getStack(flip? 8: 6).writeNbt(compound);
-		tires.add(compound);
+		// Unrolled loop
+			NbtCompound compound = new NbtCompound();
+			inv.getStack(flip? 6: 8).writeNbt(compound);
+			tires.add(compound);
+		// --- //
+			compound = new NbtCompound();
+			inv.getStack(flip? 8: 6).writeNbt(compound);
+			tires.add(compound);
 		NbtCompound nbtout = new NbtCompound();
 		nbtout.put("Tires", tires);
 		iout.setNbt(nbtout);

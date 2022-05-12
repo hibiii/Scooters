@@ -64,6 +64,7 @@ InventoryChangedListener {
 	public boolean frontTire = true;
 	public boolean rearTire = true;
 
+	// TODO Add public static final ints instead of using magic numbers
 	/**
 	 * <ul>
 	 * <li>Slot 0 - Front Tyre</li>
@@ -90,6 +91,10 @@ InventoryChangedListener {
 		this.oldz = this.getZ();
 	}
 
+	/**
+	 * Used by the scooter item to spawn a scooter entity.
+	 * Defaults the inventory to two unenchant undamaged tires if there's no NBT.
+	 */
 	public static ScooterEntity create(EntityType<? extends ScooterEntity> type, ItemUsageContext context) {
 		Vec3d pos = context.getHitPos();
 		ScooterEntity out = type.create(context.getWorld());
@@ -99,6 +104,7 @@ InventoryChangedListener {
 		out.prevZ = pos.z;
 		ItemStack stack = context.getStack();
 		if(!stack.hasNbt()) {
+			// TODO Potatoes from using an item in creative
 			out.items.setStack(0, Common.TIRE_ITEM.getDefaultStack());
 			out.items.setStack(1, Common.TIRE_ITEM.getDefaultStack());
 		}
@@ -108,14 +114,24 @@ InventoryChangedListener {
 		return out;
 	}
 
+	/**
+	 * Creates a spawn packet from a scooter.
+	 * The entity data is used to keep the visuals synchronized, and is encoded bitwise.
+	 */
 	@Override
 	public Packet<?> createSpawnPacket() {
 		int tires = 0;
+		// Bit 0 is used for displaying the front tire
 		if(!this.items.getStack(0).isEmpty()) tires |= 1;
+		// Bit 1 is used for displaying the rear tire
 		if(!this.items.getStack(1).isEmpty()) tires |= 2;
 		return new EntitySpawnS2CPacket(this, tires);
 	}
 
+	/**
+	 * Populates a scooter with data from a spawn packet using the entity data.
+	 * See {@code createSpawnPacket} for info on the entity data.
+	 */
 	@Override
 	public void onSpawnPacket(EntitySpawnS2CPacket packet) {
 		super.onSpawnPacket(packet);
@@ -129,6 +145,7 @@ InventoryChangedListener {
 		this.yawVelocity *= 0.8f;
 		super.tick();
 		this.interp();
+
 		if(this.isLogicalSideForUpdatingMovement()) {
 			if(this.world.isClient) {
 				this.drive();
@@ -137,6 +154,7 @@ InventoryChangedListener {
 				this.setVelocity(this.getVelocity().add(0, -0.04, 0));
 			}
 			if(!this.hasPassengers()){
+				// Add resistance to pushing the thing around
 				this.setVelocity(this.getVelocity().multiply(0.7, 1, 0.7));
 			}
 			this.move(MovementType.SELF, this.getVelocity());
@@ -153,12 +171,16 @@ InventoryChangedListener {
 				this.oldx = this.getX();
 				this.oldz = this.getZ();
 			}
+			// Assures the scooter doesn't slide around desynchronizedly
 			this.setVelocity(Vec3d.ZERO);
 		}
+		// Enforce scooters not being ridable underwater
 		if(this.hasPassengers() && this.isSubmergedInWater()) {
 			this.removeAllPassengers();
 		}
 		this.checkBlockCollision();
+
+		// Generic pushing code
 		List<Entity> others = this.world.getOtherEntities(this, this.getBoundingBox(), EntityPredicates.canBePushedBy(this));
 		if(!others.isEmpty()) {
 			for (Entity e : others) {
@@ -167,6 +189,7 @@ InventoryChangedListener {
 		}
 	}
 
+	// More details on the technical reference
 	protected void drive() {
 		double speed = this.getVelocity().multiply(1, 0, 1).length();
 		double inertia = this.tireMult;
@@ -193,13 +216,20 @@ InventoryChangedListener {
 			MathHelper.cos(this.getYaw() * 0.017453293f) * speed * inertia);
 	}
 
+	/**
+	 * Used to smooth movement clientside.
+	 */
 	protected void interp() {
+		// Don't do any interp if we're the commanding side
 		if(this.isLogicalSideForUpdatingMovement()) {
 			this.interpTicks = 0;
 			this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
 			return;
 		}
+
 		if(this.interpTicks <= 0) return;
+
+		// Proper interp logic
 		double xoff = this.getX() + (this.x - this.getX()) / (double)this.interpTicks;
         double yoff = this.getY() + (this.y - this.getY()) / (double)this.interpTicks;
         double zoff = this.getZ() + (this.z - this.getZ()) / (double)this.interpTicks;
@@ -222,15 +252,20 @@ InventoryChangedListener {
 	public ActionResult interact(PlayerEntity player, Hand hand) {
 		if(this.hasPassengers()) return ActionResult.PASS;
 		if(this.isTouchingWater()) return ActionResult.PASS;
+
+		// If the player is sneaking then open the GUI
 		if(player.shouldCancelInteraction()) {
 			if(!this.world.isClient)
 				((ServerPlayerEntity)player).openHandledScreen(this);
 			return ActionResult.success(this.world.isClient);
 		}
+
 		if(!this.world.isClient) {
+			// Prevent the player from riding the scooter if there's at least a tire missing
 			if(this.items.getStack(0).isEmpty() || this.items.getStack(1).isEmpty())
 				return ActionResult.PASS;
 			if(player.startRiding(this)) {
+				// Update the rider so it's aware of the state of the tires
 				this.updateClientScootersInventory((ServerPlayerEntity)player);
 				return ActionResult.CONSUME;
 			}
@@ -262,11 +297,15 @@ InventoryChangedListener {
 	public boolean damage(DamageSource source, float amount) {
 		if(this.isInvulnerableTo(source)) return false;
 		if(this.world.isClient || this.isRemoved()) return true;
-		this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
+		
+		// Don't do drops if the player is in creative mode, or their inventory will get cluttered
 		boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
 		if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
 			this.dropStack(this.asItemStack());
+		
+		// Dump the rider if there's any
 		this.removeAllPassengers();
+		this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
 		this.discard();
 		return true;
 	}
@@ -275,6 +314,7 @@ InventoryChangedListener {
 		NbtCompound nbt = new NbtCompound();
 		ItemStack out = this.item.getDefaultStack();
 		this.writeCustomDataToNbt(nbt);
+		// TODO Move to ElectricScooterEntity
 		nbt.remove("ChargerX");
 		nbt.remove("ChargerY");
 		nbt.remove("ChargerZ");
@@ -287,6 +327,11 @@ InventoryChangedListener {
 		return 0.45d;
 	}
 
+	/**
+	 * Limit and wrap the yaw of the player's head so they can't look entirely backwards.
+	 * The code here effectively reflects that of {@link net.minecraft.entity.vehicle.BoatEntity BoatEntity}'s.
+	 * @param passenger The current passenger.
+	 */
 	@Override
 	public void updatePassengerPosition(Entity passenger) {
 		if(!this.hasPassenger(passenger)) return;
@@ -302,6 +347,7 @@ InventoryChangedListener {
 
 	@Override
 	public ItemStack getPickBlockStack() {
+		// Get the item WITH the nbt so it's easy to carry around in creative.
 		return this.asItemStack();
 	}
 
@@ -321,6 +367,14 @@ InventoryChangedListener {
 		return list.isEmpty() ? null : list.get(0);
 	}
 
+	/**
+	 * Update the scooter on the state of the controls of the rider.
+	 * This must be called to pass the player's inputs through to the vehicle so it actually has any effect.
+	 * @param forward
+	 * @param back
+	 * @param left
+	 * @param right
+	 */
 	public void setInputs(boolean forward, boolean back, boolean left, boolean right) {
 		this.keyW = forward;
 		this.keyA = left;
@@ -337,6 +391,10 @@ InventoryChangedListener {
 	protected void initDataTracker() {
 	}
 
+	/**
+	 * Populates {@code this} from an NBT.
+	 * @param nbt The NBT data to read from.
+	 */
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
 		if(nbt.contains("Tires", NbtElement.LIST_TYPE)) {
@@ -344,23 +402,37 @@ InventoryChangedListener {
 			this.items.setStack(0, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(1, ItemStack.fromNbt(list.getCompound(1)));
 		}
+		// TODO Check if this onInventoryChanged actually has any effect whatsoever
 		this.onInventoryChanged(this.items);
 	}
 
+	/**
+	 * <p>
+	 *   The NBT for a normal, kick scooter is the following:
+	 * </p>
+	 * <ul>
+	 *   <li>{@code Tires}, {@link ItemStack}[2]</li>
+	 * </ul>
+	 * <hr>
+	 * @param nbt The NBT data to write into.
+	 */
 	@Override
 	protected void writeCustomDataToNbt(NbtCompound nbt) {
 		NbtList tiresNbt = new NbtList();
+
 		// unrolled loop
 		NbtCompound compound = new NbtCompound();
 		ItemStack is = this.items.getStack(0);
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
+		// --- //
 		compound = new NbtCompound();
 		is = this.items.getStack(1);
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
+
 		nbt.put("Tires", tiresNbt);
 	}
 
@@ -379,34 +451,52 @@ InventoryChangedListener {
 		buf.writeInt(this.getId());
 	}
 
+	/**
+	 * Update a client scooter on their inventory, called in the callback registered in {@link ClientInit}.onInitializeClient.
+	 * Updating a scooter's inventory is done so the visuals of the tires, the handling characteristics, and even the charge in an electric sctooter are synchronized.
+	 * @param inv The inventory decoded from the packet.
+	 */
 	@Override
 	public void onInventoryChanged(Inventory inv) {
-		if(this.world.isClient) {
-			this.items = (SimpleInventory) inv;
-			this.tireMult = 1.0;
-			ItemStack is = inv.getStack(0);
-			this.frontTire = !is.isEmpty();
-			if(!this.frontTire || is.getDamage() == is.getMaxDamage())
-				this.tireMult *= 0.85;
-			is = inv.getStack(1);
-			this.rearTire = !is.isEmpty();
-			if(!this.rearTire || is.getDamage() == is.getMaxDamage())
-				this.tireMult *= 0.85;
-		}
+		if(!this.world.isClient) return;
+		this.items = (SimpleInventory) inv;
+		this.tireMult = 1.0;
+		// Unrolled loop
+		ItemStack is = inv.getStack(0);
+		this.frontTire = !is.isEmpty();
+		if(!this.frontTire || is.getDamage() == is.getMaxDamage())
+			this.tireMult *= 0.85;
+		is = inv.getStack(1);
+		this.rearTire = !is.isEmpty();
+		if(!this.rearTire || is.getDamage() == is.getMaxDamage())
+			this.tireMult *= 0.85;
 	}
 
+	/**
+	 * Cause a tick's worth of wear and tear on a scooter and its components, and also the rider.
+	 * @param displ The displacement in a tick, squared.
+	 */
 	protected void wearTear(double displ) {
 		this.damageTires(displ);
 		ServerPlayerEntity p = (ServerPlayerEntity) this.getPrimaryPassenger();
 		p.addExhaustion(0.028f * (float)displ);
 	}
 
+	/**
+	 * Cause a tick's worth of wear and damage to the tires.
+	 * @param displ
+	 */
+	// TODO Modulo with the network id so every 20th or 40th tick isn't saturated with tire damaging
 	protected void damageTires(double displ) {
-		if(displ < 0.001225 || displ > 25) return;
+		if(displ < 0.001225 || displ > 25) return; // 2.5km/h 0.7 m/s (nudging) < displacement < 360 km/h 100 m/s (possible desync)
 		if(this.world.getTime() % 20 != 0) return;
 		if(!this.onGround) return;
+	
+		// Cause less damage if the scooter is on a nice surface
 		boolean abrasive = this.isOnAbrasive();
 		if(!abrasive && this.world.getTime() % 40 == 0) return;
+	
+		// Unrolled loop
 		ItemStack stack = this.items.getStack(0);
 		int damage = abrasive? 2 : 1;
 		boolean popped = stack.getDamage() == stack.getMaxDamage();
@@ -417,6 +507,7 @@ InventoryChangedListener {
 			markDirty = true;
 			this.playSound(Common.SCOOTER_TIRE_POP, 0.7f, 1.5f);
 		}
+		// --- //
 		stack = this.items.getStack(1);
 		popped = stack.getDamage() == stack.getMaxDamage();
 		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
@@ -425,14 +516,24 @@ InventoryChangedListener {
 			markDirty = true;
 			this.playSound(Common.SCOOTER_TIRE_POP, 1.0f, 0.7f);
 		}
+
+		// Update clients if any of the tires are popped
 		if(markDirty)
 			this.updateClientScootersInventory();
 	}
 
+	/**
+	 * Checks if the scooter is on a block that's not nice to the tires.
+	 * @return {@code true} if the scooter is on a block in {@code #scooters:abrasive}, {@code false} otherwise.
+	 */
 	protected boolean isOnAbrasive() {
 		return !this.getLandingBlockState().isAir() && this.world.getBlockState(this.getVelocityAffectingPos()).isIn(Common.ABRASIVE_BLOCKS);
 	}
 
+	/**
+	 * Update <i>all</i> players within tracking range of the scooter with its inventory contents.
+	 * This is done so the visuals and also the handling characteristics are synced properly between the server, and clients.
+	 */
 	protected void updateClientScootersInventory() {
 		PacketByteBuf buf = this.inventoryChangedPacket();
 		for(ServerPlayerEntity player : PlayerLookup.tracking(this)) {
@@ -440,11 +541,20 @@ InventoryChangedListener {
 		}
 	}
 
+	/**
+	 * Update <i>only</i> the client of the specified player with the inventory.
+	 * This is done so to prevent a bug where the tires are popped but the scooter still rides fine.
+	 * @param player The player to update about the inventory.
+	 */
 	protected void updateClientScootersInventory(ServerPlayerEntity player) {
 		PacketByteBuf buf = this.inventoryChangedPacket();
 		ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
 	}
 
+	/**
+	 * Create a packet with the inventory data for a scooter, but not send it.
+	 * @return A {@link PacketByteBuf} with the inventory of the scooter.
+	 */
 	protected PacketByteBuf inventoryChangedPacket() {
 		PacketByteBuf buf = PacketByteBufs.create();
 		buf.writeInt(this.getId());

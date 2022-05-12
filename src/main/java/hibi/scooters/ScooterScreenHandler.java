@@ -41,24 +41,29 @@ extends ScreenHandler {
 
 	@Override
 	public boolean canUse(PlayerEntity player) {
+		// Prevent multiplayer shenanigans
 		if(this.scooter.hasPassengers())
 			return false;
 		return this.scooter.squaredDistanceTo(player) < 64d;
 	}
 
 	private void addScooterSlots(Inventory inventory) {
+		// Front Tire
 		this.addSlot(new Slot(inventory, 0, 62, 36){
 			public boolean canInsert(ItemStack stack) {
 				return stack.isOf(Common.TIRE_ITEM);
 			}
 		});
+		// Rear Tire
 		this.addSlot(new Slot(inventory, 1, 62, 54){
 			public boolean canInsert(ItemStack stack) {
 				return stack.isOf(Common.TIRE_ITEM);
 			}
 		});
 		if(this.electric) {
+			// Charged Batteries
 			LinkedSlot a = new LinkedSlot(inventory, 2, 98, 18, Items.POTATO);
+			// Discharged Batteries
 			LinkedSlot b = new LinkedSlot(inventory, 3, 98, 54, Items.POISONOUS_POTATO);
 			a.linkWith(b);
 			b.linkWith(a);
@@ -67,6 +72,7 @@ extends ScreenHandler {
 		}
 	}
 
+	// Standard method of adding the player inventory
 	private void addPlayerInventory(PlayerInventory pi) {
 		int k = 0;
 		for (k = 0; k < 3; ++k) {
@@ -87,17 +93,24 @@ extends ScreenHandler {
 			ItemStack itemStack2 = slot.getStack();
 			itemStack = itemStack2.copy();
 			int size = this.scooter.items.size();
+
+			// Scooter Inventory -> Player Inventory
 			if (index < size) {
 				if(!this.insertItem(itemStack2, size, this.slots.size(), true))
 					return ItemStack.EMPTY;
 			}
+			// Player Inventory -> Scooter Inventory
 			else {
+				// Front Tire
 				if(this.getSlot(0).canInsert(itemStack2) && !this.getSlot(0).hasStack() && !this.insertItem(itemStack2, 0, 1, false))
 					return ItemStack.EMPTY;
+				// Rear Tire
 				else if(this.getSlot(1).canInsert(itemStack2) && !this.getSlot(1).hasStack() && !this.insertItem(itemStack2, 1, 2, false))
 					return ItemStack.EMPTY;
+				// Charged Batteries
 				else if(this.getSlot(2).canInsert(itemStack2) && !this.getSlot(2).hasStack() && !this.insertItem(itemStack2, 2, 3, false))
 					return ItemStack.EMPTY;
+				// Discharged Batteries
 				else if(this.getSlot(3).canInsert(itemStack2) && !this.getSlot(3).hasStack() && !this.insertItem(itemStack2, 3, 4, false))
 					return ItemStack.EMPTY;
 				else
@@ -112,6 +125,10 @@ extends ScreenHandler {
 		return itemStack;
 	}
 
+	/**
+	 * Specialized slot class for the unique case that is the battery slots in the scooter.
+	 * Linked slots only work in pairs, and they must be linked with {@code linkWith()} after they're created.
+	 */
 	private class LinkedSlot
 	extends Slot {
 		private LinkedSlot other;

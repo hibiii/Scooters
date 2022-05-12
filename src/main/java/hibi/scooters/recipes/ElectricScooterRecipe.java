@@ -19,7 +19,12 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public boolean matches(CraftingInventory inv, World w) {
+		// The scooter in the middle is the anchor
+		// (Not applicable now because we're discarding inventories sizeof != 3x3)
+
 		boolean flip = this.isFlipped(inv);
+
+		// Simple row-wise test
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if(!INPUT[i * 3 + j].test(inv.getStack(flip? i * 3 + 2 - j: i * 3 + j)))

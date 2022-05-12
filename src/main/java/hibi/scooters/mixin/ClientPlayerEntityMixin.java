@@ -33,8 +33,10 @@ public abstract class ClientPlayerEntityMixin extends Entity {
 	private void tickRiding(CallbackInfo info) {
 		Entity vehicle = this.getVehicle();
 		if(vehicle instanceof ScooterEntity) {
+
+			// This mixin is required to actually pass the player's inputs (there is no standard way for vehicles to be aware of player inputs).
 			((ScooterEntity)vehicle).setInputs(this.input.pressingForward, this.input.pressingBack, this.input.pressingLeft, this.input.pressingRight);
-			this.riding = vehicle.getVelocity().lengthSquared() > 0.0009d; // 0.03d^2
+			this.riding = vehicle.getVelocity().lengthSquared() > 0.0009d; // 0.6 m/s 2.1 km/h
 		}
 	}
 }

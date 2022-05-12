@@ -19,15 +19,21 @@ extends Item {
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		if(context.getSide() == Direction.DOWN)
 			return ActionResult.FAIL;
+		
+		// Attempt to create a scooter entity
 		World world = context.getWorld();
 		ScooterEntity scooter = ScooterEntity.create(this.asItem() == Common.ELECTRIC_SCOOTER_ITEM? Common.ELECTRIC_SCOOTER_ENTITY: Common.SCOOTER_ENTITY, context);
 		if(!world.isSpaceEmpty(scooter, scooter.getBoundingBox()) || !world.getOtherEntities(scooter, scooter.getBoundingBox()).isEmpty())
 			return ActionResult.FAIL;
-		scooter.setYaw(context.getPlayerYaw());
+
+		// Actually spawn the scooter if it's successful
 		if(world instanceof ServerWorld) {
 			world.spawnEntity(scooter);
 			world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, scooter);
 		}
+
+		// Smaller niceties
+		scooter.setYaw(context.getPlayerYaw());
 		context.getStack().decrement(1);
 		return ActionResult.success(world.isClient);
 	}

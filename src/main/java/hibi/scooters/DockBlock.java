@@ -31,6 +31,7 @@ import net.minecraft.world.World;
 public class DockBlock
 extends BlockWithEntity {
 
+	// TODO Rename to north-south and east-west
 	private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(2f, 0f, 5f, 14f, 16f, 11f);
 	private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(5f, 0f, 2f, 11f, 16f, 14f);
 	public static final BooleanProperty POWERED = Properties.POWERED;
@@ -60,6 +61,7 @@ extends BlockWithEntity {
 	@Override
 	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
 		if(world.isClient) return;
+
 		boolean hasPower = state.get(POWERED);
 		if(hasPower != world.isReceivingRedstonePower(pos)) {
 			if(hasPower)
@@ -67,6 +69,7 @@ extends BlockWithEntity {
 			else
 				world.setBlockState(pos, state.cycle(POWERED));
 		}
+		
 		DockBlockEntity.validateCharging(state, (ServerWorld)world, pos, (DockBlockEntity)world.getBlockEntity(pos));
 	}
 

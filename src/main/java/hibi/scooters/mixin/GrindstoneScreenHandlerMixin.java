@@ -22,9 +22,13 @@ public class GrindstoneScreenHandlerMixin {
 	private void buffGrind(Args args) {
 		ItemStack item = args.get(0);
 		if(!item.isOf(Common.TIRE_ITEM)) return;
+
+		// Add 25% durability bonus instead of merely 5%, buff the grindstone because it is wheel-shaped
 		int damage = args.get(1);
+		// TODO Update for increased tire durability
 		damage -= 37;
 		if(damage < 0) damage = 0;
+
 		args.set(1, damage);
 	}
 }
