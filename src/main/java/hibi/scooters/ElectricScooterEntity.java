@@ -23,10 +23,10 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+// TODO public static finalize NBT keys
 // TODO Optimize charge progress accesses
 public class ElectricScooterEntity
 extends ScooterEntity {
@@ -58,7 +58,7 @@ extends ScooterEntity {
 		if(!this.world.isClient) {
 			// Short circuit the batteries and discharge them isntantaneously
 			if(this.submergedInWater) {
-				this.dischageItem(64);
+				this.dischargeItem(64);
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
 			}
 			if(this.charging) {
@@ -103,7 +103,7 @@ extends ScooterEntity {
 		if(this.charging && !player.shouldCancelInteraction()) {
 			BlockPos charger = this.dataTracker.get(CHARGER);
 			BlockState cached = this.world.getBlockState(charger);
-			if(cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING)) {
+			if(cached.getBlock() == Common.CHARGING_STATION_BLOCK && cached.get(DockBlock.CHARGING)) {
 				DockBlockEntity.detachScooter(cached, this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
 				return ActionResult.success(this.world.isClient);
 			}
@@ -113,7 +113,7 @@ extends ScooterEntity {
 
 	@Override
 	protected void playStepSound(BlockPos pos, BlockState state) {
-		this.playSound(Common.SCOOTER_ROLLING, 0.75f, 0.75f);
+		this.playSound(Common.SOUND_SCOOTER_ROLLING, 0.75f, 0.75f);
 	}
 
 	public boolean chargingAt(BlockPos pos) {
@@ -128,14 +128,14 @@ extends ScooterEntity {
 	 */
 	public void attachToCharher(BlockPos pos) {
 		BlockState state = this.world.getBlockState(pos);
-		if(state.getBlock() == Common.DOCK_BLOCK && !state.get(DockBlock.CHARGING)) {
+		if(state.getBlock() == Common.CHARGING_STATION_BLOCK && !state.get(DockBlock.CHARGING)) {
 			this.removeAllPassengers();
 			this.charging = true;
 			this.dataTracker.set(CHARGER, pos);
 			boolean b = state.get(DockBlock.POWERED);
 			if(b != this.dataTracker.get(CAN_CHARGE))
 				this.dataTracker.set(CAN_CHARGE, b);
-			this.playSound(Common.CHARGER_CONNECT, 1.0f, 1.0f);
+			this.playSound(Common.SOUND_CHARGER_CONNECT, 1.0f, 1.0f);
 		}
 	}
 
@@ -147,7 +147,7 @@ extends ScooterEntity {
 	public void detachFromCharger() {
 		this.charging = false;
 		this.dataTracker.set(CHARGER, null);
-		this.playSound(Common.CHARGER_DISCONNECT, 1.0f, 1.0f);
+		this.playSound(Common.SOUND_CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
 
 	public boolean isCharging() {
@@ -163,7 +163,7 @@ extends ScooterEntity {
 	public boolean checkCharger() {
 		BlockPos charger = this.dataTracker.get(CHARGER);
 		BlockState cached = this.world.getBlockState(charger);
-		if(cached.getBlock() != Common.DOCK_BLOCK) return false;
+		if(cached.getBlock() != Common.CHARGING_STATION_BLOCK) return false;
 
 		boolean b = cached.get(DockBlock.POWERED);
 		if(b != this.canCharge) {
@@ -264,9 +264,12 @@ extends ScooterEntity {
 	 * Take an {@code amount} of discharged items from slot 3 and transmute them into the charged one in slot 2.
 	 * Charge progress isn't taken into account and is left untouched.
 	 * @param amount How many items to charge.
+	 * @return {@code true} if any amount of items were charged, {@code false} otherwise.
 	 */
-	private void chargeItem(int amount) {
+	private boolean chargeItem(int amount) {
 		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
+		if(discharged.isEmpty()) return false;
+
 		ItemStack charged = this.items.getStack(SLOT_CHARGED);
 		if(charged.isEmpty()) {
 			charged = Items.POTATO.getDefaultStack();
@@ -277,17 +280,20 @@ extends ScooterEntity {
 		}
 		discharged.decrement(amount);
 		this.items.setStack(SLOT_CHARGED, charged);
+		return true;
 	}
 
-	// TODO Make return boolean, true if it was discharged, false otherwise
 	/**
 	 * Discharges an item.
 	 * Take an {@code amount} of charged items from slot 2 and transmute them into the discharged one in slot 3.
 	 * Charge progress isn't taken into account and is left untouched.
 	 * @param amount How many items to discharge.
+	 * @return {@code true} if any amount of items were discharged, {@code false} otherwise.
 	 */
-	private void dischageItem(int amount) {
+	private boolean dischargeItem(int amount) {
 		ItemStack charged = this.items.getStack(SLOT_CHARGED);
+		if(charged.isEmpty()) return false;
+
 		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
 		if(discharged.isEmpty()) {
 			discharged = Items.POISONOUS_POTATO.getDefaultStack();
@@ -298,6 +304,7 @@ extends ScooterEntity {
 		}
 		charged.decrement(amount);
 		this.items.setStack(SLOT_DISCHARGED, discharged);
+		return true;
 	}
 
 	@Override
@@ -318,13 +325,9 @@ extends ScooterEntity {
 			float charge = this.dataTracker.get(CHARGE_PROGRESS);
 			charge -= 1f/90f;
 			if(charge <= 0f) {
-				if(!this.items.getStack(SLOT_CHARGED).isEmpty()) {
-					charge = 1f;
-					this.dischageItem(1);
-				}
-				else {
+				if(!this.dischargeItem(1))
 					this.updateClientScootersInventory();
-				}
+				charge = 1f;
 			}
 			this.dataTracker.set(CHARGE_PROGRESS, charge);
 		}
@@ -341,7 +344,7 @@ extends ScooterEntity {
 		buf.writeInt(this.getId());
 		buf.writeBoolean(throttle);
 		// [E]lectric [SC]ooter [T]hrottle [UP]date
-		ClientPlayNetworking.send(new Identifier("scooters", "esctup"), buf);
+		ClientPlayNetworking.send(Common.PACKET_THROTTLE_ID, buf);
 	}
 
 	public static void updateThrottle(ServerWorld world, PacketByteBuf buf) {

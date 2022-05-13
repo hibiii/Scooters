@@ -22,7 +22,7 @@ extends Item {
 		
 		// Attempt to create a scooter entity
 		World world = context.getWorld();
-		ScooterEntity scooter = ScooterEntity.create(this.asItem() == Common.ELECTRIC_SCOOTER_ITEM? Common.ELECTRIC_SCOOTER_ENTITY: Common.SCOOTER_ENTITY, context);
+		ScooterEntity scooter = ScooterEntity.create(this.asItem() == Common.ELECTRIC_SCOOTER_ITEM? Common.ELECTRIC_SCOOTER_ENTITY: Common.KICK_SCOOTER_ENTITY, context);
 		if(!world.isSpaceEmpty(scooter, scooter.getBoundingBox()) || !world.getOtherEntities(scooter, scooter.getBoundingBox()).isEmpty())
 			return ActionResult.FAIL;
 

@@ -62,8 +62,8 @@ extends SpecialCraftingRecipe {
 	}
 
 	private static final Ingredient[] INPUT = {
-		Ingredient.EMPTY,                          Ingredient.EMPTY,                          Ingredient.ofItems(Items.LEVER),
-		Ingredient.ofItems(Items.REDSTONE_TORCH),  Ingredient.ofItems(Common.SCOOTER_ITEM),   Ingredient.ofItems(Items.REDSTONE),
-		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.REDSTONE)
+		Ingredient.EMPTY,                          Ingredient.EMPTY,                             Ingredient.ofItems(Items.LEVER),
+		Ingredient.ofItems(Items.REDSTONE_TORCH),  Ingredient.ofItems(Common.KICK_SCOOTER_ITEM), Ingredient.ofItems(Items.REDSTONE),
+		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP),    Ingredient.ofItems(Items.REDSTONE)
 	};
 }

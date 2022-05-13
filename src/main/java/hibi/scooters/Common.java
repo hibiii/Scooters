@@ -29,61 +29,117 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-// TODO public static finalize all Identifiers
-// TODO Organize this mess
 public class Common implements ModInitializer {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger("scooters");
+	public static final String MODID = "scooters";
+	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	public static final EntityType<ScooterEntity> SCOOTER_ENTITY = Registry.register(
-		Registry.ENTITY_TYPE,
-		new Identifier("scooters", "kick_scooter"),
-		FabricEntityTypeBuilder.create(SpawnGroup.MISC, ScooterEntity::new)
-			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
-			.trackRangeBlocks(10)
-			.build()
-	);
+	public static final Identifier KICK_SCOOTER_ID;
+	public static final EntityType<ScooterEntity> KICK_SCOOTER_ENTITY;
+	public static final Item KICK_SCOOTER_ITEM;
+	public static final SpecialRecipeSerializer<KickScooterRecipe> KICK_SCOOTER_CRAFTING_SERIALIZER;
 
-	public static final EntityType<ElectricScooterEntity> ELECTRIC_SCOOTER_ENTITY = Registry.register(
-		Registry.ENTITY_TYPE,
-		new Identifier("scooters", "electric_scooter"),
-		FabricEntityTypeBuilder.create(SpawnGroup.MISC, ElectricScooterEntity::new)
-			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
-			.trackRangeBlocks(10)
-			.build()
-	);
+	public static final Identifier ELECTRIC_SCOOTER_ID;
+	public static final EntityType<ElectricScooterEntity> ELECTRIC_SCOOTER_ENTITY;
+	public static final Item ELECTRIC_SCOOTER_ITEM;
+	public static final SpecialRecipeSerializer<ElectricScooterRecipe> ELECTRIC_SCOOTER_CRAFTING_SERIALIZER;
 
-	public static final Identifier PACKET_INVENTORY_CHANGED = new Identifier("scooters","invchange");
-	public static final Item SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "kick_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
-	public static final Item ELECTRIC_SCOOTER_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters", "electric_scooter"), new ScooterItem(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxCount(1)));
+	public static final Identifier CHARGING_STATION_ID;
+	public static final DockBlock CHARGING_STATION_BLOCK;
+	public static final BlockEntityType<DockBlockEntity> CHARGING_STATION_BLOCK_ENTITY;
 
-	public static final DockBlock DOCK_BLOCK = new DockBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
-	public static final BlockEntityType<DockBlockEntity> DOCK_BLOCK_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("scooters", "charging_station"), FabricBlockEntityTypeBuilder.create(DockBlockEntity::new, DOCK_BLOCK).build(null));
+	public static final Item TIRE_ITEM;
+	public static final Item RAW_TIRE_ITEM;
 
-	public static final Item TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","tire"), new Item(new FabricItemSettings().group(ItemGroup.TRANSPORTATION).maxDamage(640)));
-	public static final Item RAW_TIRE_ITEM = Registry.register(Registry.ITEM, new Identifier("scooters","raw_tire"), new Item(new FabricItemSettings().group(ItemGroup.MATERIALS).maxCount(16)));
-
+	public static final Identifier PACKET_INVENTORY_CHANGED_ID;
+	public static final Identifier PACKET_THROTTLE_ID;
 	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
+	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "abrasive"));
 
-	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier("scooters", "abrasive"));
+	public static final SoundEvent SOUND_SCOOTER_ROLLING = new SoundEvent(new Identifier(MODID, "entity.roll"));
+	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = new SoundEvent(new Identifier(MODID, "entity.tire_pop"));
+	public static final SoundEvent SOUND_CHARGER_CONNECT = new SoundEvent(new Identifier(MODID, "charger.connect"));
+	public static final SoundEvent SOUND_CHARGER_DISCONNECT = new SoundEvent(new Identifier(MODID, "charger.disconnect"));
 
-	public static final SpecialRecipeSerializer<KickScooterRecipe> SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:kick_scooter_craft", new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new));
-	public static final SpecialRecipeSerializer<ElectricScooterRecipe> ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = RecipeSerializer.register("scooters:electric_scooter_craft", new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new));
-	
-	public static final SoundEvent SCOOTER_ROLLING = new SoundEvent(new Identifier("scooters", "entity.roll"));
-	public static final SoundEvent SCOOTER_TIRE_POP = new SoundEvent(new Identifier("scooters", "entity.tire_pop"));
-	public static final SoundEvent CHARGER_CONNECT = new SoundEvent(new Identifier("scooters", "charger.connect"));
-	public static final SoundEvent CHARGER_DISCONNECT = new SoundEvent(new Identifier("scooters", "charger.disconnect"));
 	@Override
 	public void onInitialize() {
-		Registry.register(Registry.BLOCK, new Identifier("scooters", "charging_station"), DOCK_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier("scooters", "charging_station"), new BlockItem(DOCK_BLOCK, new FabricItemSettings().group(ItemGroup.TRANSPORTATION)));
-		Registry.register(Registry.SOUND_EVENT, SCOOTER_ROLLING.getId(), SCOOTER_ROLLING);
-		Registry.register(Registry.SOUND_EVENT, SCOOTER_TIRE_POP.getId(), SCOOTER_TIRE_POP);
-		Registry.register(Registry.SOUND_EVENT, CHARGER_CONNECT.getId(), CHARGER_CONNECT);
-		Registry.register(Registry.SOUND_EVENT, CHARGER_DISCONNECT.getId(), CHARGER_DISCONNECT);
-		ServerPlayNetworking.registerGlobalReceiver(new Identifier("scooters", "esctup"), (server, player, handler, buf, responseSender) -> {
+
+		// Kick Scooter //
+		Registry.register(Registry.ENTITY_TYPE, KICK_SCOOTER_ID, KICK_SCOOTER_ENTITY);
+		Registry.register(Registry.ITEM, KICK_SCOOTER_ID, KICK_SCOOTER_ITEM);
+		RecipeSerializer.register(KICK_SCOOTER_ID.toString() + "_craft", KICK_SCOOTER_CRAFTING_SERIALIZER);
+
+		// Electric Scooter //
+		Registry.register(Registry.ENTITY_TYPE, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ENTITY);
+		Registry.register(Registry.ITEM, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ITEM);
+		RecipeSerializer.register(ELECTRIC_SCOOTER_ID.toString() + "_craft", ELECTRIC_SCOOTER_CRAFTING_SERIALIZER);
+
+		// Charging Station  //
+		Registry.register(Registry.BLOCK, CHARGING_STATION_ID, CHARGING_STATION_BLOCK);
+		Registry.register(Registry.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new FabricItemSettings().group(ItemGroup.TRANSPORTATION)));
+		Registry.register(Registry.BLOCK_ENTITY_TYPE, CHARGING_STATION_ID, CHARGING_STATION_BLOCK_ENTITY);
+
+		// Tires //
+		Registry.register(Registry.ITEM, new Identifier(MODID, "tire"), TIRE_ITEM);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "raw_tire"), RAW_TIRE_ITEM);
+
+		// Networking and Misc //
+		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
 			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
 		});
+
+		// Sounds //
+		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_ROLLING.getId(), SOUND_SCOOTER_ROLLING);
+		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_TIRE_POP.getId(), SOUND_SCOOTER_TIRE_POP);
+		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_CONNECT.getId(), SOUND_CHARGER_CONNECT);
+		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_DISCONNECT.getId(), SOUND_CHARGER_DISCONNECT);
+	}
+
+	static {
+		KICK_SCOOTER_ID = new Identifier(MODID, "kick_scooter");
+		KICK_SCOOTER_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, ScooterEntity::new)
+			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
+			.trackRangeBlocks(10)
+			.build();
+		KICK_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
+			.group(ItemGroup.TRANSPORTATION)
+			.maxCount(1)
+		);
+		KICK_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new);
+
+
+		ELECTRIC_SCOOTER_ID = new Identifier(MODID, "electric_scooter");
+		ELECTRIC_SCOOTER_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, ElectricScooterEntity::new)
+			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
+			.trackRangeBlocks(10)
+			.build();
+		ELECTRIC_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
+			.group(ItemGroup.TRANSPORTATION)
+			.maxCount(1)
+		);
+		ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new);
+
+
+		CHARGING_STATION_ID = new Identifier(MODID, "charging_station");
+		CHARGING_STATION_BLOCK = new DockBlock(FabricBlockSettings
+			.of(Material.METAL)
+			.strength(4.0f)
+		);
+		CHARGING_STATION_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(DockBlockEntity::new, CHARGING_STATION_BLOCK)
+			.build(null);
+		
+		
+		TIRE_ITEM = new Item(new FabricItemSettings()
+			.group(ItemGroup.TRANSPORTATION)
+			.maxDamage(640)
+		);
+		RAW_TIRE_ITEM = new Item(new FabricItemSettings()
+			.group(ItemGroup.MATERIALS)
+			.maxCount(16)
+		);
+		
+	
+		PACKET_INVENTORY_CHANGED_ID = new Identifier(MODID,"invchange");
+		PACKET_THROTTLE_ID = new Identifier(MODID, "esctup");
 	}
 }

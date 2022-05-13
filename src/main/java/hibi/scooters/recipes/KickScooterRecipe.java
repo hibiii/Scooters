@@ -75,7 +75,7 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return Common.SCOOTER_CRAFTING_SERIALIZER;
+		return Common.KICK_SCOOTER_CRAFTING_SERIALIZER;
 	}
 
 	@Override
@@ -85,7 +85,7 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public ItemStack getOutput() {
-		return Common.SCOOTER_ITEM.getDefaultStack().copy();
+		return Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 	}
 
 	private static final Ingredient[] INPUT = {

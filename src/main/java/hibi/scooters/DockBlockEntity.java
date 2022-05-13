@@ -24,7 +24,7 @@ extends BlockEntity {
 	private UUID chargee = null;
 
 	public DockBlockEntity(BlockPos pos, BlockState state) {
-		super(Common.DOCK_BLOCK_ENTITY_TYPE, pos, state);
+		super(Common.CHARGING_STATION_BLOCK_ENTITY, pos, state);
 	}
 
 	public static void tick(World world, BlockPos pos, BlockState state, DockBlockEntity that) {

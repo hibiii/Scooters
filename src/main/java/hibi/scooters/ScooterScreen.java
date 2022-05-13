@@ -19,7 +19,7 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
 public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
-	private static final Identifier TEXTURE = new Identifier("scooters","textures/gui/scooter.png");
+	private static final Identifier TEXTURE = new Identifier(Common.MODID,"textures/gui/scooter.png");
 	private final ScooterEntity entity;
 	private final boolean electric;
 

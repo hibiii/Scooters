@@ -41,6 +41,8 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+// FIXME Scooter interps to angle when it's placed down
+// TODO public static finalize NBT keys
 public class ScooterEntity extends Entity
 implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
@@ -85,7 +87,7 @@ InventoryChangedListener {
 		this.baseInertia = 0.98d;
 		this.coastInertia = 0.986d;
 		this.yawAccel = 1.2f;
-		this.item = Common.SCOOTER_ITEM;
+		this.item = Common.KICK_SCOOTER_ITEM;
 		this.items = new SimpleInventory(2);
 		this.items.addListener(this);
 		this.oldx = this.getX();
@@ -355,7 +357,7 @@ InventoryChangedListener {
 
 	@Override
 	protected void playStepSound(BlockPos pos, BlockState state) {
-		this.playSound(Common.SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat(0.1f));
+		this.playSound(Common.SOUND_SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat(0.1f));
 	}
 	
 	@Override
@@ -501,7 +503,7 @@ InventoryChangedListener {
 			stack.damage(damage, this.random, null);
 		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
 			markDirty = true;
-			this.playSound(Common.SCOOTER_TIRE_POP, 0.7f, 1.5f);
+			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 0.7f, 1.5f);
 		}
 		// --- //
 		stack = this.items.getStack(SLOT_REAR_TIRE);
@@ -510,7 +512,7 @@ InventoryChangedListener {
 			stack.damage(damage, this.random, null);
 		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
 			markDirty = true;
-			this.playSound(Common.SCOOTER_TIRE_POP, 1.0f, 0.7f);
+			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 1.0f, 0.7f);
 		}
 
 		// Update clients if any of the tires are popped
@@ -533,7 +535,7 @@ InventoryChangedListener {
 	protected void updateClientScootersInventory() {
 		PacketByteBuf buf = this.inventoryChangedPacket();
 		for(ServerPlayerEntity player : PlayerLookup.tracking(this)) {
-			ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
+			ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED_ID, buf);
 		}
 	}
 
@@ -544,7 +546,7 @@ InventoryChangedListener {
 	 */
 	protected void updateClientScootersInventory(ServerPlayerEntity player) {
 		PacketByteBuf buf = this.inventoryChangedPacket();
-		ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED, buf);
+		ServerPlayNetworking.send(player, Common.PACKET_INVENTORY_CHANGED_ID, buf);
 	}
 
 	/**

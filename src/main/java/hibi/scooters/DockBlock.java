@@ -115,6 +115,6 @@ extends BlockWithEntity {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return BlockWithEntity.checkType(type, Common.DOCK_BLOCK_ENTITY_TYPE, DockBlockEntity::tick);
+		return BlockWithEntity.checkType(type, Common.CHARGING_STATION_BLOCK_ENTITY, DockBlockEntity::tick);
 	}
 }

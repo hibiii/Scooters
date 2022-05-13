@@ -18,17 +18,17 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class ClientInit implements ClientModInitializer {
 	
-	public static final EntityModelLayer SCOOTER_MODEL_LAYER = new EntityModelLayer(new Identifier("scooters", "scooter"), "main");
+	public static final EntityModelLayer SCOOTER_MODEL_LAYER = new EntityModelLayer(new Identifier(Common.MODID, "scooter"), "main");
 
 	@Override
 	public void onInitializeClient() {
 		EntityModelLayerRegistry.registerModelLayer(SCOOTER_MODEL_LAYER, ScooterEntityModel::model);
-		EntityRendererRegistry.register(Common.SCOOTER_ENTITY, ScooterEntityRenderer::new);
+		EntityRendererRegistry.register(Common.KICK_SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		EntityRendererRegistry.register(Common.ELECTRIC_SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		ScreenRegistry.register(Common.SCOOTER_SCREEN_HANDLER, ScooterScreen::new);
 
 		// Register Scooter Inventory Changed Packet
-		ClientPlayNetworking.registerGlobalReceiver(Common.PACKET_INVENTORY_CHANGED, (client, handler, buf, responseSender) -> {
+		ClientPlayNetworking.registerGlobalReceiver(Common.PACKET_INVENTORY_CHANGED_ID, (client, handler, buf, responseSender) -> {
 			// Silently drop the packet if the scooter wasn't found
 			int id = buf.readInt();
 			ScooterEntity scoot = (ScooterEntity)client.world.getEntityById(id);

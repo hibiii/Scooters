@@ -15,8 +15,8 @@ import net.minecraft.util.math.Vec3f;
 public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 
 	protected final ScooterEntityModel model;
-	protected final Identifier kick_texture = new Identifier("scooters", "textures/entity/kick_scooter.png");
-	protected final Identifier electric_texture = new Identifier("scooters", "textures/entity/electric_scooter.png");
+	protected final Identifier kick_texture = new Identifier(Common.MODID, "textures/entity/kick_scooter.png");
+	protected final Identifier electric_texture = new Identifier(Common.MODID, "textures/entity/electric_scooter.png");
 
 	protected ScooterEntityRenderer(Context ctx) {
 		super(ctx);
