@@ -102,17 +102,19 @@ extends ScreenHandler {
 			// Player Inventory -> Scooter Inventory
 			else {
 				// Front Tire
-				if(this.getSlot(0).canInsert(itemStack2) && !this.getSlot(0).hasStack() && !this.insertItem(itemStack2, 0, 1, false))
+				if(this.getSlot(ScooterEntity.SLOT_FRONT_TIRE).canInsert(itemStack2) && !this.getSlot(0).hasStack() && !this.insertItem(itemStack2, 0, 1, false))
 					return ItemStack.EMPTY;
 				// Rear Tire
-				else if(this.getSlot(1).canInsert(itemStack2) && !this.getSlot(1).hasStack() && !this.insertItem(itemStack2, 1, 2, false))
+				else if(this.getSlot(ScooterEntity.SLOT_REAR_TIRE).canInsert(itemStack2) && !this.getSlot(1).hasStack() && !this.insertItem(itemStack2, 1, 2, false))
 					return ItemStack.EMPTY;
-				// Charged Batteries
-				else if(this.getSlot(2).canInsert(itemStack2) && !this.getSlot(2).hasStack() && !this.insertItem(itemStack2, 2, 3, false))
-					return ItemStack.EMPTY;
-				// Discharged Batteries
-				else if(this.getSlot(3).canInsert(itemStack2) && !this.getSlot(3).hasStack() && !this.insertItem(itemStack2, 3, 4, false))
-					return ItemStack.EMPTY;
+				else if (this.electric) {
+					// Charged Batteries
+					if(this.getSlot(ElectricScooterEntity.SLOT_CHARGED).canInsert(itemStack2) && !this.getSlot(2).hasStack() && !this.insertItem(itemStack2, 2, 3, false))
+						return ItemStack.EMPTY;
+					// Discharged Batteries
+					else if(this.getSlot(ElectricScooterEntity.SLOT_DISCHARGED).canInsert(itemStack2) && !this.getSlot(3).hasStack() && !this.insertItem(itemStack2, 3, 4, false))
+						return ItemStack.EMPTY;
+				}
 				else
 					return ItemStack.EMPTY;
 			}

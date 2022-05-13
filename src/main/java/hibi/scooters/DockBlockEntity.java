@@ -21,7 +21,6 @@ public class DockBlockEntity
 extends BlockEntity {
 
 	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 2d, 0.5d, 2d);
-	// TODO Use network ID as that's much faster than willy-nilly UUIDs
 	private UUID chargee = null;
 
 	public DockBlockEntity(BlockPos pos, BlockState state) {
@@ -30,8 +29,7 @@ extends BlockEntity {
 
 	public static void tick(World world, BlockPos pos, BlockState state, DockBlockEntity that) {
 		if(world.isClient) return;
-		// TODO Optimize this so it doesn't waste precious server CPU cycles
-		if(((ServerWorld)world).getEntity(that.chargee) == null)
+		if(that.chargee != null && ((ServerWorld)world).getEntity(that.chargee) == null)
 			detachScooter(state, world, pos, that);
 	}
 

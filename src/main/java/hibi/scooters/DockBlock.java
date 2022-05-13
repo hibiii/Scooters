@@ -31,9 +31,8 @@ import net.minecraft.world.World;
 public class DockBlock
 extends BlockWithEntity {
 
-	// TODO Rename to north-south and east-west
-	private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(2f, 0f, 5f, 14f, 16f, 11f);
-	private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(5f, 0f, 2f, 11f, 16f, 14f);
+	private static final VoxelShape NORTH_SOUTH_SHAPE = Block.createCuboidShape(2f, 0f, 5f, 14f, 16f, 11f);
+	private static final VoxelShape EAST_WEST_SHAPE = Block.createCuboidShape(5f, 0f, 2f, 11f, 16f, 14f);
 	public static final BooleanProperty POWERED = Properties.POWERED;
 	public static final BooleanProperty CHARGING = BooleanProperty.of("charging");
 	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
@@ -50,11 +49,11 @@ extends BlockWithEntity {
 		switch(state.get(FACING)) {
 			case EAST:
 			case WEST:
-				return EAST_SHAPE;
+				return EAST_WEST_SHAPE;
 			case NORTH:
 			case SOUTH:
 			default:
-				return NORTH_SHAPE;
+				return NORTH_SOUTH_SHAPE;
 		}
 	}
 

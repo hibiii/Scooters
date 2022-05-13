@@ -34,6 +34,8 @@ extends ScooterEntity {
 	public static final TrackedData<BlockPos> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
 	public static final TrackedData<Float> CHARGE_PROGRESS = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.FLOAT);
 	public static final TrackedData<Boolean> CAN_CHARGE = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	public static final int SLOT_CHARGED = 2;
+	public static final int SLOT_DISCHARGED = 3;
 	private boolean charging = false;
 	private boolean canCharge = false;
 
@@ -60,7 +62,7 @@ extends ScooterEntity {
 				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
 			}
 			if(this.charging) {
-				if(!this.items.getStack(3).isEmpty() && this.canCharge) {
+				if(!this.items.getStack(SLOT_DISCHARGED).isEmpty() && this.canCharge) {
 					float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
 					chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
 					if(chargeProgress > 1f) {
@@ -69,8 +71,7 @@ extends ScooterEntity {
 					}
 					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
-				// TODO Modulo with network ID so every 20th tick isn't saturated with escooters checking if they're elligible to charge
-				if(this.world.getTime() % 20 == 0) {
+				if(this.world.getTime() + this.getId() % 20 == 0) {
 					if(this.checkCharger()) {
 						BlockPos charger = this.dataTracker.get(CHARGER);
 						if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
@@ -80,7 +81,7 @@ extends ScooterEntity {
 						this.detachFromCharger();
 				}
 			}
-			if(this.items.getStack(3).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) != 0f) {
+			if(this.items.getStack(SLOT_DISCHARGED).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) != 0f) {
 				this.dataTracker.set(CHARGE_PROGRESS, 0f);
 			}
 		}
@@ -153,7 +154,6 @@ extends ScooterEntity {
 		return this.charging || this.dataTracker.get(CHARGER) != null;
 	}
 
-	// TODO Check if it's a dock block before doing dock block specific operations
 	/**
 	 * Checks if the attached charger is actually valid for charging.
 	 * The charger is not disconnected here.
@@ -163,12 +163,14 @@ extends ScooterEntity {
 	public boolean checkCharger() {
 		BlockPos charger = this.dataTracker.get(CHARGER);
 		BlockState cached = this.world.getBlockState(charger);
+		if(cached.getBlock() != Common.DOCK_BLOCK) return false;
+
 		boolean b = cached.get(DockBlock.POWERED);
 		if(b != this.canCharge) {
 			this.canCharge = b;
 			this.dataTracker.set(CAN_CHARGE, b);
 		}
-		return cached.getBlock() == Common.DOCK_BLOCK && cached.get(DockBlock.CHARGING);
+		return cached.get(DockBlock.CHARGING);
 	}
 
 	public float getChargeProgress() {
@@ -199,13 +201,13 @@ extends ScooterEntity {
 		NbtList batteriesNbt = new NbtList();
 		// Unrolled loop
 			NbtCompound compound = new NbtCompound();
-			ItemStack is = this.items.getStack(2);
+			ItemStack is = this.items.getStack(SLOT_CHARGED);
 			if(!is.isEmpty())
 				is.writeNbt(compound);
 			batteriesNbt.add(compound);
 		// --- //
 			compound = new NbtCompound();
-			is = this.items.getStack(3);
+			is = this.items.getStack(SLOT_DISCHARGED);
 			if(!is.isEmpty())
 				is.writeNbt(compound);
 			batteriesNbt.add(compound);
@@ -227,8 +229,8 @@ extends ScooterEntity {
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
 		if(nbt.contains("Batteries", NbtElement.LIST_TYPE)) {
 			NbtList list = nbt.getList("Batteries", NbtElement.COMPOUND_TYPE);
-			this.items.setStack(2, ItemStack.fromNbt(list.getCompound(0)));
-			this.items.setStack(3, ItemStack.fromNbt(list.getCompound(1)));
+			this.items.setStack(SLOT_CHARGED, ItemStack.fromNbt(list.getCompound(0)));
+			this.items.setStack(SLOT_DISCHARGED, ItemStack.fromNbt(list.getCompound(1)));
 		}
 		if(nbt.contains("ChargeProgress", NbtElement.FLOAT_TYPE)) {
 			this.dataTracker.set(CHARGE_PROGRESS, nbt.getFloat("ChargeProgress"));
@@ -249,7 +251,7 @@ extends ScooterEntity {
 		// Make it so we can't accelerate if the battery is dead.
 		// Manipulating the acceleration gets around an issue where you can continue to accelerate if
 		//   the battery depletes while you're still riding the e-scooter.
-		if(this.items.getStack(2).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) <= 0f) {
+		if(this.items.getStack(SLOT_CHARGED).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) <= 0f) {
 			this.acceleration = 0d;
 		}
 		else {
@@ -264,8 +266,8 @@ extends ScooterEntity {
 	 * @param amount How many items to charge.
 	 */
 	private void chargeItem(int amount) {
-		ItemStack discharged = this.items.getStack(3);
-		ItemStack charged = this.items.getStack(2);
+		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
+		ItemStack charged = this.items.getStack(SLOT_CHARGED);
 		if(charged.isEmpty()) {
 			charged = Items.POTATO.getDefaultStack();
 			charged.setCount(Math.min(amount, discharged.getCount()));
@@ -274,7 +276,7 @@ extends ScooterEntity {
 			charged.increment(Math.min(amount, discharged.getCount()));
 		}
 		discharged.decrement(amount);
-		this.items.setStack(2, charged);
+		this.items.setStack(SLOT_CHARGED, charged);
 	}
 
 	// TODO Make return boolean, true if it was discharged, false otherwise
@@ -285,8 +287,8 @@ extends ScooterEntity {
 	 * @param amount How many items to discharge.
 	 */
 	private void dischageItem(int amount) {
-		ItemStack charged = this.items.getStack(2);
-		ItemStack discharged = this.items.getStack(3);
+		ItemStack charged = this.items.getStack(SLOT_CHARGED);
+		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
 		if(discharged.isEmpty()) {
 			discharged = Items.POISONOUS_POTATO.getDefaultStack();
 			discharged.setCount(Math.min(amount, charged.getCount()));
@@ -295,7 +297,7 @@ extends ScooterEntity {
 			discharged.increment(Math.min(amount, charged.getCount()));
 		}
 		charged.decrement(amount);
-		this.items.setStack(3, discharged);
+		this.items.setStack(SLOT_DISCHARGED, discharged);
 	}
 
 	@Override
@@ -316,7 +318,7 @@ extends ScooterEntity {
 			float charge = this.dataTracker.get(CHARGE_PROGRESS);
 			charge -= 1f/90f;
 			if(charge <= 0f) {
-				if(!this.items.getStack(2).isEmpty()) {
+				if(!this.items.getStack(SLOT_CHARGED).isEmpty()) {
 					charge = 1f;
 					this.dischageItem(1);
 				}
@@ -331,7 +333,7 @@ extends ScooterEntity {
 	/**
 	 * Throttle packets are used so the server is aware of battery consumption and actually consumes battery while the player is using the throttle.
 	 * There is no other way around this.
-	 * @param throttle
+	 * @param throttle The state of the "forward" key (usually W)
 	 */
 	protected void sendThrottlePacket(boolean throttle) {
 		if(!this.world.isClient) return;
@@ -348,5 +350,17 @@ extends ScooterEntity {
 		if(e instanceof ElectricScooterEntity) {
 			((ElectricScooterEntity)e).keyW = buf.readBoolean();
 		}
+	}
+
+	// Remove position from the NBT if it's destroyed or picked when it's charging.
+	// Otherwise, the scooter would connect to the charger when it's placed down and immediately disconnect (distance)
+	@Override
+	protected ItemStack asItemStack() {
+		ItemStack out = super.asItemStack();
+		NbtCompound nbt = out.getNbt();
+		nbt.remove("ChargerX");
+		nbt.remove("ChargerY");
+		nbt.remove("ChargerZ");
+		return out;
 	}
 }

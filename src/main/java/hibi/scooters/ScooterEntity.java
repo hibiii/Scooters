@@ -64,7 +64,6 @@ InventoryChangedListener {
 	public boolean frontTire = true;
 	public boolean rearTire = true;
 
-	// TODO Add public static final ints instead of using magic numbers
 	/**
 	 * <ul>
 	 * <li>Slot 0 - Front Tyre</li>
@@ -74,6 +73,8 @@ InventoryChangedListener {
 	 * </ul>
 	 */
 	public SimpleInventory items;
+	public static final int SLOT_FRONT_TIRE = 0;
+	public static final int SLOT_REAR_TIRE = 1;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -105,8 +106,8 @@ InventoryChangedListener {
 		ItemStack stack = context.getStack();
 		if(!stack.hasNbt()) {
 			// TODO Potatoes from using an item in creative
-			out.items.setStack(0, Common.TIRE_ITEM.getDefaultStack());
-			out.items.setStack(1, Common.TIRE_ITEM.getDefaultStack());
+			out.items.setStack(SLOT_FRONT_TIRE, Common.TIRE_ITEM.getDefaultStack());
+			out.items.setStack(SLOT_REAR_TIRE, Common.TIRE_ITEM.getDefaultStack());
 		}
 		else {
 			out.readCustomDataFromNbt(stack.getNbt());
@@ -122,9 +123,9 @@ InventoryChangedListener {
 	public Packet<?> createSpawnPacket() {
 		int tires = 0;
 		// Bit 0 is used for displaying the front tire
-		if(!this.items.getStack(0).isEmpty()) tires |= 1;
+		if(!this.items.getStack(SLOT_FRONT_TIRE).isEmpty()) tires |= 1;
 		// Bit 1 is used for displaying the rear tire
-		if(!this.items.getStack(1).isEmpty()) tires |= 2;
+		if(!this.items.getStack(SLOT_REAR_TIRE).isEmpty()) tires |= 2;
 		return new EntitySpawnS2CPacket(this, tires);
 	}
 
@@ -262,7 +263,7 @@ InventoryChangedListener {
 
 		if(!this.world.isClient) {
 			// Prevent the player from riding the scooter if there's at least a tire missing
-			if(this.items.getStack(0).isEmpty() || this.items.getStack(1).isEmpty())
+			if(this.items.getStack(SLOT_FRONT_TIRE).isEmpty() || this.items.getStack(SLOT_REAR_TIRE).isEmpty())
 				return ActionResult.PASS;
 			if(player.startRiding(this)) {
 				// Update the rider so it's aware of the state of the tires
@@ -314,10 +315,6 @@ InventoryChangedListener {
 		NbtCompound nbt = new NbtCompound();
 		ItemStack out = this.item.getDefaultStack();
 		this.writeCustomDataToNbt(nbt);
-		// TODO Move to ElectricScooterEntity
-		nbt.remove("ChargerX");
-		nbt.remove("ChargerY");
-		nbt.remove("ChargerZ");
 		out.setNbt(nbt);
 		return out;
 	}
@@ -399,11 +396,9 @@ InventoryChangedListener {
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
 		if(nbt.contains("Tires", NbtElement.LIST_TYPE)) {
 			NbtList list = nbt.getList("Tires", NbtElement.COMPOUND_TYPE);
-			this.items.setStack(0, ItemStack.fromNbt(list.getCompound(0)));
-			this.items.setStack(1, ItemStack.fromNbt(list.getCompound(1)));
+			this.items.setStack(SLOT_FRONT_TIRE, ItemStack.fromNbt(list.getCompound(0)));
+			this.items.setStack(SLOT_REAR_TIRE, ItemStack.fromNbt(list.getCompound(1)));
 		}
-		// TODO Check if this onInventoryChanged actually has any effect whatsoever
-		this.onInventoryChanged(this.items);
 	}
 
 	/**
@@ -422,13 +417,13 @@ InventoryChangedListener {
 
 		// unrolled loop
 		NbtCompound compound = new NbtCompound();
-		ItemStack is = this.items.getStack(0);
+		ItemStack is = this.items.getStack(SLOT_FRONT_TIRE);
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
 		// --- //
 		compound = new NbtCompound();
-		is = this.items.getStack(1);
+		is = this.items.getStack(SLOT_REAR_TIRE);
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
@@ -462,11 +457,12 @@ InventoryChangedListener {
 		this.items = (SimpleInventory) inv;
 		this.tireMult = 1.0;
 		// Unrolled loop
-		ItemStack is = inv.getStack(0);
+		ItemStack is = inv.getStack(SLOT_FRONT_TIRE);
 		this.frontTire = !is.isEmpty();
 		if(!this.frontTire || is.getDamage() == is.getMaxDamage())
 			this.tireMult *= 0.85;
-		is = inv.getStack(1);
+		// --- //
+		is = inv.getStack(SLOT_REAR_TIRE);
 		this.rearTire = !is.isEmpty();
 		if(!this.rearTire || is.getDamage() == is.getMaxDamage())
 			this.tireMult *= 0.85;
@@ -486,18 +482,18 @@ InventoryChangedListener {
 	 * Cause a tick's worth of wear and damage to the tires.
 	 * @param displ
 	 */
-	// TODO Modulo with the network id so every 20th or 40th tick isn't saturated with tire damaging
 	protected void damageTires(double displ) {
 		if(displ < 0.001225 || displ > 25) return; // 2.5km/h 0.7 m/s (nudging) < displacement < 360 km/h 100 m/s (possible desync)
-		if(this.world.getTime() % 20 != 0) return;
+		long offsetTime = this.world.getTime() + this.getId();
+		if(offsetTime % 20 != 0) return;
 		if(!this.onGround) return;
 	
 		// Cause less damage if the scooter is on a nice surface
 		boolean abrasive = this.isOnAbrasive();
-		if(!abrasive && this.world.getTime() % 40 == 0) return;
+		if(!abrasive && offsetTime % 40 == 0) return;
 	
 		// Unrolled loop
-		ItemStack stack = this.items.getStack(0);
+		ItemStack stack = this.items.getStack(SLOT_FRONT_TIRE);
 		int damage = abrasive? 2 : 1;
 		boolean popped = stack.getDamage() == stack.getMaxDamage();
 		boolean markDirty = false;
@@ -508,7 +504,7 @@ InventoryChangedListener {
 			this.playSound(Common.SCOOTER_TIRE_POP, 0.7f, 1.5f);
 		}
 		// --- //
-		stack = this.items.getStack(1);
+		stack = this.items.getStack(SLOT_REAR_TIRE);
 		popped = stack.getDamage() == stack.getMaxDamage();
 		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
 			stack.damage(damage, this.random, null);
