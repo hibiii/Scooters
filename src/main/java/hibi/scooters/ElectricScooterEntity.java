@@ -26,7 +26,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-// TODO public static finalize NBT keys
 // TODO Optimize charge progress accesses
 public class ElectricScooterEntity
 extends ScooterEntity {
@@ -36,6 +35,11 @@ extends ScooterEntity {
 	public static final TrackedData<Boolean> CAN_CHARGE = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	public static final int SLOT_CHARGED = 2;
 	public static final int SLOT_DISCHARGED = 3;
+	public static final String NBT_KEY_BATTERIES = "Batteries";
+	public static final String NBT_KEY_CHARGE_PROGRESS = "ChargeProgress";
+	public static final String NBT_KEY_CHARGER_X = "ChargerX";
+	public static final String NBT_KEY_CHARGER_Y = "ChargerY";
+	public static final String NBT_KEY_CHARGER_Z = "ChargerZ";
 	private boolean charging = false;
 	private boolean canCharge = false;
 
@@ -211,32 +215,32 @@ extends ScooterEntity {
 			if(!is.isEmpty())
 				is.writeNbt(compound);
 			batteriesNbt.add(compound);
-		nbt.put("Batteries", batteriesNbt);
+		nbt.put(NBT_KEY_BATTERIES, batteriesNbt);
 
 		NbtFloat prog = NbtFloat.of(this.dataTracker.get(CHARGE_PROGRESS));
-		nbt.put("ChargeProgress", prog);
+		nbt.put(NBT_KEY_CHARGE_PROGRESS, prog);
 
 		BlockPos chargerPos = this.dataTracker.get(CHARGER);
 		if(chargerPos != null) {
-			nbt.putInt("ChargerX", chargerPos.getX());
-			nbt.putInt("ChargerY", chargerPos.getY());
-			nbt.putInt("ChargerZ", chargerPos.getZ());
+			nbt.putInt(NBT_KEY_CHARGER_X, chargerPos.getX());
+			nbt.putInt(NBT_KEY_CHARGER_Y, chargerPos.getY());
+			nbt.putInt(NBT_KEY_CHARGER_Z, chargerPos.getZ());
 		}
 		super.writeCustomDataToNbt(nbt);
 	}
 
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
-		if(nbt.contains("Batteries", NbtElement.LIST_TYPE)) {
-			NbtList list = nbt.getList("Batteries", NbtElement.COMPOUND_TYPE);
+		if(nbt.contains(NBT_KEY_BATTERIES, NbtElement.LIST_TYPE)) {
+			NbtList list = nbt.getList(NBT_KEY_BATTERIES, NbtElement.COMPOUND_TYPE);
 			this.items.setStack(SLOT_CHARGED, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(SLOT_DISCHARGED, ItemStack.fromNbt(list.getCompound(1)));
 		}
-		if(nbt.contains("ChargeProgress", NbtElement.FLOAT_TYPE)) {
-			this.dataTracker.set(CHARGE_PROGRESS, nbt.getFloat("ChargeProgress"));
+		if(nbt.contains(NBT_KEY_CHARGE_PROGRESS, NbtElement.FLOAT_TYPE)) {
+			this.dataTracker.set(CHARGE_PROGRESS, nbt.getFloat(NBT_KEY_CHARGE_PROGRESS));
 		}
-		if(nbt.contains("ChargerX") && nbt.contains("ChargerY" ) && nbt.contains("ChargerZ")) {
-			BlockPos charger = new BlockPos(nbt.getInt("ChargerX"), nbt.getInt("ChargerY"), nbt.getInt("ChargerZ"));
+		if(nbt.contains(NBT_KEY_CHARGER_X) && nbt.contains(NBT_KEY_CHARGER_Y) && nbt.contains(NBT_KEY_CHARGER_Z)) {
+			BlockPos charger = new BlockPos(nbt.getInt(NBT_KEY_CHARGER_Z), nbt.getInt(NBT_KEY_CHARGER_Y), nbt.getInt(NBT_KEY_CHARGER_Z));
 			BlockEntity be = this.world.getBlockEntity(charger);
 			if(be instanceof DockBlockEntity) {
 				DockBlockEntity.attachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)be, this);
@@ -361,9 +365,9 @@ extends ScooterEntity {
 	protected ItemStack asItemStack() {
 		ItemStack out = super.asItemStack();
 		NbtCompound nbt = out.getNbt();
-		nbt.remove("ChargerX");
-		nbt.remove("ChargerY");
-		nbt.remove("ChargerZ");
+		nbt.remove(NBT_KEY_CHARGER_X);
+		nbt.remove(NBT_KEY_CHARGER_X);
+		nbt.remove(NBT_KEY_CHARGER_Z);
 		return out;
 	}
 }

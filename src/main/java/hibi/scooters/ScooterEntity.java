@@ -41,11 +41,13 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-// FIXME Scooter interps to angle when it's placed down
-// TODO public static finalize NBT keys
 public class ScooterEntity extends Entity
 implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
+
+	public static final int SLOT_FRONT_TIRE = 0;
+	public static final int SLOT_REAR_TIRE = 1;
+	public static final String NBT_KEY_TIRES = "Tires";
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity, yawAccel;
@@ -75,8 +77,6 @@ InventoryChangedListener {
 	 * </ul>
 	 */
 	public SimpleInventory items;
-	public static final int SLOT_FRONT_TIRE = 0;
-	public static final int SLOT_REAR_TIRE = 1;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -105,6 +105,7 @@ InventoryChangedListener {
 		out.prevX = pos.x;
 		out.prevY = pos.y;
 		out.prevZ = pos.z;
+		out.setYaw(context.getPlayerYaw());
 		ItemStack stack = context.getStack();
 		if(!stack.hasNbt()) {
 			// TODO Potatoes from using an item in creative
@@ -396,8 +397,8 @@ InventoryChangedListener {
 	 */
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
-		if(nbt.contains("Tires", NbtElement.LIST_TYPE)) {
-			NbtList list = nbt.getList("Tires", NbtElement.COMPOUND_TYPE);
+		if(nbt.contains(NBT_KEY_TIRES, NbtElement.LIST_TYPE)) {
+			NbtList list = nbt.getList(NBT_KEY_TIRES, NbtElement.COMPOUND_TYPE);
 			this.items.setStack(SLOT_FRONT_TIRE, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(SLOT_REAR_TIRE, ItemStack.fromNbt(list.getCompound(1)));
 		}
@@ -430,7 +431,7 @@ InventoryChangedListener {
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
 
-		nbt.put("Tires", tiresNbt);
+		nbt.put(NBT_KEY_TIRES, tiresNbt);
 	}
 
 	@Override

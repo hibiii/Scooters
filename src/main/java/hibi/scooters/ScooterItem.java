@@ -32,8 +32,6 @@ extends Item {
 			world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, scooter);
 		}
 
-		// Smaller niceties
-		scooter.setYaw(context.getPlayerYaw());
 		context.getStack().decrement(1);
 		return ActionResult.success(world.isClient);
 	}
