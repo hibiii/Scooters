@@ -34,25 +34,22 @@ extends BlockEntity {
 	}
 
 	public static ActionResult use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, DockBlockEntity that) {
-		if(world.isClient)
-			return ActionResult.success(true);
 
 		// Detach an e-scooter if there's one connected to it.
-		if(that.isCharging()) {
+		if(state.get(DockBlock.CHARGING)) {
 			detachScooter(state, world, pos, that);
-			return ActionResult.CONSUME;
+			return ActionResult.success(world.isClient());
 		}
 
-		boolean succeeded = false;
 		for (Entity entity : world.getOtherEntities(null, CHARGING_AREA.offset(pos))) {
 			if(!(entity instanceof ElectricScooterEntity)) continue;
 			ElectricScooterEntity scooter = (ElectricScooterEntity)entity;
 			if(scooter.isCharging()) continue;
 			attachScooter(state, world, pos, that, scooter);
-			succeeded = true;
-			break;
+			return ActionResult.success(world.isClient());
 		}
-		return succeeded ? ActionResult.CONSUME: ActionResult.FAIL;
+
+		return ActionResult.PASS;
 	}
 
 	/**

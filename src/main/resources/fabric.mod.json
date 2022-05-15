@@ -38,6 +38,8 @@
   "custom": {
     "modmenu": {
       "links": {
+        "modmenu.scooters.quick_start_guide": "https://hibiscus.pet/mods/scooters/quick_start",
+        "modmenu.scooters.users_manual": "https://hibiscus.pet/mods/scooters/manual",
         "modmenu.github_releases": "https://github.com/Hibiii/Scooters/releases/",
         "modmenu.discord": "https://discord.gg/Zef3c27dN2"
       }
