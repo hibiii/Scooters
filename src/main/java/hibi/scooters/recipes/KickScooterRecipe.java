@@ -88,6 +88,16 @@ extends SpecialCraftingRecipe {
 		return Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 	}
 
+	@Override
+	public boolean isIgnoredInRecipeBook() {
+		return false;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
 	private static final Ingredient[] INPUT = {
 		Ingredient.EMPTY,                     Ingredient.EMPTY,                                        Ingredient.fromTag(ItemTags.WOOL),
 		Ingredient.ofItems(Items.IRON_INGOT), Ingredient.EMPTY,                                        Ingredient.ofItems(Items.IRON_BARS),

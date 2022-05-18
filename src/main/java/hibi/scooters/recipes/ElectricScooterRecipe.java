@@ -8,6 +8,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class ElectricScooterRecipe
@@ -53,6 +54,21 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
+	public DefaultedList<Ingredient> getIngredients() {
+		return RECIPE;
+	}
+
+	@Override
+	public boolean isIgnoredInRecipeBook() {
+		return false;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return Common.ELECTRIC_SCOOTER_CRAFTING_SERIALIZER;
 	}
@@ -66,4 +82,6 @@ extends SpecialCraftingRecipe {
 		Ingredient.ofItems(Items.REDSTONE_TORCH),  Ingredient.ofItems(Common.KICK_SCOOTER_ITEM), Ingredient.ofItems(Items.REDSTONE),
 		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP),    Ingredient.ofItems(Items.REDSTONE)
 	};
+
+	private static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);
 }
