@@ -87,11 +87,9 @@ extends ScreenHandler {
 
 	@Override
 	public ItemStack transferSlot(PlayerEntity player, int index) {
-		ItemStack itemStack = ItemStack.EMPTY;
 		Slot slot = this.getSlot(index);
 		if (slot != null && slot.hasStack()) {
 			ItemStack itemStack2 = slot.getStack();
-			itemStack = itemStack2.copy();
 			int size = this.scooter.items.size();
 
 			// Scooter Inventory -> Player Inventory
@@ -109,10 +107,10 @@ extends ScreenHandler {
 					return ItemStack.EMPTY;
 				else if (this.electric) {
 					// Charged Batteries
-					if(this.getSlot(ElectricScooterEntity.SLOT_CHARGED).canInsert(itemStack2) && !this.getSlot(2).hasStack() && !this.insertItem(itemStack2, 2, 3, false))
+					if(this.getSlot(ElectricScooterEntity.SLOT_CHARGED).canInsert(itemStack2) && !this.insertItem(itemStack2, 2, 3, false))
 						return ItemStack.EMPTY;
 					// Discharged Batteries
-					else if(this.getSlot(ElectricScooterEntity.SLOT_DISCHARGED).canInsert(itemStack2) && !this.getSlot(3).hasStack() && !this.insertItem(itemStack2, 3, 4, false))
+					else if(this.getSlot(ElectricScooterEntity.SLOT_DISCHARGED).canInsert(itemStack2) && !this.insertItem(itemStack2, 3, 4, false))
 						return ItemStack.EMPTY;
 				}
 				else
@@ -124,7 +122,9 @@ extends ScreenHandler {
 				slot.markDirty();
 			}
 		}
-		return itemStack;
+		// NEVER EVER return the item stack unmodified or you'll break people's worlds
+		// While returned itemstack not empty and stacks are not equal
+		return ItemStack.EMPTY;
 	}
 
 	/**
