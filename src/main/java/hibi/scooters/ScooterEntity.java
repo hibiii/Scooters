@@ -309,7 +309,7 @@ InventoryChangedListener {
 		
 		// Dump the rider if there's any
 		this.removeAllPassengers();
-		this.emitGameEvent(GameEvent.ENTITY_KILLED, source.getAttacker());
+		this.emitGameEvent(GameEvent.ENTITY_DIE, source.getAttacker());
 		this.discard();
 		return true;
 	}
@@ -358,7 +358,7 @@ InventoryChangedListener {
 
 	@Override
 	protected void playStepSound(BlockPos pos, BlockState state) {
-		this.playSound(Common.SOUND_SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat(0.1f));
+		this.playSound(Common.SOUND_SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat() * 0.1f);
 	}
 	
 	@Override

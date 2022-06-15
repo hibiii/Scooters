@@ -63,21 +63,26 @@ public class Common implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		LOGGER.debug("Initializing common");
+		LOGGER.debug("Common Init: Scooter");
 
 		// Kick Scooter //
 		Registry.register(Registry.ENTITY_TYPE, KICK_SCOOTER_ID, KICK_SCOOTER_ENTITY);
 		Registry.register(Registry.ITEM, KICK_SCOOTER_ID, KICK_SCOOTER_ITEM);
 		RecipeSerializer.register(KICK_SCOOTER_ID.toString() + "_craft", KICK_SCOOTER_CRAFTING_SERIALIZER);
+		LOGGER.debug("Common Init: Escooter");
 
 		// Electric Scooter //
 		Registry.register(Registry.ENTITY_TYPE, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ENTITY);
 		Registry.register(Registry.ITEM, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ITEM);
 		RecipeSerializer.register(ELECTRIC_SCOOTER_ID.toString() + "_craft", ELECTRIC_SCOOTER_CRAFTING_SERIALIZER);
+		LOGGER.debug("Common Init: Charging Station");
 
 		// Charging Station  //
 		Registry.register(Registry.BLOCK, CHARGING_STATION_ID, CHARGING_STATION_BLOCK);
 		Registry.register(Registry.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new FabricItemSettings().group(ItemGroup.TRANSPORTATION)));
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, CHARGING_STATION_ID, CHARGING_STATION_BLOCK_ENTITY);
+		LOGGER.debug("Common Init: Tires");
 
 		// Tires //
 		Registry.register(Registry.ITEM, new Identifier(MODID, "tire"), TIRE_ITEM);
@@ -87,12 +92,15 @@ public class Common implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
 			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
 		});
+		LOGGER.debug("Common Init: Sounds");
 
 		// Sounds //
 		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_ROLLING.getId(), SOUND_SCOOTER_ROLLING);
 		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_TIRE_POP.getId(), SOUND_SCOOTER_TIRE_POP);
 		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_CONNECT.getId(), SOUND_CHARGER_CONNECT);
 		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_DISCONNECT.getId(), SOUND_CHARGER_DISCONNECT);
+
+		LOGGER.debug("Common Init finished");
 	}
 
 	static {

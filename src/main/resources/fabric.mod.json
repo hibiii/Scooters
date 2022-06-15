@@ -30,9 +30,8 @@
     "scooters.mixin.json"
   ],
   "depends": {
-    "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": ">=1.18.2",
+    "minecraft": ">=1.19",
     "java": ">=17"
   },
   "custom": {

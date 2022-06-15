@@ -29,7 +29,7 @@ extends Item {
 		// Actually spawn the scooter if it's successful
 		if(world instanceof ServerWorld) {
 			world.spawnEntity(scooter);
-			world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, scooter);
+			world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, scooter.getPos());
 		}
 
 		context.getStack().decrement(1);
