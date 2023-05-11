@@ -25,6 +25,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.screen.ScreenHandler;
@@ -123,7 +124,7 @@ InventoryChangedListener {
 	 * The entity data is used to keep the visuals synchronized, and is encoded bitwise.
 	 */
 	@Override
-	public Packet<?> createSpawnPacket() {
+	public Packet<ClientPlayPacketListener> createSpawnPacket() {
 		int tires = 0;
 		// Bit 0 is used for displaying the front tire
 		if(!this.items.getStack(SLOT_FRONT_TIRE).isEmpty()) tires |= 1;
@@ -285,11 +286,6 @@ InventoryChangedListener {
 	@Override
 	public boolean isCollidable() {
 		return false;
-	}
-
-	@Override
-	public boolean collides() {
-		return !this.isRemoved();
 	}
 
 	@Override

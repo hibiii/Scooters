@@ -10,7 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 
@@ -33,8 +33,8 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 	@Override
 	public void render(ScooterEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
-		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
-		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f + yaw));
+		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f + yaw));
 		// Lower the scooter if it doesn't have any tires attached (= resting on the platform)
 		if(!(entity.frontTire || entity.rearTire))
 			matrices.translate(0d, -1.445d, 0d);

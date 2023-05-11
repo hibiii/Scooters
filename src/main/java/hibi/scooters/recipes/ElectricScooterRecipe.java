@@ -7,6 +7,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
+import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -14,8 +15,8 @@ import net.minecraft.world.World;
 public class ElectricScooterRecipe
 extends SpecialCraftingRecipe {
 
-	public ElectricScooterRecipe(Identifier id) {
-		super(id);
+	public ElectricScooterRecipe(Identifier id, CraftingRecipeCategory category) {
+		super(id, category);
 	}
 
 	@Override

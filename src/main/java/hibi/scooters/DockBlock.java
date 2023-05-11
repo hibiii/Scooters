@@ -63,7 +63,7 @@ extends BlockWithEntity {
 		boolean hasPower = state.get(POWERED);
 		if(hasPower != world.isReceivingRedstonePower(pos)) {
 			if(hasPower)
-				world.createAndScheduleBlockTick(pos, this, 4);
+				world.scheduleBlockTick(pos, this, 4);
 			else
 				world.setBlockState(pos, state.cycle(POWERED));
 		}

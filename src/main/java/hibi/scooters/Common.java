@@ -7,6 +7,7 @@ import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -21,13 +22,18 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class Common implements ModInitializer {
 
@@ -54,12 +60,12 @@ public class Common implements ModInitializer {
 	public static final Identifier PACKET_INVENTORY_CHANGED_ID;
 	public static final Identifier PACKET_THROTTLE_ID;
 	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
-	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "abrasive"));
+	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, new Identifier(MODID, "abrasive"));
 
-	public static final SoundEvent SOUND_SCOOTER_ROLLING = new SoundEvent(new Identifier(MODID, "entity.roll"));
-	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = new SoundEvent(new Identifier(MODID, "entity.tire_pop"));
-	public static final SoundEvent SOUND_CHARGER_CONNECT = new SoundEvent(new Identifier(MODID, "charger.connect"));
-	public static final SoundEvent SOUND_CHARGER_DISCONNECT = new SoundEvent(new Identifier(MODID, "charger.disconnect"));
+	public static final SoundEvent SOUND_SCOOTER_ROLLING = SoundEvent.of(new Identifier(MODID, "entity.roll"));
+	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = SoundEvent.of(new Identifier(MODID, "entity.tire_pop"));
+	public static final SoundEvent SOUND_CHARGER_CONNECT = SoundEvent.of(new Identifier(MODID, "charger.connect"));
+	public static final SoundEvent SOUND_CHARGER_DISCONNECT = SoundEvent.of(new Identifier(MODID, "charger.disconnect"));
 
 	@Override
 	public void onInitialize() {
@@ -67,26 +73,26 @@ public class Common implements ModInitializer {
 		LOGGER.debug("Common Init: Scooter");
 
 		// Kick Scooter //
-		Registry.register(Registry.ENTITY_TYPE, KICK_SCOOTER_ID, KICK_SCOOTER_ENTITY);
-		Registry.register(Registry.ITEM, KICK_SCOOTER_ID, KICK_SCOOTER_ITEM);
+		Registry.register(Registries.ENTITY_TYPE, KICK_SCOOTER_ID, KICK_SCOOTER_ENTITY);
+		var kickScooter = Registry.register(Registries.ITEM, KICK_SCOOTER_ID, KICK_SCOOTER_ITEM);
 		RecipeSerializer.register(KICK_SCOOTER_ID.toString() + "_craft", KICK_SCOOTER_CRAFTING_SERIALIZER);
 		LOGGER.debug("Common Init: Escooter");
 
 		// Electric Scooter //
-		Registry.register(Registry.ENTITY_TYPE, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ENTITY);
-		Registry.register(Registry.ITEM, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ITEM);
+		Registry.register(Registries.ENTITY_TYPE, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ENTITY);
+		var electricScooter = Registry.register(Registries.ITEM, ELECTRIC_SCOOTER_ID, ELECTRIC_SCOOTER_ITEM);
 		RecipeSerializer.register(ELECTRIC_SCOOTER_ID.toString() + "_craft", ELECTRIC_SCOOTER_CRAFTING_SERIALIZER);
 		LOGGER.debug("Common Init: Charging Station");
 
 		// Charging Station  //
-		Registry.register(Registry.BLOCK, CHARGING_STATION_ID, CHARGING_STATION_BLOCK);
-		Registry.register(Registry.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new FabricItemSettings().group(ItemGroup.TRANSPORTATION)));
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, CHARGING_STATION_ID, CHARGING_STATION_BLOCK_ENTITY);
+		Registry.register(Registries.BLOCK, CHARGING_STATION_ID, CHARGING_STATION_BLOCK);
+		var chargingStation = Registry.register(Registries.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new FabricItemSettings()));
+		Registry.register(Registries.BLOCK_ENTITY_TYPE, CHARGING_STATION_ID, CHARGING_STATION_BLOCK_ENTITY);
 		LOGGER.debug("Common Init: Tires");
 
 		// Tires //
-		Registry.register(Registry.ITEM, new Identifier(MODID, "tire"), TIRE_ITEM);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "raw_tire"), RAW_TIRE_ITEM);
+		var tire = Registry.register(Registries.ITEM, new Identifier(MODID, "tire"), TIRE_ITEM);
+		var rawTire = Registry.register(Registries.ITEM, new Identifier(MODID, "raw_tire"), RAW_TIRE_ITEM);
 
 		// Networking and Misc //
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
@@ -95,10 +101,21 @@ public class Common implements ModInitializer {
 		LOGGER.debug("Common Init: Sounds");
 
 		// Sounds //
-		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_ROLLING.getId(), SOUND_SCOOTER_ROLLING);
-		Registry.register(Registry.SOUND_EVENT, SOUND_SCOOTER_TIRE_POP.getId(), SOUND_SCOOTER_TIRE_POP);
-		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_CONNECT.getId(), SOUND_CHARGER_CONNECT);
-		Registry.register(Registry.SOUND_EVENT, SOUND_CHARGER_DISCONNECT.getId(), SOUND_CHARGER_DISCONNECT);
+		Registry.register(Registries.SOUND_EVENT, SOUND_SCOOTER_ROLLING.getId(), SOUND_SCOOTER_ROLLING);
+		Registry.register(Registries.SOUND_EVENT, SOUND_SCOOTER_TIRE_POP.getId(), SOUND_SCOOTER_TIRE_POP);
+		Registry.register(Registries.SOUND_EVENT, SOUND_CHARGER_CONNECT.getId(), SOUND_CHARGER_CONNECT);
+		Registry.register(Registries.SOUND_EVENT, SOUND_CHARGER_DISCONNECT.getId(), SOUND_CHARGER_DISCONNECT);
+
+		// Item Groups //
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register((content) -> {
+			content.addAfter(Items.LODESTONE, chargingStation);
+		});
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register((content) -> {
+			content.addAfter(Items.TNT_MINECART, kickScooter, electricScooter, tire);
+		});
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {
+			content.addBefore(Items.SCUTE, rawTire);
+		});
 
 		LOGGER.debug("Common Init finished");
 	}
@@ -110,7 +127,6 @@ public class Common implements ModInitializer {
 			.trackRangeBlocks(10)
 			.build();
 		KICK_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
-			.group(ItemGroup.TRANSPORTATION)
 			.maxCount(1)
 		);
 		KICK_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new);
@@ -122,7 +138,6 @@ public class Common implements ModInitializer {
 			.trackRangeBlocks(10)
 			.build();
 		ELECTRIC_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
-			.group(ItemGroup.TRANSPORTATION)
 			.maxCount(1)
 		);
 		ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new);
@@ -138,11 +153,9 @@ public class Common implements ModInitializer {
 		
 		
 		TIRE_ITEM = new Item(new FabricItemSettings()
-			.group(ItemGroup.TRANSPORTATION)
 			.maxDamage(640)
 		);
 		RAW_TIRE_ITEM = new Item(new FabricItemSettings()
-			.group(ItemGroup.MATERIALS)
 			.maxCount(16)
 		);
 		

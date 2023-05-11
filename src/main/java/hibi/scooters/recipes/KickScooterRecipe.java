@@ -1,5 +1,7 @@
 package hibi.scooters.recipes;
 
+import com.ibm.icu.util.ULocale.Category;
+
 import hibi.scooters.Common;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -9,7 +11,8 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -17,8 +20,8 @@ import net.minecraft.world.World;
 public class KickScooterRecipe
 extends SpecialCraftingRecipe {
 
-	public KickScooterRecipe(Identifier id) {
-		super(id);
+	public KickScooterRecipe(Identifier id, CraftingRecipeCategory category) {
+		super(id, category);
 	}
 
 	@Override
