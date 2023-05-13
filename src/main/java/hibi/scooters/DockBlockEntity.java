@@ -17,6 +17,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
+// FIXME: Entire electric scooter - charging station interaction needs to be refactored
 public class DockBlockEntity
 extends BlockEntity {
 
@@ -75,6 +76,7 @@ extends BlockEntity {
 	 * Detach the e-scooter connected to this charger.
 	 * Detaching should be made here, but it's perfectly okay to do on the scooter, as there are provisions for discontinuity.
 	 */
+	@Deprecated
 	public static void detachScooter(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
 		if(world.isClient) return;
 		validateCharging(state, world, pos, that);

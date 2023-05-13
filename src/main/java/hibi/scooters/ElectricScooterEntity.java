@@ -1,5 +1,7 @@
 package hibi.scooters;
 
+import java.util.Optional;
+
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
@@ -30,7 +32,7 @@ import net.minecraft.world.World;
 public class ElectricScooterEntity
 extends ScooterEntity {
 
-	public static final TrackedData<BlockPos> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
+	public static final TrackedData<Optional<BlockPos>> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
 	public static final TrackedData<Float> CHARGE_PROGRESS = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.FLOAT);
 	public static final TrackedData<Boolean> CAN_CHARGE = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	public static final int SLOT_CHARGED = 2;
@@ -75,9 +77,9 @@ extends ScooterEntity {
 					}
 					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
-				if(this.world.getTime() + this.getId() % 20 == 0) {
+				if((this.world.getTime() + this.getId()) % 20 == 0) {
 					if(this.checkCharger()) {
-						BlockPos charger = this.dataTracker.get(CHARGER);
+						BlockPos charger = this.dataTracker.get(CHARGER).get();
 						if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
 							DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
 					}
@@ -93,7 +95,7 @@ extends ScooterEntity {
 
 	@Override
 	protected void initDataTracker() {
-		this.dataTracker.startTracking(CHARGER, null);
+		this.dataTracker.startTracking(CHARGER, Optional.empty());
 		this.dataTracker.startTracking(CHARGE_PROGRESS, 0f);
 		this.dataTracker.startTracking(CAN_CHARGE, false);
 		super.initDataTracker();
@@ -105,7 +107,8 @@ extends ScooterEntity {
 
 		// If the player right clicks a charging e-scooter then detach it from a charger.
 		if(this.charging && !player.shouldCancelInteraction()) {
-			BlockPos charger = this.dataTracker.get(CHARGER);
+			// FIXME Throws on null
+			BlockPos charger = this.dataTracker.get(CHARGER).get();
 			BlockState cached = this.world.getBlockState(charger);
 			if(cached.getBlock() == Common.CHARGING_STATION_BLOCK && cached.get(DockBlock.CHARGING)) {
 				DockBlockEntity.detachScooter(cached, this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
@@ -121,7 +124,10 @@ extends ScooterEntity {
 	}
 
 	public boolean chargingAt(BlockPos pos) {
-		return this.dataTracker.get(CHARGER) == pos;
+		var optionalCharger = this.dataTracker.get(CHARGER);
+		if (optionalCharger.isEmpty())
+			return false;
+		return optionalCharger.get() == pos;
 	}
 
 	/**
@@ -130,12 +136,13 @@ extends ScooterEntity {
 	 * Charging <b>must</b> be initialized from {@link DockBlockEntity}.attachScooter, as the charger is required to actually exist.
 	 * @param pos The position of the charger.
 	 */
+	@Deprecated
 	public void attachToCharher(BlockPos pos) {
 		BlockState state = this.world.getBlockState(pos);
 		if(state.getBlock() == Common.CHARGING_STATION_BLOCK && !state.get(DockBlock.CHARGING)) {
 			this.removeAllPassengers();
 			this.charging = true;
-			this.dataTracker.set(CHARGER, pos);
+			this.dataTracker.set(CHARGER, Optional.of(pos));
 			boolean b = state.get(DockBlock.POWERED);
 			if(b != this.dataTracker.get(CAN_CHARGE))
 				this.dataTracker.set(CAN_CHARGE, b);
@@ -148,14 +155,15 @@ extends ScooterEntity {
 	 * If there is a charger, then detaching <b>must</b> be initialized from that {@link DockBlockEntity}.detachScooter.
 	 * This method should only be called if there's no charger available (e.g. it is destroyed).
 	 */
+	@Deprecated
 	public void detachFromCharger() {
 		this.charging = false;
-		this.dataTracker.set(CHARGER, null);
+		this.dataTracker.set(CHARGER, Optional.empty());
 		this.playSound(Common.SOUND_CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
 
 	public boolean isCharging() {
-		return this.charging || this.dataTracker.get(CHARGER) != null;
+		return this.charging || this.dataTracker.get(CHARGER).isPresent();
 	}
 
 	/**
@@ -165,7 +173,11 @@ extends ScooterEntity {
 	 * @return {@code true} if the charger is valid to stay connected, {@code false} otherwise.
 	 */
 	public boolean checkCharger() {
-		BlockPos charger = this.dataTracker.get(CHARGER);
+		Optional<BlockPos> optionalCharger = this.dataTracker.get(CHARGER);
+		if(optionalCharger.isEmpty()) {
+			return false;
+		}
+		BlockPos charger = optionalCharger.get();
 		BlockState cached = this.world.getBlockState(charger);
 		if(cached.getBlock() != Common.CHARGING_STATION_BLOCK) return false;
 
@@ -220,7 +232,8 @@ extends ScooterEntity {
 		NbtFloat prog = NbtFloat.of(this.dataTracker.get(CHARGE_PROGRESS));
 		nbt.put(NBT_KEY_CHARGE_PROGRESS, prog);
 
-		BlockPos chargerPos = this.dataTracker.get(CHARGER);
+		var optChargerPos = this.dataTracker.get(CHARGER);
+		BlockPos chargerPos = optChargerPos.isPresent()? optChargerPos.get() : null;
 		if(chargerPos != null) {
 			nbt.putInt(NBT_KEY_CHARGER_X, chargerPos.getX());
 			nbt.putInt(NBT_KEY_CHARGER_Y, chargerPos.getY());
@@ -329,9 +342,9 @@ extends ScooterEntity {
 			float charge = this.dataTracker.get(CHARGE_PROGRESS);
 			charge -= 1f/90f;
 			if(charge <= 0f) {
-				if(!this.dischargeItem(1))
-					this.updateClientScootersInventory();
-				charge = 1f;
+				this.updateClientScootersInventory();
+				if(this.dischargeItem(1))
+					charge = 1f;
 			}
 			this.dataTracker.set(CHARGE_PROGRESS, charge);
 		}

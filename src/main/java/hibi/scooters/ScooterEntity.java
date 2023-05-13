@@ -256,7 +256,7 @@ InventoryChangedListener {
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
 		if(this.hasPassengers()) return ActionResult.PASS;
-		if(this.isTouchingWater()) return ActionResult.PASS;
+		if(this.isSubmergedInWater()) return ActionResult.PASS;
 
 		// If the player is sneaking then open the GUI
 		if(player.shouldCancelInteraction()) {
@@ -277,6 +277,11 @@ InventoryChangedListener {
 			return ActionResult.PASS;
 		}
 		return ActionResult.SUCCESS;
+	}
+
+	@Override
+	public boolean canHit() {
+		return true;
 	}
 
 	@Override
@@ -498,8 +503,9 @@ InventoryChangedListener {
 		boolean markDirty = false;
 		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
 			stack.damage(damage, this.random, null);
-		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
+		if(stack.getDamage() >= stack.getMaxDamage() && !popped) {
 			markDirty = true;
+			stack.setDamage(stack.getMaxDamage());
 			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 0.7f, 1.5f);
 		}
 		// --- //
@@ -509,6 +515,7 @@ InventoryChangedListener {
 			stack.damage(damage, this.random, null);
 		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
 			markDirty = true;
+			stack.setDamage(stack.getMaxDamage());
 			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 1.0f, 0.7f);
 		}
 
