@@ -1,7 +1,5 @@
 package hibi.scooters.recipes;
 
-import com.ibm.icu.util.ULocale.Category;
-
 import hibi.scooters.Common;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -12,6 +10,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -46,8 +45,8 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public ItemStack craft(CraftingInventory inv) {
-		ItemStack iout = this.getOutput();
+	public ItemStack craft(CraftingInventory inv, DynamicRegistryManager manager) {
+		ItemStack iout = Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 		boolean flip = this.isFlipped(inv);
 		NbtList tires = new NbtList();
 		// Unrolled loop
@@ -84,11 +83,6 @@ extends SpecialCraftingRecipe {
 	@Override
 	public DefaultedList<Ingredient> getIngredients() {
 		return RECIPE;
-	}
-
-	@Override
-	public ItemStack getOutput() {
-		return Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 	}
 
 	@Override

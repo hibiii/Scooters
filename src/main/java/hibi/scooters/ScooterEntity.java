@@ -10,6 +10,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,9 +24,9 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.screen.ScreenHandler;
@@ -81,7 +82,7 @@ InventoryChangedListener {
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
-		this.stepHeight = 0.6f;
+		this.setStepHeight(0.6f);
 		this.maxSpeed = 0.4d;
 		this.acceleration = 0.02d;
 		this.brakeForce = 0.93d;
@@ -166,7 +167,7 @@ InventoryChangedListener {
 		}
 		else {
 			if(!this.world.isClient && this.hasPassengers()) {
-				Entity e = this.getPrimaryPassenger();
+				Entity e = this.getControllingPassenger();
 				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative()) {
 					double displx = this.oldx - this.getX();
 					double displz = this.oldz - this.getZ();
@@ -361,11 +362,12 @@ InventoryChangedListener {
 	protected void playStepSound(BlockPos pos, BlockState state) {
 		this.playSound(Common.SOUND_SCOOTER_ROLLING, 1f, 0.9f + this.random.nextFloat() * 0.1f);
 	}
-	
+
 	@Override
-	public Entity getPrimaryPassenger() {
+	public LivingEntity getControllingPassenger() {
 		List<Entity> list = this.getPassengerList();
-		return list.isEmpty() ? null : list.get(0);
+		// TODO Object Cast
+		return list.isEmpty() ? null : (LivingEntity)(Object)list.get(0);
 	}
 
 	/**
@@ -478,7 +480,7 @@ InventoryChangedListener {
 	 */
 	protected void wearTear(double displ) {
 		this.damageTires(displ);
-		ServerPlayerEntity p = (ServerPlayerEntity) this.getPrimaryPassenger();
+		ServerPlayerEntity p = (ServerPlayerEntity) this.getControllingPassenger();
 		p.addExhaustion(0.028f * (float)displ);
 	}
 

@@ -65,7 +65,8 @@ extends ScooterEntity {
 			// Short circuit the batteries and discharge them isntantaneously
 			if(this.submergedInWater) {
 				this.dischargeItem(64);
-				this.damage(DamageSource.DROWN, Float.MAX_VALUE);
+				// TODO 19.4 damage refactor
+				this.damage(null, Float.MAX_VALUE);
 			}
 			if(this.charging) {
 				if(!this.items.getStack(SLOT_DISCHARGED).isEmpty() && this.canCharge) {

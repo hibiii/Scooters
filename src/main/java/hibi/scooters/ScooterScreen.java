@@ -5,6 +5,7 @@ import org.joml.Quaternionf;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
@@ -39,30 +40,30 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
         int lmost = (this.width - this.backgroundWidth) / 2;
         int tmost = (this.height - this.backgroundHeight) / 2;
 
-        this.drawTexture(matrices, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        DrawableHelper.drawTexture(matrices, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
 		DefaultedList<Slot> slots = this.getScreenHandler().slots;
 
 		// Tire outlines
 		if(!slots.get(0).hasStack())
-			this.drawTexture(matrices, lmost + 61, tmost + 35, 0, 166, 18, 18);
+			DrawableHelper.drawTexture(matrices, lmost + 61, tmost + 35, 0, 166, 18, 18);
 		if(!slots.get(1).hasStack())
-			this.drawTexture(matrices, lmost + 61, tmost + 53, 0, 166, 18, 18);
+			DrawableHelper.drawTexture(matrices, lmost + 61, tmost + 53, 0, 166, 18, 18);
 
 		if(this.electric) {
 
 			// Charging slots
-			this.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);
+			DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);
 
 			// Potato outlines
 			if(!slots.get(2).hasStack())
-				this.drawTexture(matrices, lmost + 97, tmost + 17, 0, 184, 18, 18);
+				DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 17, 0, 184, 18, 18);
 			if(!slots.get(3).hasStack())
-				this.drawTexture(matrices, lmost + 97, tmost + 53, 0, 202, 18, 18);
+				DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 53, 0, 202, 18, 18);
 			
 			// Spark
-			this.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14);
+			DrawableHelper.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14);
 			// Charger
-			this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
+			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
 
 			ElectricScooterEntity e = (ElectricScooterEntity)this.entity;
 			if (e.isCharging()) {
@@ -70,18 +71,18 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 					int y = (int) (this.entity.world.getTime() % 15);
 					if(y != 0) {
 						// Spark foreground
-						this.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
+						DrawableHelper.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
 					}
 				}
 				// Cord from charger
-				this.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18);
+				DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18);
 			}
 
 			// Charge bar
-			this.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 10, 28);
+			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 10, 28);
 			// Charge filled in
 			int p = (int) (((ElectricScooterEntity)this.entity).getChargeProgress() * 29);
-			this.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 10, p);
+			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 10, p);
 		}
 		ScooterScreen.drawEntity(lmost + 36, tmost + 60, 22, 110f, -24f, this.entity);
 	}

@@ -8,6 +8,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -37,8 +38,8 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public ItemStack craft(CraftingInventory inv) {
-		ItemStack out = this.getOutput().copy();
+	public ItemStack craft(CraftingInventory inv, DynamicRegistryManager manager) {
+		ItemStack out = Common.ELECTRIC_SCOOTER_ITEM.getDefaultStack().copy();
 		out.setNbt(inv.getStack(4).getNbt());
 		return out;
 	}
@@ -47,11 +48,6 @@ extends SpecialCraftingRecipe {
 	public boolean fits(int w, int h) {
 		// FIXME: Recipes do not work on a crafting inventory larger than 3x3
 		return w * h == 9;
-	}
-
-	@Override
-	public ItemStack getOutput() {
-		return Common.ELECTRIC_SCOOTER_ITEM.getDefaultStack().copy();
 	}
 
 	@Override
