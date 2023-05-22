@@ -51,7 +51,7 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		// Render the charging cable if the scooter is connected to a charging station
 		if(entity instanceof ElectricScooterEntity) {
 			ElectricScooterEntity e = (ElectricScooterEntity)entity;
-			if(false && e.isCharging()) {
+			if(false && e.isConnectedToCharger()) {
 				BlockPos charger = e.getDataTracker().get(ElectricScooterEntity.CHARGER).orElseGet(() -> null);
 				if(e != null) {
 					// Apparently 0-offset is at the +X-Y+Zmost corner

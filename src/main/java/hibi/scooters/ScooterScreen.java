@@ -66,8 +66,8 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
 
 			ElectricScooterEntity e = (ElectricScooterEntity)this.entity;
-			if (e.isCharging()) {
-				if(e.getCanCharge()) {
+			if (e.isConnectedToCharger()) {
+				if(e.getChargerIsPowered()) {
 					int y = (int) (this.entity.world.getTime() % 15);
 					if(y != 0) {
 						// Spark foreground

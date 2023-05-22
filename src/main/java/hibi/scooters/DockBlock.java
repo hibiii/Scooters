@@ -62,19 +62,19 @@ extends BlockWithEntity {
 
 		boolean hasPower = state.get(POWERED);
 		if(hasPower != world.isReceivingRedstonePower(pos)) {
-			if(hasPower)
+			if(hasPower) {
 				world.scheduleBlockTick(pos, this, 4);
-			else
+			} else {
 				world.setBlockState(pos, state.cycle(POWERED));
+			}
 		}
-		
-		DockBlockEntity.validateCharging(state, (ServerWorld)world, pos, (DockBlockEntity)world.getBlockEntity(pos));
 	}
 
 	@Override
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		if(state.get(POWERED) && !world.isReceivingRedstonePower(pos))
+		if(state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
 			world.setBlockState(pos, state.cycle(POWERED));
+		}
 	}
 
 	@Override
@@ -84,7 +84,9 @@ extends BlockWithEntity {
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite()).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+		return (BlockState) this.getDefaultState()
+			.with(FACING, ctx.getHorizontalPlayerFacing().getOpposite())
+			.with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
 	}
 
 	@Override

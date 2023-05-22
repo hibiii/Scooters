@@ -498,32 +498,23 @@ InventoryChangedListener {
 		boolean abrasive = this.isOnAbrasive();
 		if(!abrasive && offsetTime % 40 == 0) return;
 	
-		// Unrolled loop
-		ItemStack stack = this.items.getStack(SLOT_FRONT_TIRE);
-		int damage = abrasive? 2 : 1;
-		boolean popped = stack.getDamage() == stack.getMaxDamage();
-		boolean markDirty = false;
-		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
-			stack.damage(damage, this.random, null);
-		if(stack.getDamage() >= stack.getMaxDamage() && !popped) {
-			markDirty = true;
-			stack.setDamage(stack.getMaxDamage());
-			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 0.7f, 1.5f);
-		}
-		// --- //
-		stack = this.items.getStack(SLOT_REAR_TIRE);
-		popped = stack.getDamage() == stack.getMaxDamage();
-		if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
-			stack.damage(damage, this.random, null);
-		if(stack.getDamage() == stack.getMaxDamage() && !popped) {
-			markDirty = true;
-			stack.setDamage(stack.getMaxDamage());
-			this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 1.0f, 0.7f);
+		for (int i = SLOT_FRONT_TIRE; i <= SLOT_REAR_TIRE; i++) {
+			ItemStack stack = this.items.getStack(SLOT_FRONT_TIRE);
+			int damage = abrasive? 2 : 1;
+			boolean popped = stack.getDamage() == stack.getMaxDamage();
+			boolean markDirty = false;
+			if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
+				stack.damage(damage, this.random, null);
+			if(stack.getDamage() >= stack.getMaxDamage() && !popped) {
+				markDirty = true;
+				stack.setDamage(stack.getMaxDamage());
+				this.playSound(Common.SOUND_SCOOTER_TIRE_POP, 0.7f, 1.5f);
+			}
 		}
 
 		// Update clients if any of the tires are popped
-		if(markDirty)
-			this.updateClientScootersInventory();
+		// FIXME find replacement for markDirty
+		this.updateClientScootersInventory();
 	}
 
 	/**

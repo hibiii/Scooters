@@ -34,7 +34,7 @@ extends ScooterEntity {
 
 	public static final TrackedData<Optional<BlockPos>> CHARGER = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
 	public static final TrackedData<Float> CHARGE_PROGRESS = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.FLOAT);
-	public static final TrackedData<Boolean> CAN_CHARGE = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	public static final TrackedData<Boolean> CHARGER_IS_POWERED = DataTracker.registerData(ElectricScooterEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	public static final int SLOT_CHARGED = 2;
 	public static final int SLOT_DISCHARGED = 3;
 	public static final String NBT_KEY_BATTERIES = "Batteries";
@@ -42,8 +42,6 @@ extends ScooterEntity {
 	public static final String NBT_KEY_CHARGER_X = "ChargerX";
 	public static final String NBT_KEY_CHARGER_Y = "ChargerY";
 	public static final String NBT_KEY_CHARGER_Z = "ChargerZ";
-	private boolean charging = false;
-	private boolean canCharge = false;
 
 	public ElectricScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -68,8 +66,12 @@ extends ScooterEntity {
 				// TODO 19.4 damage refactor
 				this.damage(null, Float.MAX_VALUE);
 			}
-			if(this.charging) {
-				if(!this.items.getStack(SLOT_DISCHARGED).isEmpty() && this.canCharge) {
+			if(this.isConnectedToCharger()) {
+				if(!this.hasValidCharger()) {
+					this.detachFromCharger();
+				}
+				this.trackChargerPower();
+				if(this.dataTracker.get(CHARGER_IS_POWERED) && !this.items.getStack(SLOT_DISCHARGED).isEmpty()) {
 					float chargeProgress = this.dataTracker.get(CHARGE_PROGRESS);
 					chargeProgress += 1f/120f; // 6 seconds per item, 6"24' per stack
 					if(chargeProgress > 1f) {
@@ -78,14 +80,8 @@ extends ScooterEntity {
 					}
 					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
-				if((this.world.getTime() + this.getId()) % 20 == 0) {
-					if(this.checkCharger()) {
-						BlockPos charger = this.dataTracker.get(CHARGER).get();
-						if(charger.getSquaredDistanceFromCenter(this.getX(), this.getY(), this.getZ()) > 8)
-							DockBlockEntity.detachScooter(this.world.getBlockState(charger), this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
-					}
-					else
-						this.detachFromCharger();
+				if((this.world.getTime() + this.getId()) % 20 != 0) {
+					return;
 				}
 			}
 			if(this.items.getStack(SLOT_DISCHARGED).isEmpty() && this.dataTracker.get(CHARGE_PROGRESS) != 0f) {
@@ -98,7 +94,7 @@ extends ScooterEntity {
 	protected void initDataTracker() {
 		this.dataTracker.startTracking(CHARGER, Optional.empty());
 		this.dataTracker.startTracking(CHARGE_PROGRESS, 0f);
-		this.dataTracker.startTracking(CAN_CHARGE, false);
+		this.dataTracker.startTracking(CHARGER_IS_POWERED, false);
 		super.initDataTracker();
 	}
 
@@ -106,13 +102,14 @@ extends ScooterEntity {
 	public ActionResult interact(PlayerEntity player, Hand hand) {
 		if(this.hasPassengers()) return ActionResult.PASS;
 
+		Optional<BlockPos> optChargerPos = this.dataTracker.get(CHARGER);
 		// If the player right clicks a charging e-scooter then detach it from a charger.
-		if(this.charging && !player.shouldCancelInteraction()) {
-			// FIXME Throws on null
-			BlockPos charger = this.dataTracker.get(CHARGER).get();
+		if(optChargerPos.isPresent() && !player.shouldCancelInteraction()) {
+			BlockPos charger = optChargerPos.get();
 			BlockState cached = this.world.getBlockState(charger);
 			if(cached.getBlock() == Common.CHARGING_STATION_BLOCK && cached.get(DockBlock.CHARGING)) {
 				DockBlockEntity.detachScooter(cached, this.world, charger, (DockBlockEntity)this.world.getBlockEntity(charger));
+				this.detachFromCharger();
 				return ActionResult.success(this.world.isClient);
 			}
 		}
@@ -137,18 +134,15 @@ extends ScooterEntity {
 	 * Charging <b>must</b> be initialized from {@link DockBlockEntity}.attachScooter, as the charger is required to actually exist.
 	 * @param pos The position of the charger.
 	 */
-	@Deprecated
 	public void attachToCharher(BlockPos pos) {
-		BlockState state = this.world.getBlockState(pos);
-		if(state.getBlock() == Common.CHARGING_STATION_BLOCK && !state.get(DockBlock.CHARGING)) {
-			this.removeAllPassengers();
-			this.charging = true;
-			this.dataTracker.set(CHARGER, Optional.of(pos));
-			boolean b = state.get(DockBlock.POWERED);
-			if(b != this.dataTracker.get(CAN_CHARGE))
-				this.dataTracker.set(CAN_CHARGE, b);
-			this.playSound(Common.SOUND_CHARGER_CONNECT, 1.0f, 1.0f);
+		BlockState blockState = this.world.getBlockState(pos);
+		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
+			return;
 		}
+		this.removeAllPassengers();
+		this.dataTracker.set(CHARGER, Optional.of(pos));
+		this.dataTracker.set(CHARGER_IS_POWERED, blockState.get(DockBlock.POWERED));
+		this.playSound(Common.SOUND_CHARGER_CONNECT, 1.0f, 1.0f);
 	}
 
 	/**
@@ -156,46 +150,52 @@ extends ScooterEntity {
 	 * If there is a charger, then detaching <b>must</b> be initialized from that {@link DockBlockEntity}.detachScooter.
 	 * This method should only be called if there's no charger available (e.g. it is destroyed).
 	 */
-	@Deprecated
 	public void detachFromCharger() {
-		this.charging = false;
+		Optional<BlockPos> optChargerPos = this.dataTracker.get(CHARGER);
+		if (optChargerPos.isEmpty()) {
+			return;
+		}
+		BlockPos blockPos = optChargerPos.get();
+		BlockEntity blockEntity = this.world.getBlockEntity(blockPos);
+		if (!(blockEntity instanceof DockBlockEntity)) {
+			return;
+		}
+		DockBlockEntity.detachScooter(this.world.getBlockState(blockPos), this.world, blockPos, (DockBlockEntity) blockEntity);
 		this.dataTracker.set(CHARGER, Optional.empty());
 		this.playSound(Common.SOUND_CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
 
-	public boolean isCharging() {
-		return this.charging || this.dataTracker.get(CHARGER).isPresent();
+	public boolean isConnectedToCharger() {
+		return this.dataTracker.get(CHARGER).isPresent();
 	}
 
 	/**
 	 * Checks if the attached charger is actually valid for charging.
-	 * The charger is not disconnected here.
 	 * {@code this.canCharge} is set if the charger is valid to stay connected, and also powered.
 	 * @return {@code true} if the charger is valid to stay connected, {@code false} otherwise.
 	 */
-	public boolean checkCharger() {
+	public boolean hasValidCharger() {
 		Optional<BlockPos> optionalCharger = this.dataTracker.get(CHARGER);
 		if(optionalCharger.isEmpty()) {
 			return false;
 		}
 		BlockPos charger = optionalCharger.get();
-		BlockState cached = this.world.getBlockState(charger);
-		if(cached.getBlock() != Common.CHARGING_STATION_BLOCK) return false;
-
-		boolean b = cached.get(DockBlock.POWERED);
-		if(b != this.canCharge) {
-			this.canCharge = b;
-			this.dataTracker.set(CAN_CHARGE, b);
+		BlockState blockState = this.world.getBlockState(charger);
+		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
+			return false;
 		}
-		return cached.get(DockBlock.CHARGING);
+		if (charger.getSquaredDistance(this.getPos()) > 9) {
+			return false;
+		}
+		return blockState.get(DockBlock.CHARGING);
 	}
 
 	public float getChargeProgress() {
 		return this.dataTracker.get(CHARGE_PROGRESS);
 	}
 
-	public boolean getCanCharge() {
-		return this.dataTracker.get(CAN_CHARGE);
+	public boolean getChargerIsPowered() {
+		return this.dataTracker.get(CHARGER_IS_POWERED);
 	}
 
 	/**
@@ -344,10 +344,11 @@ extends ScooterEntity {
 			charge -= 1f/90f;
 			if(charge <= 0f) {
 				this.updateClientScootersInventory();
-				if(this.dischargeItem(1))
+				if(this.dischargeItem(1)) {
 					charge = 1f;
+				}
+				this.dataTracker.set(CHARGE_PROGRESS, charge);
 			}
-			this.dataTracker.set(CHARGE_PROGRESS, charge);
 		}
 	}
 	
@@ -383,5 +384,17 @@ extends ScooterEntity {
 		nbt.remove(NBT_KEY_CHARGER_X);
 		nbt.remove(NBT_KEY_CHARGER_Z);
 		return out;
+	}
+
+	protected void trackChargerPower() {
+		Optional<BlockPos> optChargerPos = this.dataTracker.get(CHARGER);
+		if(optChargerPos.isEmpty()) {
+			return;
+		}
+		boolean isRememberedPowered = this.dataTracker.get(CHARGER_IS_POWERED);
+		boolean isChargerPowered = this.world.getBlockState(optChargerPos.get()).get(DockBlock.POWERED);
+		if (isChargerPowered != isRememberedPowered) {
+			this.dataTracker.set(CHARGER_IS_POWERED, isChargerPowered);
+		}
 	}
 }
