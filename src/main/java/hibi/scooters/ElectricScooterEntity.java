@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -284,7 +283,7 @@ extends ScooterEntity {
 	 * @param amount How many items to charge.
 	 * @return {@code true} if any amount of items were charged, {@code false} otherwise.
 	 */
-	private boolean chargeItem(int amount) {
+	protected boolean chargeItem(int amount) {
 		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
 		if(discharged.isEmpty()) return false;
 
@@ -308,7 +307,7 @@ extends ScooterEntity {
 	 * @param amount How many items to discharge.
 	 * @return {@code true} if any amount of items were discharged, {@code false} otherwise.
 	 */
-	private boolean dischargeItem(int amount) {
+	protected boolean dischargeItem(int amount) {
 		ItemStack charged = this.items.getStack(SLOT_CHARGED);
 		if(charged.isEmpty()) return false;
 
