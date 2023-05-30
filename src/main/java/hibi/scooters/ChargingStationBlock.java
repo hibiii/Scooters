@@ -27,7 +27,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class DockBlock
+public class ChargingStationBlock
 extends BlockWithEntity {
 
 	private static final VoxelShape NORTH_SOUTH_SHAPE = Block.createCuboidShape(2f, 0f, 5f, 14f, 16f, 11f);
@@ -36,7 +36,7 @@ extends BlockWithEntity {
 	public static final BooleanProperty CHARGING = BooleanProperty.of("charging");
 	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-	public DockBlock(Settings settings) {
+	public ChargingStationBlock(Settings settings) {
 		super(settings);
 		this.setDefaultState(this.stateManager.getDefaultState()
 			.with(POWERED, false)
@@ -101,12 +101,12 @@ extends BlockWithEntity {
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		return DockBlockEntity.use(state, world, pos, player, hand, hit, (DockBlockEntity)world.getBlockEntity(pos));
+		return ChargingStationBlockEntity.use(state, world, pos, player, hand, hit, (ChargingStationBlockEntity)world.getBlockEntity(pos));
 	}
 
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-		return new DockBlockEntity(pos, state);
+		return new ChargingStationBlockEntity(pos, state);
 	}
 
 	@Override
@@ -116,6 +116,6 @@ extends BlockWithEntity {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return BlockWithEntity.checkType(type, Common.CHARGING_STATION_BLOCK_ENTITY, DockBlockEntity::tick);
+		return BlockWithEntity.checkType(type, Common.CHARGING_STATION_BLOCK_ENTITY, ChargingStationBlockEntity::tick);
 	}
 }

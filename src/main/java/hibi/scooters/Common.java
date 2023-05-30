@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -25,7 +25,6 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -49,22 +48,23 @@ public class Common implements ModInitializer {
 	public static final SpecialRecipeSerializer<ElectricScooterRecipe> ELECTRIC_SCOOTER_CRAFTING_SERIALIZER;
 
 	public static final Identifier CHARGING_STATION_ID;
-	public static final DockBlock CHARGING_STATION_BLOCK;
-	public static final BlockEntityType<DockBlockEntity> CHARGING_STATION_BLOCK_ENTITY;
+	public static final ChargingStationBlock CHARGING_STATION_BLOCK;
+	public static final BlockEntityType<ChargingStationBlockEntity> CHARGING_STATION_BLOCK_ENTITY;
 
 	public static final Item TIRE_ITEM;
 	public static final Item RAW_TIRE_ITEM;
 
 	public static final Identifier PACKET_INVENTORY_CHANGED_ID;
 	public static final Identifier PACKET_THROTTLE_ID;
-	public static final ScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("scooters", "scooter"), ScooterScreenHandler::new);
+	public static final ExtendedScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(ScooterScreenHandler::new);
+	public static final Identifier SCOOTER_SCREEN_HANDLER_ID;
 	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, new Identifier(MODID, "abrasive"));
-
+	
 	public static final SoundEvent SOUND_SCOOTER_ROLLING = SoundEvent.of(new Identifier(MODID, "entity.roll"));
 	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = SoundEvent.of(new Identifier(MODID, "entity.tire_pop"));
 	public static final SoundEvent SOUND_CHARGER_CONNECT = SoundEvent.of(new Identifier(MODID, "charger.connect"));
 	public static final SoundEvent SOUND_CHARGER_DISCONNECT = SoundEvent.of(new Identifier(MODID, "charger.disconnect"));
-
+	
 	@Override
 	public void onInitialize() {
 		LOGGER.debug("Initializing common");
@@ -96,6 +96,7 @@ public class Common implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
 			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
 		});
+		Registry.register(Registries.SCREEN_HANDLER, SCOOTER_SCREEN_HANDLER_ID, SCOOTER_SCREEN_HANDLER);
 		LOGGER.debug("Common Init: Sounds");
 
 		// Sounds //
@@ -142,11 +143,11 @@ public class Common implements ModInitializer {
 
 
 		CHARGING_STATION_ID = new Identifier(MODID, "charging_station");
-		CHARGING_STATION_BLOCK = new DockBlock(FabricBlockSettings
+		CHARGING_STATION_BLOCK = new ChargingStationBlock(FabricBlockSettings
 			.of(Material.METAL)
 			.strength(4.0f)
 		);
-		CHARGING_STATION_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(DockBlockEntity::new, CHARGING_STATION_BLOCK)
+		CHARGING_STATION_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ChargingStationBlockEntity::new, CHARGING_STATION_BLOCK)
 			.build(null);
 		
 		
@@ -160,5 +161,7 @@ public class Common implements ModInitializer {
 	
 		PACKET_INVENTORY_CHANGED_ID = new Identifier(MODID,"invchange");
 		PACKET_THROTTLE_ID = new Identifier(MODID, "esctup");
+
+		SCOOTER_SCREEN_HANDLER_ID = new Identifier(MODID, "scooter_screen_handler");
 	}
 }

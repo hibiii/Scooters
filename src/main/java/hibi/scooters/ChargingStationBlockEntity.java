@@ -16,37 +16,36 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
-// FIXME: Entire electric scooter - charging station interaction needs to be refactored
-public class DockBlockEntity
+public class ChargingStationBlockEntity
 extends BlockEntity {
 
 	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 2d, 0.5d, 2d);
 	private UUID chargee = null;
 
-	public DockBlockEntity(BlockPos pos, BlockState state) {
+	public ChargingStationBlockEntity(BlockPos pos, BlockState state) {
 		super(Common.CHARGING_STATION_BLOCK_ENTITY, pos, state);
 	}
 
-	public static void tick(World world, BlockPos pos, BlockState state, DockBlockEntity that) {
+	public static void tick(World world, BlockPos pos, BlockState state, ChargingStationBlockEntity that) {
 		if(world.isClient) return;
-		DockBlockEntity.detectBrokenInvariants(that);
+		ChargingStationBlockEntity.detectBrokenInvariants(that);
 		ServerWorld serverWorld = (ServerWorld)world;
-		if(!state.get(DockBlock.CHARGING)) {
+		if(!state.get(ChargingStationBlock.CHARGING)) {
 			return;
 		}
 		if(serverWorld.getEntity(that.chargee) == null) {
-			DockBlockEntity.detachScooter(state, serverWorld, pos, that);
+			ChargingStationBlockEntity.detachScooter(state, serverWorld, pos, that);
 		}
 	}
 
-	public static ActionResult use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, DockBlockEntity that) {
+	public static ActionResult use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ChargingStationBlockEntity that) {
 
 		// Detach an e-scooter if there's one connected to it.
-		if(state.get(DockBlock.CHARGING)) {
+		if(state.get(ChargingStationBlock.CHARGING)) {
 			if(!world.isClient && that.chargee != null) {
 				((ElectricScooterEntity)((ServerWorld)world).getEntity(that.chargee)).detachFromCharger();
 			}
-			DockBlockEntity.detachScooter(state, world, pos, that);
+			ChargingStationBlockEntity.detachScooter(state, world, pos, that);
 			return ActionResult.success(world.isClient());
 		}
 
@@ -58,7 +57,7 @@ extends BlockEntity {
 			if(escooter.isConnectedToCharger()) {
 				continue;
 			}
-			DockBlockEntity.attachScooter(state, world, pos, that, escooter);
+			ChargingStationBlockEntity.attachScooter(state, world, pos, that, escooter);
 			escooter.attachToCharher(pos);
 			return ActionResult.success(world.isClient());
 		}
@@ -66,27 +65,27 @@ extends BlockEntity {
 		return ActionResult.PASS;
 	}
 
-	public static void detachScooter(BlockState state, World world, BlockPos pos, DockBlockEntity that) {
+	public static void detachScooter(BlockState state, World world, BlockPos pos, ChargingStationBlockEntity that) {
 		if(world.isClient) return;
-		that.world.setBlockState(pos, state.with(DockBlock.CHARGING, false));
+		that.world.setBlockState(pos, state.with(ChargingStationBlock.CHARGING, false));
 		that.chargee = null;
 	}
 
-	public static void attachScooter(BlockState state, World world, BlockPos pos, DockBlockEntity that, ElectricScooterEntity escooter) {
+	public static void attachScooter(BlockState state, World world, BlockPos pos, ChargingStationBlockEntity that, ElectricScooterEntity escooter) {
 		if(world.isClient) return;
 
 		if(that.isCharging()) return;
 		if(escooter.isConnectedToCharger()) return;
 
-		world.setBlockState(pos, state.with(DockBlock.CHARGING, true));
+		world.setBlockState(pos, state.with(ChargingStationBlock.CHARGING, true));
 		that.chargee = escooter.getUuid();
 	}
 
 	private boolean isCharging() {
-		return this.getCachedState().get(DockBlock.CHARGING) && this.chargee != null && ((ServerWorld)this.world).getEntity(this.chargee) != null;
+		return this.getCachedState().get(ChargingStationBlock.CHARGING) && this.chargee != null && ((ServerWorld)this.world).getEntity(this.chargee) != null;
 	}
 
-	private static void detectBrokenInvariants(DockBlockEntity that) {
+	private static void detectBrokenInvariants(ChargingStationBlockEntity that) {
 		// if ((that.getCachedState().get(DockBlock.CHARGING) && that.chargee == null)
 		// || (that.chargee != null && ((ServerWorld)that.world).getEntity(that.chargee) == null)
 		// ) throw new IllegalStateException();
