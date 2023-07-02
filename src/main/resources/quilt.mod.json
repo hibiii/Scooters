@@ -35,6 +35,7 @@
       }
     ]
   },
+  "mixin": "scooters.mixin.json",
   "modmenu": {
     "links": {
       "modmenu.scooters.quick_start_guide": "https://hibiscus.pet/mods/scooters/quick_start",
