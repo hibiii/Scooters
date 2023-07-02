@@ -5,7 +5,7 @@ import org.joml.Quaternionf;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import com.mojang.blaze3d.lighting.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
@@ -33,64 +33,62 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 	}
 
 	@Override
-	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, TEXTURE);
+	protected void drawBackground(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
         int lmost = (this.width - this.backgroundWidth) / 2;
         int tmost = (this.height - this.backgroundHeight) / 2;
 
-        DrawableHelper.drawTexture(matrices, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        graphics.drawTexture(TEXTURE, lmost, tmost, 0, 0, this.backgroundWidth, this.backgroundHeight);
 		DefaultedList<Slot> slots = this.getScreenHandler().slots;
 
 		// Tire outlines
 		if(!slots.get(0).hasStack())
-			DrawableHelper.drawTexture(matrices, lmost + 61, tmost + 35, 0, 166, 18, 18);
+			graphics.drawTexture(TEXTURE, lmost + 61, tmost + 35, 0, 166, 18, 18);
 		if(!slots.get(1).hasStack())
-			DrawableHelper.drawTexture(matrices, lmost + 61, tmost + 53, 0, 166, 18, 18);
+			graphics.drawTexture(TEXTURE, lmost + 61, tmost + 53, 0, 166, 18, 18);
 
 		if(this.electric) {
 
 			// Charging slots
-			DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 17, 18, 166, 18, 54);
+			graphics.drawTexture(TEXTURE, lmost + 97, tmost + 17, 18, 166, 18, 54);
 
 			// Potato outlines
 			if(!slots.get(2).hasStack())
-				DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 17, 0, 184, 18, 18);
+				graphics.drawTexture(TEXTURE, lmost + 97, tmost + 17, 0, 184, 18, 18);
 			if(!slots.get(3).hasStack())
-				DrawableHelper.drawTexture(matrices, lmost + 97, tmost + 53, 0, 202, 18, 18);
+				graphics.drawTexture(TEXTURE, lmost + 97, tmost + 53, 0, 202, 18, 18);
 			
 			// Spark
-			DrawableHelper.drawTexture(matrices, lmost + 138, tmost + 37, 56, 166, 12, 14);
+			graphics.drawTexture(TEXTURE, lmost + 138, tmost + 37, 56, 166, 12, 14);
 			// Charger
-			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 53, 56, 184, 35, 18);
+			graphics.drawTexture(TEXTURE, lmost + 115, tmost + 53, 56, 184, 35, 18);
 
 			ElectricScooterEntity e = (ElectricScooterEntity)this.entity;
 			if (e.isConnectedToCharger()) {
 				if(e.getChargerIsPowered()) {
-					int y = (int) (this.entity.world.getTime() % 15);
+					int y = (int) (this.entity.getWorld().getTime() % 15);
 					if(y != 0) {
 						// Spark foreground
-						DrawableHelper.drawTexture(matrices, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
+						graphics.drawTexture(TEXTURE, lmost + 138, tmost + 51 - y, 68, 180 - y, 12, y);
 					}
 				}
 				// Cord from charger
-				DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 53, 56, 202, 35, 18);
+				graphics.drawTexture(TEXTURE, lmost + 115, tmost + 53, 56, 202, 35, 18);
 			}
 
 			// Charge bar
-			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 26, 36, 175, 10, 28);
+			graphics.drawTexture(TEXTURE, lmost + 115, tmost + 26, 36, 175, 10, 28);
 			// Charge filled in
 			int p = (int) (((ElectricScooterEntity)this.entity).getChargeProgress() * 29);
-			DrawableHelper.drawTexture(matrices, lmost + 115, tmost + 54 - p, 46, 203 - p, 10, p);
+			graphics.drawTexture(TEXTURE, lmost + 115, tmost + 54 - p, 46, 203 - p, 10, p);
 		}
 		ScooterScreen.drawEntity(lmost + 36, tmost + 60, 22, 110f, -24f, this.entity);
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
-		super.render(matrices, mouseX, mouseY, delta);
-		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		this.renderBackground(graphics);
+		super.render(graphics, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(graphics, mouseX, mouseY);
 	}
 
 	// Ultra hacky solution to get around InventoryScreen.drawEntity being made for LivingEntitys

@@ -2,6 +2,7 @@ package hibi.scooters.recipes;
 
 import hibi.scooters.Common;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.CraftingCategory;
@@ -21,7 +22,7 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public boolean matches(CraftingInventory inv, World w) {
+	public boolean matches(RecipeInputInventory inv, World w) {
 		// The scooter in the middle is the anchor
 		// (Not applicable now because we're discarding inventories sizeof != 3x3)
 
@@ -38,7 +39,7 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public ItemStack craft(CraftingInventory inv, DynamicRegistryManager manager) {
+	public ItemStack craft(RecipeInputInventory inv, DynamicRegistryManager manager) {
 		ItemStack out = Common.ELECTRIC_SCOOTER_ITEM.getDefaultStack().copy();
 		out.setNbt(inv.getStack(4).getNbt());
 		return out;
@@ -70,7 +71,7 @@ extends SpecialCraftingRecipe {
 		return Common.ELECTRIC_SCOOTER_CRAFTING_SERIALIZER;
 	}
 	
-	private boolean isFlipped(CraftingInventory inv) {
+	private boolean isFlipped(RecipeInputInventory inv) {
 		return !INPUT[3].test(inv.getStack(3));
 	}
 

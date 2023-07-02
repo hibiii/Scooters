@@ -96,6 +96,7 @@ InventoryChangedListener {
 		this.items.addListener(this);
 		this.oldx = this.getX();
 		this.oldz = this.getZ();
+		this.inanimate = true;
 	}
 
 	/**
@@ -154,8 +155,9 @@ InventoryChangedListener {
 		super.tick();
 		this.interp();
 
+		World world = this.getWorld();
 		if(this.isLogicalSideForUpdatingMovement()) {
-			if(this.world.isClient) {
+			if(world.isClient) {
 				this.drive();
 			}
 			if(!this.hasNoGravity()) {
@@ -168,7 +170,7 @@ InventoryChangedListener {
 			this.move(MovementType.SELF, this.getVelocity());
 		}
 		else {
-			if(!this.world.isClient && this.hasPassengers()) {
+			if(!world.isClient && this.hasPassengers()) {
 				Entity e = this.getPrimaryPassenger();
 				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative()) {
 					double displx = this.oldx - this.getX();
@@ -189,7 +191,7 @@ InventoryChangedListener {
 		this.checkBlockCollision();
 
 		// Generic pushing code
-		List<Entity> others = this.world.getOtherEntities(this, this.getBoundingBox(), EntityPredicates.canBePushedBy(this));
+		List<Entity> others = world.getOtherEntities(this, this.getBoundingBox(), EntityPredicates.canBePushedBy(this));
 		if(!others.isEmpty()) {
 			for (Entity e : others) {
 				this.pushAwayFrom(e);
@@ -262,14 +264,15 @@ InventoryChangedListener {
 		if(this.hasPassengers()) return ActionResult.PASS;
 		if(this.isSubmergedInWater()) return ActionResult.PASS;
 
+		boolean worldIsClient = this.getWorld().isClient();
 		// If the player is sneaking then open the GUI
 		if(player.shouldCancelInteraction()) {
-			if(!this.world.isClient)
+			if(!worldIsClient)
 				((ServerPlayerEntity)player).openHandledScreen(this);
-			return ActionResult.success(this.world.isClient);
+			return ActionResult.success(worldIsClient);
 		}
 
-		if(!this.world.isClient) {
+		if(!worldIsClient) {
 			// Prevent the player from riding the scooter if there's at least a tire missing
 			if(this.items.getStack(SLOT_FRONT_TIRE).isEmpty() || this.items.getStack(SLOT_REAR_TIRE).isEmpty())
 				return ActionResult.PASS;
@@ -293,18 +296,18 @@ InventoryChangedListener {
 	}
 
 	@Override
-	public Box getVisibilityBoundingBox() {
-		return this.getBoundingBox();
+	public boolean collides() {
+		return true;
 	}
 
 	@Override
 	public boolean damage(DamageSource source, float amount) {
 		if(this.isInvulnerableTo(source)) return false;
-		if(this.world.isClient || this.isRemoved()) return true;
+		if(this.getWorld().isClient() || this.isRemoved()) return true;
 		
 		// Don't do drops if the player is in creative mode, or their inventory will get cluttered
 		boolean drops = !(source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode);
-		if(drops && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
+		if(drops && this.getWorld().getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
 			this.dropStack(this.asItemStack());
 		
 		// Dump the rider if there's any
@@ -333,7 +336,7 @@ InventoryChangedListener {
 	 * @param passenger The current passenger.
 	 */
 	@Override
-	public void updatePassengerPosition(Entity passenger) {
+	protected void updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater) {
 		if(!this.hasPassenger(passenger)) return;
 		passenger.setYaw(passenger.getYaw() + this.yawVelocity);
 		passenger.setBodyYaw(this.getYaw());
@@ -342,7 +345,7 @@ InventoryChangedListener {
         passenger.prevYaw += g - f;
         passenger.setYaw(passenger.getYaw() + g - f);
         passenger.setHeadYaw(passenger.getYaw());
-		super.updatePassengerPosition(passenger);
+		positionUpdater.accept(passenger, this.getX(), this.getY() + this.getMountedHeightOffset() + passenger.getHeightOffset(), this.getZ());
 	}
 
 	@Override
@@ -461,7 +464,7 @@ InventoryChangedListener {
 	 */
 	@Override
 	public void onInventoryChanged(Inventory inv) {
-		if(!this.world.isClient) return;
+		if(!this.getWorld().isClient()) return;
 		this.items = (SimpleInventory) inv;
 		this.tireMult = 1.0;
 		// Unrolled loop
@@ -492,9 +495,9 @@ InventoryChangedListener {
 	 */
 	protected void damageTires(double displ) {
 		if(displ < 0.001225 || displ > 25) return; // 2.5km/h 0.7 m/s (nudging) < displacement < 360 km/h 100 m/s (possible desync)
-		long offsetTime = this.world.getTime() + this.getId();
+		long offsetTime = this.getWorld().getTime() + this.getId();
 		if(offsetTime % 20 != 0) return;
-		if(!this.onGround) return;
+		if(!this.isOnGround()) return;
 	
 		// Cause less damage if the scooter is on a nice surface
 		boolean abrasive = this.isOnAbrasive();
@@ -525,7 +528,7 @@ InventoryChangedListener {
 	 * @return {@code true} if the scooter is on a block in {@code #scooters:abrasive}, {@code false} otherwise.
 	 */
 	protected boolean isOnAbrasive() {
-		return !this.getLandingBlockState().isAir() && this.world.getBlockState(this.getVelocityAffectingPos()).isIn(Common.ABRASIVE_BLOCKS);
+		return !this.getLandingBlockState().isAir() && this.getWorld().getBlockState(this.getVelocityAffectingPos()).isIn(Common.ABRASIVE_BLOCKS);
 	}
 
 	/**

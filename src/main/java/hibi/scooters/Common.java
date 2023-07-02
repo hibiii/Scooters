@@ -1,5 +1,7 @@
 package hibi.scooters;
 
+import org.quiltmc.qsl.block.extensions.api.QuiltBlockSettings;
+import org.quiltmc.qsl.entity.api.QuiltEntityTypeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,13 +10,13 @@ import hibi.scooters.recipes.KickScooterRecipe;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -25,11 +27,13 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 
 public class Common implements ModInitializer {
@@ -94,7 +98,7 @@ public class Common implements ModInitializer {
 
 		// Networking and Misc //
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
-			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
+			ElectricScooterEntity.updateThrottle((ServerWorld)(player.getWorld()),buf);
 		});
 		Registry.register(Registries.SCREEN_HANDLER_TYPE, SCOOTER_SCREEN_HANDLER_ID, SCOOTER_SCREEN_HANDLER);
 		LOGGER.debug("Common Init: Sounds");
@@ -121,9 +125,9 @@ public class Common implements ModInitializer {
 
 	static {
 		KICK_SCOOTER_ID = new Identifier(MODID, "kick_scooter");
-		KICK_SCOOTER_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, ScooterEntity::new)
-			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
-			.trackRangeBlocks(10)
+		KICK_SCOOTER_ENTITY = QuiltEntityTypeBuilder.create(SpawnGroup.MISC, ScooterEntity::new)
+			.setDimensions(EntityDimensions.fixed(0.8f, 0.8f))
+			.maxChunkTrackingRange(4)
 			.build();
 		KICK_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
 			.maxCount(1)
@@ -143,8 +147,10 @@ public class Common implements ModInitializer {
 
 
 		CHARGING_STATION_ID = new Identifier(MODID, "charging_station");
-		CHARGING_STATION_BLOCK = new ChargingStationBlock(FabricBlockSettings
-			.of(Material.METAL)
+		CHARGING_STATION_BLOCK = new ChargingStationBlock(QuiltBlockSettings
+			.copyOf(Blocks.STONE_BRICKS)
+			.sounds(BlockSoundGroup.METAL)
+			.mapColor(Blocks.REPEATER.getDefaultMapColor())
 			.strength(4.0f)
 		);
 		CHARGING_STATION_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ChargingStationBlockEntity::new, CHARGING_STATION_BLOCK)

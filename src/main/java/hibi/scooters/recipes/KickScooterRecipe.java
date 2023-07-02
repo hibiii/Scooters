@@ -2,6 +2,7 @@ package hibi.scooters.recipes;
 
 import hibi.scooters.Common;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -24,7 +25,7 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public boolean matches(CraftingInventory inv, World w) {
+	public boolean matches(RecipeInputInventory inv, World w) {
 		// The anchor is the bottomost row because it's the same flipped
 		if(!(
 			INPUT[6].test(inv.getStack(6)) &&
@@ -45,7 +46,7 @@ extends SpecialCraftingRecipe {
 	}
 
 	@Override
-	public ItemStack craft(CraftingInventory inv, DynamicRegistryManager manager) {
+	public ItemStack craft(RecipeInputInventory inv, DynamicRegistryManager manager) {
 		ItemStack iout = Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 		boolean flip = this.isFlipped(inv);
 		NbtList tires = new NbtList();
@@ -63,7 +64,7 @@ extends SpecialCraftingRecipe {
 		return iout;
 	}
 
-	private boolean isFlipped(CraftingInventory inv) {
+	private boolean isFlipped(RecipeInputInventory inv) {
 		if(INPUT[3].test(inv.getStack(5))) return true;
 		return false;
 	}

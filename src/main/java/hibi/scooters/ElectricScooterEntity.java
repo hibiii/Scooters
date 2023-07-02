@@ -58,7 +58,7 @@ extends ScooterEntity {
 	@Override
 	public void tick() {
 		super.tick();
-		if(!this.world.isClient) {
+		if(!this.getWorld().isClient()) {
 			// Short circuit the batteries and discharge them isntantaneously
 			if(this.submergedInWater) {
 				this.dischargeItem(64);
@@ -79,7 +79,7 @@ extends ScooterEntity {
 					}
 					this.dataTracker.set(CHARGE_PROGRESS, chargeProgress);
 				}
-				if((this.world.getTime() + this.getId()) % 20 != 0) {
+				if((this.getWorld().getTime() + this.getId()) % 20 != 0) {
 					return;
 				}
 			}
@@ -105,11 +105,12 @@ extends ScooterEntity {
 		// If the player right clicks a charging e-scooter then detach it from a charger.
 		if(optChargerPos.isPresent() && !player.shouldCancelInteraction()) {
 			BlockPos charger = optChargerPos.get();
-			BlockState cached = this.world.getBlockState(charger);
+			World world = this.getWorld();
+			BlockState cached = world.getBlockState(charger);
 			if(cached.getBlock() == Common.CHARGING_STATION_BLOCK && cached.get(ChargingStationBlock.CHARGING)) {
-				ChargingStationBlockEntity.detachScooter(cached, this.world, charger, (ChargingStationBlockEntity)this.world.getBlockEntity(charger));
+				ChargingStationBlockEntity.detachScooter(cached, world, charger, (ChargingStationBlockEntity)world.getBlockEntity(charger));
 				this.detachFromCharger();
-				return ActionResult.success(this.world.isClient);
+				return ActionResult.success(world.isClient);
 			}
 		}
 		return super.interact(player, hand);
@@ -134,7 +135,7 @@ extends ScooterEntity {
 	 * @param pos The position of the charger.
 	 */
 	public void attachToCharher(BlockPos pos) {
-		BlockState blockState = this.world.getBlockState(pos);
+		BlockState blockState = this.getWorld().getBlockState(pos);
 		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
 			return;
 		}
@@ -155,11 +156,12 @@ extends ScooterEntity {
 			return;
 		}
 		BlockPos blockPos = optChargerPos.get();
-		BlockEntity blockEntity = this.world.getBlockEntity(blockPos);
+		World world = this.getWorld();
+		BlockEntity blockEntity = world.getBlockEntity(blockPos);
 		if (!(blockEntity instanceof ChargingStationBlockEntity)) {
 			return;
 		}
-		ChargingStationBlockEntity.detachScooter(this.world.getBlockState(blockPos), this.world, blockPos, (ChargingStationBlockEntity) blockEntity);
+		ChargingStationBlockEntity.detachScooter(world.getBlockState(blockPos), world, blockPos, (ChargingStationBlockEntity) blockEntity);
 		this.dataTracker.set(CHARGER, Optional.empty());
 		this.playSound(Common.SOUND_CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
@@ -179,7 +181,7 @@ extends ScooterEntity {
 			return false;
 		}
 		BlockPos charger = optionalCharger.get();
-		BlockState blockState = this.world.getBlockState(charger);
+		BlockState blockState = this.getWorld().getBlockState(charger);
 		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
 			return false;
 		}
@@ -254,9 +256,10 @@ extends ScooterEntity {
 		}
 		if(nbt.contains(NBT_KEY_CHARGER_X) && nbt.contains(NBT_KEY_CHARGER_Y) && nbt.contains(NBT_KEY_CHARGER_Z)) {
 			BlockPos charger = new BlockPos(nbt.getInt(NBT_KEY_CHARGER_Z), nbt.getInt(NBT_KEY_CHARGER_Y), nbt.getInt(NBT_KEY_CHARGER_Z));
-			BlockEntity be = this.world.getBlockEntity(charger);
+			World world = this.getWorld();
+			BlockEntity be = world.getBlockEntity(charger);
 			if(be instanceof ChargingStationBlockEntity) {
-				ChargingStationBlockEntity.attachScooter(this.world.getBlockState(charger), this.world, charger, (ChargingStationBlockEntity)be, this);
+				ChargingStationBlockEntity.attachScooter(world.getBlockState(charger), world, charger, (ChargingStationBlockEntity)be, this);
 			}
 		}
 		super.readCustomDataFromNbt(nbt);
@@ -357,7 +360,7 @@ extends ScooterEntity {
 	 * @param throttle The state of the "forward" key (usually W)
 	 */
 	protected void sendThrottlePacket(boolean throttle) {
-		if(!this.world.isClient) return;
+		if(!this.getWorld().isClient()) return;
 		PacketByteBuf buf = PacketByteBufs.create();
 		buf.writeInt(this.getId());
 		buf.writeBoolean(throttle);
@@ -391,7 +394,7 @@ extends ScooterEntity {
 			return;
 		}
 		boolean isRememberedPowered = this.dataTracker.get(CHARGER_IS_POWERED);
-		boolean isChargerPowered = this.world.getBlockState(optChargerPos.get()).get(ChargingStationBlock.POWERED);
+		boolean isChargerPowered = this.getWorld().getBlockState(optChargerPos.get()).get(ChargingStationBlock.POWERED);
 		if (isChargerPowered != isRememberedPowered) {
 			this.dataTracker.set(CHARGER_IS_POWERED, isChargerPowered);
 		}
