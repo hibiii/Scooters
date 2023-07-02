@@ -1,16 +1,17 @@
 package hibi.scooters.mixin;
 
-import hibi.scooters.Common;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.InputSlotFiller;
-import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import hibi.scooters.Common;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.InputSlotFiller;
+import net.minecraft.screen.slot.Slot;
 
 @Mixin(InputSlotFiller.class)
 public class InputSlotFillerMixin {

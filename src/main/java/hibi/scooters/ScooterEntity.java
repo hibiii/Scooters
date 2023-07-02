@@ -3,10 +3,10 @@ package hibi.scooters;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import org.quiltmc.qsl.networking.api.PacketByteBufs;
+import org.quiltmc.qsl.networking.api.PlayerLookup;
+import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -38,13 +38,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+// FIXME Position desync
 public class ScooterEntity extends Entity
 implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
@@ -233,7 +233,6 @@ InventoryChangedListener {
 		// Don't do any interp if we're the commanding side
 		if(this.isLogicalSideForUpdatingMovement()) {
 			this.interpTicks = 0;
-			// TODO Check if this is necessary
 			this.updatePosition(this.getX(), this.getY(), this.getZ());
 			return;
 		}

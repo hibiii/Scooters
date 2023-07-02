@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "id": "scooters",
+    "version": "${version}",
+    "group": "hibi.scooters",
+    "entrypoints": {
+      "init": "hibi.scooters.Common",
+      "client_init": "hibi.scooters.ClientInit"
+    },
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "metadata": {
+      "name": "Scooters",
+      "description": "This mod adds two-wheeled stand-up scooters to the game, push scooters and electric ones. Designed to compliment the vanilla game, this mod has no settings that can be set.",
+      "contributors": {
+        "hibi": "Owner",
+        "BasiqueEvangelist": "Fixes"
+      },
+      "license": "Unlicense",
+      "icon": "assets/scooters/icon.png",
+      "contact": {
+        "homepage": "https://hibiscus.pet/mods/scooters",
+        "sources": "https://github.com/Hibiii/Scooters",
+        "issues": "https://github.com/Hibiii/Scooters/issues"
+      }
+    },
+    "depends": [
+      {
+        "id": "quilted_fabric_api",
+        "versions": ">=7.0.4+0.84.0"
+      },
+      {
+        "id": "minecraft",
+        "versions": ">=1.20.1"
+      }
+    ]
+  },
+  "modmenu": {
+    "links": {
+      "modmenu.scooters.quick_start_guide": "https://hibiscus.pet/mods/scooters/quick_start",
+      "modmenu.scooters.users_manual": "https://hibiscus.pet/mods/scooters/manual",
+      "modmenu.github_releases": "https://github.com/Hibiii/Scooters/releases/"
+    }
+  }
+}

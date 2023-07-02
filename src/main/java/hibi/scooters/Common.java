@@ -1,19 +1,18 @@
 package hibi.scooters;
 
+import org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
+import org.quiltmc.qsl.block.entity.api.QuiltBlockEntityTypeBuilder;
 import org.quiltmc.qsl.block.extensions.api.QuiltBlockSettings;
 import org.quiltmc.qsl.entity.api.QuiltEntityTypeBuilder;
+import org.quiltmc.qsl.item.setting.api.QuiltItemSettings;
+import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -27,15 +26,17 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
+// TODO Organize common data
+// TODO Organize innitialization
 public class Common implements ModInitializer {
 
 	public static final String MODID = "scooters";
@@ -70,7 +71,7 @@ public class Common implements ModInitializer {
 	public static final SoundEvent SOUND_CHARGER_DISCONNECT = SoundEvent.createVariableRangeEvent(new Identifier(MODID, "charger.disconnect"));
 	
 	@Override
-	public void onInitialize() {
+	public void onInitialize(ModContainer mod) {
 		LOGGER.debug("Initializing common");
 		LOGGER.debug("Common Init: Scooter");
 
@@ -88,7 +89,7 @@ public class Common implements ModInitializer {
 
 		// Charging Station  //
 		Registry.register(Registries.BLOCK, CHARGING_STATION_ID, CHARGING_STATION_BLOCK);
-		var chargingStation = Registry.register(Registries.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new FabricItemSettings()));
+		var chargingStation = Registry.register(Registries.ITEM, CHARGING_STATION_ID, new BlockItem(CHARGING_STATION_BLOCK, new QuiltItemSettings()));
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, CHARGING_STATION_ID, CHARGING_STATION_BLOCK_ENTITY);
 		LOGGER.debug("Common Init: Tires");
 
@@ -129,18 +130,18 @@ public class Common implements ModInitializer {
 			.setDimensions(EntityDimensions.fixed(0.8f, 0.8f))
 			.maxChunkTrackingRange(4)
 			.build();
-		KICK_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
+		KICK_SCOOTER_ITEM = new ScooterItem(new QuiltItemSettings()
 			.maxCount(1)
 		);
 		KICK_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new);
 
 
 		ELECTRIC_SCOOTER_ID = new Identifier(MODID, "electric_scooter");
-		ELECTRIC_SCOOTER_ENTITY = FabricEntityTypeBuilder.create(SpawnGroup.MISC, ElectricScooterEntity::new)
-			.dimensions(EntityDimensions.fixed(0.8f, 0.8f))
-			.trackRangeBlocks(10)
+		ELECTRIC_SCOOTER_ENTITY = QuiltEntityTypeBuilder.create(SpawnGroup.MISC, ElectricScooterEntity::new)
+			.setDimensions(EntityDimensions.fixed(0.8f, 0.8f))
+			.maxChunkTrackingRange(4)
 			.build();
-		ELECTRIC_SCOOTER_ITEM = new ScooterItem(new FabricItemSettings()
+		ELECTRIC_SCOOTER_ITEM = new ScooterItem(new QuiltItemSettings()
 			.maxCount(1)
 		);
 		ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new);
@@ -153,14 +154,14 @@ public class Common implements ModInitializer {
 			.mapColor(Blocks.REPEATER.getDefaultMapColor())
 			.strength(4.0f)
 		);
-		CHARGING_STATION_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ChargingStationBlockEntity::new, CHARGING_STATION_BLOCK)
+		CHARGING_STATION_BLOCK_ENTITY = QuiltBlockEntityTypeBuilder.create(ChargingStationBlockEntity::new, CHARGING_STATION_BLOCK)
 			.build(null);
 		
 		
-		TIRE_ITEM = new Item(new FabricItemSettings()
+		TIRE_ITEM = new Item(new QuiltItemSettings()
 			.maxDamage(640)
 		);
-		RAW_TIRE_ITEM = new Item(new FabricItemSettings()
+		RAW_TIRE_ITEM = new Item(new QuiltItemSettings()
 			.maxCount(16)
 		);
 		

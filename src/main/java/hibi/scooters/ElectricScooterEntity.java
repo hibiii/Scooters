@@ -2,8 +2,9 @@ package hibi.scooters;
 
 import java.util.Optional;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import org.quiltmc.qsl.networking.api.PacketByteBufs;
+import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -364,7 +365,6 @@ extends ScooterEntity {
 		PacketByteBuf buf = PacketByteBufs.create();
 		buf.writeInt(this.getId());
 		buf.writeBoolean(throttle);
-		// [E]lectric [SC]ooter [T]hrottle [UP]date
 		ClientPlayNetworking.send(Common.PACKET_THROTTLE_ID, buf);
 	}
 

@@ -2,13 +2,12 @@ package hibi.scooters;
 
 import org.joml.Quaternionf;
 
+import com.mojang.blaze3d.lighting.DiffuseLighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import com.mojang.blaze3d.lighting.DiffuseLighting;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -91,6 +90,8 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 		this.drawMouseoverTooltip(graphics, mouseX, mouseY);
 	}
 
+	// For RenderSystem.runAsFancy. REASON: Vanilla calls it
+	@SuppressWarnings("deprecation")
 	// Ultra hacky solution to get around InventoryScreen.drawEntity being made for LivingEntitys
 	public static void drawEntity(int x, int y, int size, float yaw, float pitch, Entity entity) {
 		MatrixStack matrixStack = RenderSystem.getModelViewStack();
@@ -113,7 +114,7 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 		entityRenderDispatcher.setRotation(quaternion2);
 		entityRenderDispatcher.setRenderShadows(false);
 		VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-		// VANILLA DOES IT SO LET ME DO IT FS
+
 		RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, yaw, 1.0f, matrixStack2, immediate, 0xF000F0));
 		immediate.draw();
 		entityRenderDispatcher.setRenderShadows(true);

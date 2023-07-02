@@ -1,7 +1,6 @@
 package hibi.scooters.recipes;
 
 import hibi.scooters.Common;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
