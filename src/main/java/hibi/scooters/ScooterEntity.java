@@ -2,6 +2,8 @@ package hibi.scooters;
 
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -167,7 +169,7 @@ InventoryChangedListener {
 		}
 		else {
 			if(!this.world.isClient && this.hasPassengers()) {
-				Entity e = this.getControllingPassenger();
+				Entity e = this.getPrimaryPassenger();
 				if(e instanceof PlayerEntity && !((ServerPlayerEntity)e).isCreative()) {
 					double displx = this.oldx - this.getX();
 					double displz = this.oldz - this.getZ();
@@ -229,7 +231,8 @@ InventoryChangedListener {
 		// Don't do any interp if we're the commanding side
 		if(this.isLogicalSideForUpdatingMovement()) {
 			this.interpTicks = 0;
-			this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
+			// TODO Check if this is necessary
+			this.updatePosition(this.getX(), this.getY(), this.getZ());
 			return;
 		}
 
@@ -278,11 +281,6 @@ InventoryChangedListener {
 			return ActionResult.PASS;
 		}
 		return ActionResult.SUCCESS;
-	}
-
-	@Override
-	public boolean canHit() {
-		return true;
 	}
 
 	@Override
@@ -364,10 +362,14 @@ InventoryChangedListener {
 	}
 
 	@Override
-	public LivingEntity getControllingPassenger() {
+	@Nullable
+	public LivingEntity getPrimaryPassenger() {
 		List<Entity> list = this.getPassengerList();
-		// TODO Object Cast
-		return list.isEmpty() ? null : (LivingEntity)(Object)list.get(0);
+		if (list.isEmpty()) {
+			return null;
+		}
+		Entity passenger = this.getFirstPassenger();
+		return passenger instanceof LivingEntity? (LivingEntity) passenger : null;
 	}
 
 	/**
@@ -480,7 +482,7 @@ InventoryChangedListener {
 	 */
 	protected void wearTear(double displ) {
 		this.damageTires(displ);
-		ServerPlayerEntity p = (ServerPlayerEntity) this.getControllingPassenger();
+		ServerPlayerEntity p = (ServerPlayerEntity) this.getPrimaryPassenger();
 		p.addExhaustion(0.028f * (float)displ);
 	}
 

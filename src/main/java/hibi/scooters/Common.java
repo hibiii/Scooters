@@ -60,10 +60,10 @@ public class Common implements ModInitializer {
 	public static final Identifier SCOOTER_SCREEN_HANDLER_ID;
 	public static final TagKey<Block> ABRASIVE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, new Identifier(MODID, "abrasive"));
 	
-	public static final SoundEvent SOUND_SCOOTER_ROLLING = SoundEvent.of(new Identifier(MODID, "entity.roll"));
-	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = SoundEvent.of(new Identifier(MODID, "entity.tire_pop"));
-	public static final SoundEvent SOUND_CHARGER_CONNECT = SoundEvent.of(new Identifier(MODID, "charger.connect"));
-	public static final SoundEvent SOUND_CHARGER_DISCONNECT = SoundEvent.of(new Identifier(MODID, "charger.disconnect"));
+	public static final SoundEvent SOUND_SCOOTER_ROLLING = SoundEvent.createVariableRangeEvent(new Identifier(MODID, "entity.roll"));
+	public static final SoundEvent SOUND_SCOOTER_TIRE_POP = SoundEvent.createVariableRangeEvent(new Identifier(MODID, "entity.tire_pop"));
+	public static final SoundEvent SOUND_CHARGER_CONNECT = SoundEvent.createVariableRangeEvent(new Identifier(MODID, "charger.connect"));
+	public static final SoundEvent SOUND_CHARGER_DISCONNECT = SoundEvent.createVariableRangeEvent(new Identifier(MODID, "charger.disconnect"));
 	
 	@Override
 	public void onInitialize() {
@@ -96,7 +96,7 @@ public class Common implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
 			ElectricScooterEntity.updateThrottle(player.getWorld(),buf);
 		});
-		Registry.register(Registries.SCREEN_HANDLER, SCOOTER_SCREEN_HANDLER_ID, SCOOTER_SCREEN_HANDLER);
+		Registry.register(Registries.SCREEN_HANDLER_TYPE, SCOOTER_SCREEN_HANDLER_ID, SCOOTER_SCREEN_HANDLER);
 		LOGGER.debug("Common Init: Sounds");
 
 		// Sounds //
@@ -106,10 +106,10 @@ public class Common implements ModInitializer {
 		Registry.register(Registries.SOUND_EVENT, SOUND_CHARGER_DISCONNECT.getId(), SOUND_CHARGER_DISCONNECT);
 
 		// Item Groups //
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register((content) -> {
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL_BLOCKS).register((content) -> {
 			content.addAfter(Items.LODESTONE, chargingStation);
 		});
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register((content) -> {
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS_AND_UTILITIES).register((content) -> {
 			content.addAfter(Items.TNT_MINECART, kickScooter, electricScooter, tire);
 		});
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {

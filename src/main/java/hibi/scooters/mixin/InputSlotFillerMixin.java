@@ -40,7 +40,7 @@ public class InputSlotFillerMixin {
 
         for(int i = 0; i < this.inventory.main.size(); ++i) {
             ItemStack otherStack = this.inventory.main.get(i);
-            if (!otherStack.isEmpty() && ItemStack.areItemsEqual(stack, otherStack) && !otherStack.isDamaged() && !otherStack.hasEnchantments() && !otherStack.hasCustomName()) {
+            if (!otherStack.isEmpty() && stack.getItem().equals(otherStack.getItem()) && !otherStack.isDamaged() && !otherStack.hasEnchantments() && !otherStack.hasCustomName()) {
                 return i;
             }
         }

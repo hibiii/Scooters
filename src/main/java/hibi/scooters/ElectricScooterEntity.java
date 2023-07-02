@@ -183,7 +183,7 @@ extends ScooterEntity {
 		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
 			return false;
 		}
-		if (charger.getSquaredDistance(this.getPos()) > 9) {
+		if (charger.getSquaredDistanceToCenter(this.getPos()) > 9) {
 			return false;
 		}
 		return blockState.get(ChargingStationBlock.CHARGING);

@@ -1,16 +1,17 @@
 package hibi.scooters;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 
 public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 
@@ -33,8 +34,8 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 	@Override
 	public void render(ScooterEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
-		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f + yaw));
+		matrices.multiply(Axis.Z_POSITIVE.rotationDegrees(180.0f));
+		matrices.multiply(Axis.Y_POSITIVE.rotationDegrees(180.0f + yaw));
 		// Lower the scooter if it doesn't have any tires attached (= resting on the platform)
 		if(!(entity.frontTire || entity.rearTire))
 			matrices.translate(0d, -1.445d, 0d);
@@ -91,6 +92,8 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		float k = z * segmentEnd - h;
 		float l = MathHelper.sqrt(i * i + j * j + k * k);
 		int c = (int) (20 * q);
-		buffer.vertex(matrices.getPositionMatrix(), f , g, h).color(c, c, c, 255).normal(matrices.getNormalMatrix(), i /= l, j /= l, k /= l).next();
+		buffer.vertex(matrices.getModel(), f , g, h).color(c, c, c, 255).normal(matrices.getNormal(), i /= l, j /= l, k /= l).next();
 	}
+
+	
 }

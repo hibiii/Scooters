@@ -7,7 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.DiffuseLighting;
+import com.mojang.blaze3d.lighting.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -18,7 +18,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Axis;
 
 public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 	private static final Identifier TEXTURE = new Identifier(Common.MODID,"textures/gui/scooter.png");
@@ -34,7 +34,6 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 
 	@Override
 	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, TEXTURE);
         int lmost = (this.width - this.backgroundWidth) / 2;
@@ -101,14 +100,16 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 		matrixStack.translate(x, y, 1050.0);
 		matrixStack.scale(1.0f, 1.0f, -1.0f);
 		RenderSystem.applyModelViewMatrix();
+
 		MatrixStack matrixStack2 = new MatrixStack();
 		matrixStack2.translate(0.0, 0.0, 1000.0);
 		matrixStack2.scale(size, size, size);
-		Quaternionf quaternion = RotationAxis.POSITIVE_Z.rotationDegrees(180.0f);
-		Quaternionf quaternion2 = RotationAxis.POSITIVE_X.rotationDegrees(pitch);
+		Quaternionf quaternion = Axis.Z_POSITIVE.rotationDegrees(180.0f);
+		Quaternionf quaternion2 = Axis.X_POSITIVE.rotationDegrees(pitch);
 		quaternion.mul(quaternion2);
 		matrixStack2.multiply(quaternion);
-		DiffuseLighting.method_34742();
+
+		DiffuseLighting.setupInventoryEntityLighting();
 		EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
 		quaternion2.conjugate();
 		entityRenderDispatcher.setRotation(quaternion2);
@@ -120,6 +121,6 @@ public class ScooterScreen extends HandledScreen<ScooterScreenHandler> {
 		entityRenderDispatcher.setRenderShadows(true);
 		matrixStack.pop();
 		RenderSystem.applyModelViewMatrix();
-		DiffuseLighting.enableGuiDepthLighting();
+		DiffuseLighting.setup3DGuiLighting();
 	}
 }

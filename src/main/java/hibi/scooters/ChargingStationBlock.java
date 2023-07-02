@@ -22,7 +22,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -71,7 +71,7 @@ extends BlockWithEntity {
 	}
 
 	@Override
-	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, RandomGenerator random) {
 		if(state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
 			world.setBlockState(pos, state.cycle(POWERED));
 		}
@@ -85,7 +85,7 @@ extends BlockWithEntity {
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
 		return (BlockState) this.getDefaultState()
-			.with(FACING, ctx.getHorizontalPlayerFacing().getOpposite())
+			.with(FACING, ctx.getPlayerFacing().getOpposite())
 			.with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
 	}
 

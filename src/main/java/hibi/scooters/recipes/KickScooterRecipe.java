@@ -6,10 +6,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.recipe.CraftingCategory;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public class KickScooterRecipe
 extends SpecialCraftingRecipe {
 
-	public KickScooterRecipe(Identifier id, CraftingRecipeCategory category) {
+	public KickScooterRecipe(Identifier id, CraftingCategory category) {
 		super(id, category);
 	}
 
@@ -96,7 +96,7 @@ extends SpecialCraftingRecipe {
 	}
 
 	private static final Ingredient[] INPUT = {
-		Ingredient.EMPTY,                     Ingredient.EMPTY,                                        Ingredient.fromTag(ItemTags.WOOL),
+		Ingredient.EMPTY,                     Ingredient.EMPTY,                                        Ingredient.ofTag(ItemTags.WOOL),
 		Ingredient.ofItems(Items.IRON_INGOT), Ingredient.EMPTY,                                        Ingredient.ofItems(Items.IRON_BARS),
 		Ingredient.ofItems(Common.TIRE_ITEM), Ingredient.ofItems(Items.HEAVY_WEIGHTED_PRESSURE_PLATE), Ingredient.ofItems(Common.TIRE_ITEM)
 	};
