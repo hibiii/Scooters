@@ -44,7 +44,6 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-// FIXME Position desync
 public class ScooterEntity extends Entity
 implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
@@ -181,6 +180,7 @@ InventoryChangedListener {
 				this.oldx = this.getX();
 				this.oldz = this.getZ();
 			}
+			this.setPos(this.getX(), this.getY(), this.getZ());
 			// Assures the scooter doesn't slide around desynchronizedly
 			this.setVelocity(Vec3d.ZERO);
 		}
@@ -233,7 +233,8 @@ InventoryChangedListener {
 		// Don't do any interp if we're the commanding side
 		if(this.isLogicalSideForUpdatingMovement()) {
 			this.interpTicks = 0;
-			this.updatePosition(this.getX(), this.getY(), this.getZ());
+			this.updateTrackedPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.getPitch(), 0, false);
+			this.syncPacketPositionCodec(this.getX(), this.getY(), this.getZ());
 			return;
 		}
 
