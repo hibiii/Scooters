@@ -59,6 +59,10 @@ public class Common implements ModInitializer {
 	public static final Item TIRE_ITEM;
 	public static final Item RAW_TIRE_ITEM;
 
+	public static final Item COPPER_NUGGET_ITEM;
+	public static final Item POTATO_BATTERY_ITEM;
+	public static final Item SPENT_POTATO_BATTERY_ITEM;
+
 	public static final Identifier PACKET_INVENTORY_CHANGED_ID;
 	public static final Identifier PACKET_THROTTLE_ID;
 	public static final ExtendedScreenHandlerType<ScooterScreenHandler> SCOOTER_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(ScooterScreenHandler::new);
@@ -97,6 +101,10 @@ public class Common implements ModInitializer {
 		var tire = Registry.register(Registries.ITEM, new Identifier(MODID, "tire"), TIRE_ITEM);
 		var rawTire = Registry.register(Registries.ITEM, new Identifier(MODID, "raw_tire"), RAW_TIRE_ITEM);
 
+		var copperNugget = Registry.register(Registries.ITEM, new Identifier(MODID, "copper_nugget"), COPPER_NUGGET_ITEM);
+		var potatoBattery = Registry.register(Registries.ITEM, new Identifier(MODID, "potato_battery"), POTATO_BATTERY_ITEM);
+		var spentPotatoBattery = Registry.register(Registries.ITEM, new Identifier(MODID, "spent_potato_battery"), SPENT_POTATO_BATTERY_ITEM);
+
 		// Networking and Misc //
 		ServerPlayNetworking.registerGlobalReceiver(PACKET_THROTTLE_ID, (server, player, handler, buf, responseSender) -> {
 			ElectricScooterEntity.updateThrottle((ServerWorld)(player.getWorld()),buf);
@@ -119,6 +127,8 @@ public class Common implements ModInitializer {
 		});
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {
 			content.addBefore(Items.SCUTE, rawTire);
+			content.addAfter(Items.IRON_NUGGET, copperNugget);
+			content.addAfter(Items.PHANTOM_MEMBRANE, potatoBattery, spentPotatoBattery);
 		});
 
 		LOGGER.debug("Common Init finished");
@@ -164,7 +174,10 @@ public class Common implements ModInitializer {
 		RAW_TIRE_ITEM = new Item(new QuiltItemSettings()
 			.maxCount(16)
 		);
-		
+
+		COPPER_NUGGET_ITEM = new Item(new QuiltItemSettings());
+		POTATO_BATTERY_ITEM = new Item(new QuiltItemSettings());
+		SPENT_POTATO_BATTERY_ITEM = new Item(new QuiltItemSettings());
 	
 		PACKET_INVENTORY_CHANGED_ID = new Identifier(MODID,"invchange");
 		PACKET_THROTTLE_ID = new Identifier(MODID, "esctup");

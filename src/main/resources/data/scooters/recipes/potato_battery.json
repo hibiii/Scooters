@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"group": "scooters:potato",
+	"ingredients": [
+		{
+			"tag": "minecraft:potato"
+		},
+		{
+			"item": "minecraft:iron_nugget"
+		},
+		{
+			"item": "scooters:copper_nugget"
+		}
+	],
+	"result": {
+		"item": "scooters:potato_battery"
+	}
+}

@@ -62,9 +62,9 @@ extends ScreenHandler {
 		});
 		if(this.electric) {
 			// Charged Batteries
-			LinkedSlot a = new LinkedSlot(inventory, 2, 98, 18, Items.POTATO);
+			LinkedSlot a = new LinkedSlot(inventory, 2, 98, 18, Common.POTATO_BATTERY_ITEM);
 			// Discharged Batteries
-			LinkedSlot b = new LinkedSlot(inventory, 3, 98, 54, Items.POISONOUS_POTATO);
+			LinkedSlot b = new LinkedSlot(inventory, 3, 98, 54, Common.SPENT_POTATO_BATTERY_ITEM);
 			a.linkWith(b);
 			b.linkWith(a);
 			this.addSlot(a);

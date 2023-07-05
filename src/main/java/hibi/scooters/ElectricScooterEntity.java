@@ -293,7 +293,7 @@ extends ScooterEntity {
 
 		ItemStack charged = this.items.getStack(SLOT_CHARGED);
 		if(charged.isEmpty()) {
-			charged = Items.POTATO.getDefaultStack();
+			charged = Common.POTATO_BATTERY_ITEM.getDefaultStack();
 			charged.setCount(Math.min(amount, discharged.getCount()));
 		}
 		else {
@@ -317,7 +317,7 @@ extends ScooterEntity {
 
 		ItemStack discharged = this.items.getStack(SLOT_DISCHARGED);
 		if(discharged.isEmpty()) {
-			discharged = Items.POISONOUS_POTATO.getDefaultStack();
+			discharged = Common.SPENT_POTATO_BATTERY_ITEM.getDefaultStack();
 			discharged.setCount(Math.min(amount, charged.getCount()));
 		}
 		else {

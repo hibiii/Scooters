@@ -1,0 +1,13 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"category": "misc",
+	"ingredients": [
+		{
+			"tag": "minecraft:copper_ingot"
+		}
+	],
+	"result": {
+		"item": "scooters:copper_nugget",
+		"count": 9
+	}
+}
