@@ -1,18 +1,19 @@
 {
 	"type": "minecraft:crafting_shaped",
+	"category": "redstone",
 	"pattern": [
 		"RGQ",
 		"SSS"
 	],
 	"key": {
 		"R": {
-			"item": "minecraft:redstone"
+			"tag": "c:redstone_dusts"
 		},
 		"G": {
-			"item": "minecraft:gold_ingot"
+			"tag": "c:gold_ingots"
 		},
 		"Q": {
-			"item": "minecraft:quartz"
+			"tag": "c:quartz"
 		},
 		"S": {
 			"item": "minecraft:stone"

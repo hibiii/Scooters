@@ -7,13 +7,21 @@
 			"item": "minecraft:potato"
 		},
 		{
-			"item": "minecraft:iron_nugget"
+			"tag": "c:zinc_nuggets"
 		},
 		{
-			"item": "scooters:copper_nugget"
+			"tag": "c:copper_nuggets"
 		}
 	],
 	"result": {
 		"item": "scooters:potato_battery"
-	}
+	},
+	"fabric:load_conditions": [
+		{
+			"condition": "fabric:item_tags_populated",
+			"values": [
+				"c:zinc_nuggets"
+			]
+		}
+	]
 }

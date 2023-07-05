@@ -1,5 +1,6 @@
 {
 	"type": "minecraft:blasting",
+	"category": "misc",
 	"group": "scooters:tire",
 	"ingredient": {
 		"item": "scooters:raw_tire"

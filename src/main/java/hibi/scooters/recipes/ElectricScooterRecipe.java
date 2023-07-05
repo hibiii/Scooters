@@ -1,6 +1,7 @@
 package hibi.scooters.recipes;
 
 import hibi.scooters.Common;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -75,9 +76,9 @@ extends SpecialCraftingRecipe {
 	}
 
 	private static final Ingredient[] INPUT = {
-		Ingredient.EMPTY,                          Ingredient.EMPTY,                             Ingredient.ofItems(Items.LEVER),
-		Ingredient.ofItems(Items.REDSTONE_TORCH),  Ingredient.ofItems(Common.KICK_SCOOTER_ITEM), Ingredient.ofItems(Items.REDSTONE),
-		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP),    Ingredient.ofItems(Items.REDSTONE)
+		Ingredient.EMPTY, Ingredient.EMPTY, Ingredient.ofItems(Items.LEVER),
+		Ingredient.ofItems(Items.REDSTONE_TORCH), Ingredient.ofItems(Common.KICK_SCOOTER_ITEM), Ingredient.ofTag(ConventionalItemTags.REDSTONE_DUSTS),
+		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofTag(ConventionalItemTags.REDSTONE_DUSTS)
 	};
 
 	private static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);

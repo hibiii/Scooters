@@ -1,5 +1,6 @@
 {
 	"type": "minecraft:crafting_shaped",
+	"category": "misc",
 	"group": "scooters:tire",
 	"pattern": [
 		"ABA",
@@ -11,7 +12,7 @@
 			"item": "minecraft:iron_bars"
 		},
 		"A": {
-			"item": "minecraft:coal_block"
+			"tag": "c:coal_blocks"
 		},
 		"B": {
 			"tag": "minecraft:wool"

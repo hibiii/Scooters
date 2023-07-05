@@ -1,3 +1,5 @@
 {
-	"type": "scooters:kick_scooter_craft"
+	"type": "scooters:kick_scooter_craft",
+	"category": "misc",
+	"group": "scooters:scooters"
 }

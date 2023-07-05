@@ -1,12 +1,13 @@
 {
 	"type": "minecraft:crafting_shapeless",
+	"category": "misc",
 	"group": "scooters:tire",
 	"ingredients": [
 		{
 			"tag": "minecraft:wool"
 		},
 		{
-			"item": "minecraft:coal_block"
+			"tag": "c:coal_blocks"
 		},
 		{
 			"item": "scooters:tire"

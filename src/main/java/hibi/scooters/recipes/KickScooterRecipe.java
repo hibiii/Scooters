@@ -1,6 +1,7 @@
 package hibi.scooters.recipes;
 
 import hibi.scooters.Common;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -96,8 +97,8 @@ extends SpecialCraftingRecipe {
 	}
 
 	private static final Ingredient[] INPUT = {
-		Ingredient.EMPTY,                     Ingredient.EMPTY,                                        Ingredient.ofTag(ItemTags.WOOL),
-		Ingredient.ofItems(Items.IRON_INGOT), Ingredient.EMPTY,                                        Ingredient.ofItems(Items.IRON_BARS),
+		Ingredient.EMPTY, Ingredient.EMPTY, Ingredient.ofTag(ItemTags.WOOL),
+		Ingredient.ofTag(ConventionalItemTags.IRON_INGOTS), Ingredient.EMPTY, Ingredient.ofItems(Items.IRON_BARS),
 		Ingredient.ofItems(Common.TIRE_ITEM), Ingredient.ofItems(Items.HEAVY_WEIGHTED_PRESSURE_PLATE), Ingredient.ofItems(Common.TIRE_ITEM)
 	};
 	private static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);

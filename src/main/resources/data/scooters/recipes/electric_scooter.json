@@ -1,3 +1,5 @@
 {
-	"type": "scooters:electric_scooter_craft"
+	"type": "scooters:electric_scooter_craft",
+	"category": "misc",
+	"group": "scooters:scooters"
 }
