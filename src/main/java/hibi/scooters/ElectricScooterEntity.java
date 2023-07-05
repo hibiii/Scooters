@@ -340,7 +340,7 @@ extends ScooterEntity {
 	@Override
 	protected void wearTear(double displ) {
 		this.damageTires(displ);
-
+		
 		// Discharge the battery when the throttle is being held down
 		if(this.keyW) {
 			float charge = this.dataTracker.get(CHARGE_PROGRESS);
@@ -350,8 +350,8 @@ extends ScooterEntity {
 				if(this.dischargeItem(1)) {
 					charge = 1f;
 				}
-				this.dataTracker.set(CHARGE_PROGRESS, charge);
 			}
+			this.dataTracker.set(CHARGE_PROGRESS, charge);
 		}
 	}
 	

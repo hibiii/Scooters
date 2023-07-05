@@ -3,7 +3,7 @@
 	"group": "scooters:potato",
 	"ingredients": [
 		{
-			"tag": "minecraft:potato"
+			"item": "minecraft:potato"
 		},
 		{
 			"item": "minecraft:iron_nugget"
