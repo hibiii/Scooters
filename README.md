@@ -2,6 +2,9 @@
 
 A mod that adds kick scooters and electric scooters to Minecraft.
 
+> **Warning**
+> This README is out of date.
+
 <p align="center">
 <img alt="Alex riding a kick scooter on a road through the woods" src=".pretty_readme/screenshot_alex.png" width="320px"/>
 <img alt="Lineup of a few scooters" src=".pretty_readme/screenshot_lineup.png" width="320px"/>
@@ -9,7 +12,7 @@ A mod that adds kick scooters and electric scooters to Minecraft.
 
 This mod is required on **both** the server and the client.
 
-To get going quickly, see the [Quick Start Guide][1]. For more information, see the [User's Manual][2]. If you still need help, check the [Discord][3].
+To get going quickly, see the [Quick Start Guide][1]. For more information, see the [User's Manual][2]. If you still need help, check the ~~Discord~~.
 
 ## Overview
 
@@ -40,7 +43,6 @@ But to ride a scooter, you need tires! Tires use wool and coal blocks in their c
  - [GitHub](https://github.com/Hibiii/Scooters)
  - [Quick Start Guide][1]
  - [User's Manual][2]
- - [Hibi's Discord][3]
 
 ## License
 
@@ -49,4 +51,3 @@ Feel free to learn from it and incorporate it in your own projects.
 
 [1]: https://hibiscus.pet/mods/scooters/quick_start
 [2]: https://hibiscus.pet/mods/scooters/manual
-[3]: https://discord.gg/Zef3c27dN2
