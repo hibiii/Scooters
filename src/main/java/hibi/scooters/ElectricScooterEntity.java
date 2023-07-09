@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtFloat;
@@ -63,8 +62,8 @@ extends ScooterEntity {
 			// Short circuit the batteries and discharge them isntantaneously
 			if(this.submergedInWater) {
 				this.dischargeItem(64);
-				// TODO 19.4 damage refactor
-				this.damage(null, Float.MAX_VALUE);
+				this.dataTracker.set(CHARGE_PROGRESS, 0f);
+				this.damage(this.getWorld().getDamageSources().drown(), Float.MAX_VALUE);
 			}
 			if(this.isConnectedToCharger()) {
 				if(!this.hasValidCharger()) {
