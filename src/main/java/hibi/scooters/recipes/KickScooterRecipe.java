@@ -47,7 +47,7 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public ItemStack craft(RecipeInputInventory inv, DynamicRegistryManager manager) {
-		ItemStack iout = Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
+		ItemStack iout = KickScooterRecipe.getOutput();
 		boolean flip = this.isFlipped(inv);
 		NbtList tires = new NbtList();
 		// Unrolled loop
@@ -67,6 +67,10 @@ extends SpecialCraftingRecipe {
 	private boolean isFlipped(RecipeInputInventory inv) {
 		if(INPUT[3].test(inv.getStack(5))) return true;
 		return false;
+	}
+
+	public static ItemStack getOutput() {
+		return Common.KICK_SCOOTER_ITEM.getDefaultStack().copy();
 	}
 
 	@Override
@@ -101,5 +105,5 @@ extends SpecialCraftingRecipe {
 		Ingredient.ofTag(ConventionalItemTags.IRON_INGOTS), Ingredient.EMPTY, Ingredient.ofItems(Items.IRON_BARS),
 		Ingredient.ofItems(Common.TIRE_ITEM), Ingredient.ofItems(Items.HEAVY_WEIGHTED_PRESSURE_PLATE), Ingredient.ofItems(Common.TIRE_ITEM)
 	};
-	private static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);
+	public static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);
 }

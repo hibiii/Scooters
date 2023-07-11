@@ -40,10 +40,14 @@ extends SpecialCraftingRecipe {
 
 	@Override
 	public ItemStack craft(RecipeInputInventory inv, DynamicRegistryManager manager) {
-		ItemStack out = Common.ELECTRIC_SCOOTER_ITEM.getDefaultStack().copy();
+		ItemStack out = ElectricScooterRecipe.getOutput();
 		out.setNbt(inv.getStack(4).getNbt());
 		return out;
 	}
+
+    public static ItemStack getOutput() {
+        return Common.ELECTRIC_SCOOTER_ITEM.getDefaultStack().copy();
+    }
 
 	@Override
 	public boolean fits(int w, int h) {
@@ -81,5 +85,5 @@ extends SpecialCraftingRecipe {
 		Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofItems(Items.NETHERITE_SCRAP), Ingredient.ofTag(ConventionalItemTags.REDSTONE_DUSTS)
 	};
 
-	private static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);
+	public static final DefaultedList<Ingredient> RECIPE = DefaultedList.copyOf(Ingredient.EMPTY, INPUT);
 }

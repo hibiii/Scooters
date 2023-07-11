@@ -6,7 +6,8 @@
     "group": "hibi.scooters",
     "entrypoints": {
       "init": "hibi.scooters.Common",
-      "client_init": "hibi.scooters.ClientInit"
+      "client_init": "hibi.scooters.ClientInit",
+      "emi": "hibi.scooters.EmiInteg"
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "metadata": {
