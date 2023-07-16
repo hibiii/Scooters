@@ -18,6 +18,7 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 	protected final ScooterEntityModel model;
 	protected final Identifier kick_texture = new Identifier(Common.MODID, "textures/entity/kick_scooter.png");
 	protected final Identifier electric_texture = new Identifier(Common.MODID, "textures/entity/electric_scooter.png");
+	protected final Identifier color_overlay = new Identifier(Common.MODID, "textures/entity/scooter_color.png");
 
 	protected ScooterEntityRenderer(Context ctx) {
 		super(ctx);
@@ -45,11 +46,17 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		// Render the scooter itself
 		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.getTexture(entity)));
 		this.model.setTires(entity.frontTire, entity.rearTire);
-		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 0, 0, 0, 1);
+		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
+		if (entity.isDyed()) {
+			float[] color = entity.getSteeringColor().getColorComponents();
+			VertexConsumer cutout = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(color_overlay));
+			this.model.render(matrices, cutout, light, OverlayTexture.DEFAULT_UV, color[0], color[1], color[2], 1);
+		}
 		matrices.pop();
 		super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
 
 		// Render the charging cable if the scooter is connected to a charging station
+		// TODO: Declutter: Break subroutine to function
 		if(entity instanceof ElectricScooterEntity) {
 			ElectricScooterEntity e = (ElectricScooterEntity)entity;
 			if(e.isConnectedToCharger()) {

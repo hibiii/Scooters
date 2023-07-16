@@ -15,6 +15,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -35,6 +38,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -80,6 +84,9 @@ InventoryChangedListener {
 	 * </ul>
 	 */
 	public SimpleInventory items;
+
+	protected static final TrackedData<Integer> STEERING_COLOR = DataTracker.registerData(ScooterEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	protected boolean isDyed;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -397,6 +404,7 @@ InventoryChangedListener {
 
 	@Override
 	protected void initDataTracker() {
+		this.dataTracker.startTracking(STEERING_COLOR, 0);
 	}
 
 	/**
@@ -477,6 +485,14 @@ InventoryChangedListener {
 		this.rearTire = !is.isEmpty();
 		if(!this.rearTire || is.getDamage() == is.getMaxDamage())
 			this.tireMult *= 0.85;
+	}
+
+	public DyeColor getSteeringColor() {
+		return DyeColor.byId(this.dataTracker.get(STEERING_COLOR));
+	}
+
+	public boolean isDyed() {
+		return this.isDyed;
 	}
 
 	/**

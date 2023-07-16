@@ -66,10 +66,10 @@ public class ScooterEntityModel extends EntityModel<ScooterEntity> {
 
 	@Override
 	public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-		Back.render(matrices, vertices, light, overlay);
-		Steering.render(matrices, vertices, light, overlay);
-		frontTire.render(matrices, vertices, light, overlay);
-		rearTire.render(matrices, vertices, light, overlay);
+		Back.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+		Steering.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+		frontTire.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+		rearTire.render(matrices, vertices, light, overlay, red, green, blue, alpha);
 	}
 
 	public void setTires(boolean front, boolean rear) {
