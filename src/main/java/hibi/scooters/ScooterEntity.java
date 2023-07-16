@@ -55,6 +55,7 @@ InventoryChangedListener {
 	public static final int SLOT_FRONT_TIRE = 0;
 	public static final int SLOT_REAR_TIRE = 1;
 	public static final String NBT_KEY_TIRES = "Tires";
+	public static final String NBT_KEY_COLOR = "Color";
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity, yawAccel;
@@ -86,7 +87,6 @@ InventoryChangedListener {
 	public SimpleInventory items;
 
 	protected static final TrackedData<Integer> STEERING_COLOR = DataTracker.registerData(ScooterEntity.class, TrackedDataHandlerRegistry.INTEGER);
-	protected boolean isDyed;
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -418,6 +418,11 @@ InventoryChangedListener {
 			this.items.setStack(SLOT_FRONT_TIRE, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(SLOT_REAR_TIRE, ItemStack.fromNbt(list.getCompound(1)));
 		}
+		if(nbt.contains(NBT_KEY_COLOR, NbtElement.NUMBER_TYPE)) {
+			this.dataTracker.set(STEERING_COLOR, nbt.getInt(NBT_KEY_COLOR), true);
+		} else {
+			this.dataTracker.set(STEERING_COLOR, -1, true);
+		}
 	}
 
 	/**
@@ -446,8 +451,12 @@ InventoryChangedListener {
 		if(!is.isEmpty())
 			is.writeNbt(compound);
 		tiresNbt.add(compound);
-
+		
 		nbt.put(NBT_KEY_TIRES, tiresNbt);
+		
+		if(this.dataTracker.get(STEERING_COLOR) > 0) {
+			nbt.putByte(NBT_KEY_COLOR, (byte)(this.dataTracker.get(STEERING_COLOR) % 0x100));
+		}
 	}
 
 	@Override
@@ -492,7 +501,7 @@ InventoryChangedListener {
 	}
 
 	public boolean isDyed() {
-		return this.isDyed;
+		return this.dataTracker.get(STEERING_COLOR) > 0;
 	}
 
 	/**
