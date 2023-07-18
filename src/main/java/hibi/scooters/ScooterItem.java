@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
@@ -39,6 +40,19 @@ implements DyeableItem {
 
 		context.getStack().decrement(1);
 		return ActionResult.success(world.isClient);
+	}
+
+	@Override
+	public ItemStack getDefaultStack() {
+		ItemStack out = new ItemStack(this);
+		NbtCompound stackNbt = out.getOrCreateNbt();
+		NbtList list = new NbtList();
+		NbtCompound tireCompound = new NbtCompound();
+		new ItemStack(Common.TIRE_ITEM).writeNbt(tireCompound);
+		list.add(tireCompound);
+		list.add(tireCompound);
+		stackNbt.put(ScooterEntity.NBT_KEY_TIRES, list);
+		return out;
 	}
 
 	@Override

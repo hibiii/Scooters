@@ -23,7 +23,10 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.registry.Registries;
@@ -123,7 +126,11 @@ public class Common implements ModInitializer {
 			content.addAfter(Items.LODESTONE, chargingStation);
 		});
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS_AND_UTILITIES).register((content) -> {
-			content.addAfter(Items.TNT_MINECART, kickScooter, electricScooter, tire);
+			ItemStack electricScooterStack = electricScooter.getDefaultStack();
+			NbtList batteries = new NbtList();
+			batteries.add(new ItemStack(potatoBattery, 64).writeNbt(new NbtCompound()));
+			electricScooterStack.getNbt().put(ElectricScooterEntity.NBT_KEY_BATTERIES, batteries);
+			content.addAfter(Items.TNT_MINECART, kickScooter.getDefaultStack(), electricScooterStack, tire.getDefaultStack());
 		});
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {
 			content.addBefore(Items.SCUTE, rawTire);
