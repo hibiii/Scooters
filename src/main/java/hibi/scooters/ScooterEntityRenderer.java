@@ -47,8 +47,8 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		VertexConsumer vertices = vertexConsumers.getBuffer(this.model.getLayer(this.getTexture(entity)));
 		this.model.setTires(entity.frontTire, entity.rearTire);
 		this.model.render(matrices, vertices, light, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
-		if (entity.isDyed()) {
-			float[] color = entity.getSteeringColor().getColorComponents();
+		float[] color = entity.getBodyColor();
+		if (color != null) {
 			VertexConsumer cutout = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(color_overlay));
 			this.model.render(matrices, cutout, light, OverlayTexture.DEFAULT_UV, color[0], color[1], color[2], 1);
 		}

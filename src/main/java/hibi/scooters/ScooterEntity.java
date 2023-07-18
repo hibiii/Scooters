@@ -38,7 +38,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -48,6 +47,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+// TODO: Optimize color accesses for rendering - cache color on entity itself
 public class ScooterEntity extends Entity
 implements ExtendedScreenHandlerFactory,
 InventoryChangedListener {
@@ -55,7 +55,7 @@ InventoryChangedListener {
 	public static final int SLOT_FRONT_TIRE = 0;
 	public static final int SLOT_REAR_TIRE = 1;
 	public static final String NBT_KEY_TIRES = "Tires";
-	public static final String NBT_KEY_COLOR = "Color";
+	public static final String NBT_KEY_BODY_COLOR = "BodyColor";
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity, yawAccel;
@@ -86,7 +86,7 @@ InventoryChangedListener {
 	 */
 	public SimpleInventory items;
 
-	protected static final TrackedData<Integer> STEERING_COLOR = DataTracker.registerData(ScooterEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	protected static final TrackedData<Integer> BODY_COLOR = DataTracker.registerData(ScooterEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
 	public ScooterEntity(EntityType<? extends ScooterEntity> type, World world) {
 		super(type, world);
@@ -404,7 +404,7 @@ InventoryChangedListener {
 
 	@Override
 	protected void initDataTracker() {
-		this.dataTracker.startTracking(STEERING_COLOR, 0);
+		this.dataTracker.startTracking(BODY_COLOR, -1);
 	}
 
 	/**
@@ -418,10 +418,8 @@ InventoryChangedListener {
 			this.items.setStack(SLOT_FRONT_TIRE, ItemStack.fromNbt(list.getCompound(0)));
 			this.items.setStack(SLOT_REAR_TIRE, ItemStack.fromNbt(list.getCompound(1)));
 		}
-		if(nbt.contains(NBT_KEY_COLOR, NbtElement.NUMBER_TYPE)) {
-			this.dataTracker.set(STEERING_COLOR, nbt.getInt(NBT_KEY_COLOR), true);
-		} else {
-			this.dataTracker.set(STEERING_COLOR, -1, true);
+		if(nbt.contains(NBT_KEY_BODY_COLOR)) {
+			this.dataTracker.set(BODY_COLOR, nbt.getInt(NBT_KEY_BODY_COLOR), true);
 		}
 	}
 
@@ -454,8 +452,8 @@ InventoryChangedListener {
 		
 		nbt.put(NBT_KEY_TIRES, tiresNbt);
 		
-		if(this.dataTracker.get(STEERING_COLOR) > 0) {
-			nbt.putByte(NBT_KEY_COLOR, (byte)(this.dataTracker.get(STEERING_COLOR) % 0x100));
+		if(this.dataTracker.get(BODY_COLOR) >= 0) {
+			nbt.putInt(NBT_KEY_BODY_COLOR, this.dataTracker.get(BODY_COLOR));
 		}
 	}
 
@@ -496,12 +494,14 @@ InventoryChangedListener {
 			this.tireMult *= 0.85;
 	}
 
-	public DyeColor getSteeringColor() {
-		return DyeColor.byId(this.dataTracker.get(STEERING_COLOR));
-	}
-
-	public boolean isDyed() {
-		return this.dataTracker.get(STEERING_COLOR) > 0;
+	@Nullable
+	public float[] getBodyColor() {
+		int color = this.dataTracker.get(BODY_COLOR);
+		if (color < 0) {
+			return null;
+		}
+		float[] out = {(color >> 16)/255f, ((color >> 8) & 0xFF)/255f, (color & 0xFF)/255f};
+		return out;
 	}
 
 	/**
