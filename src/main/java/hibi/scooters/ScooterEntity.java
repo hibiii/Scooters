@@ -591,4 +591,15 @@ InventoryChangedListener {
 		buf.writeCollection(contents, PacketByteBuf::writeItemStack);
 		return buf;
 	}
+
+	@Deprecated @Override
+	public void setVelocity(Vec3d vel) {
+		final double limit = this.maxSpeed + this.acceleration + 0.1;
+		if (vel.horizontalLengthSquared() <= limit * limit) {
+			super.setVelocity(vel);
+		} else {
+			var oldvel = this.getVelocity();
+			super.setVelocity(oldvel.x, vel.y, oldvel.z);
+		}
+	}
 }
