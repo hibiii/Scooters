@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -137,6 +138,9 @@ public class Common implements ModInitializer {
 			content.addAfter(Items.IRON_NUGGET, copperNugget);
 			content.addAfter(Items.PHANTOM_MEMBRANE, potatoBattery, spentPotatoBattery);
 		});
+
+		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(kickScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
+		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(electricScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
 
 		LOGGER.debug("Common Init finished");
 	}
