@@ -1,12 +1,9 @@
 plugins {
-	id 'maven-publish'
-	id 'io.github.juuxel.loom-quiltflower' version '1.8.+'
-	id 'org.quiltmc.loom' version '1.2.+'
+	id 'org.quiltmc.loom' version '1.4.+'
 }
 
-archivesBaseName = project.archives_base_name
+archivesBaseName = "scooters"
 version = "${project.mod_version}+${minecraft_version}"
-group = project.maven_group
 
 repositories {
 	maven {
@@ -23,8 +20,7 @@ dependencies {
 	modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
 	modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${quilted_fabric_api_version}-${minecraft_version}"
 
-	modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
-	modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
+	modImplementation "dev.emi:emi-fabric:${emi_version}"
 }
 
 processResources {
@@ -48,16 +44,5 @@ java {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-	repositories {
 	}
 }
