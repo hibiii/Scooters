@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+	"has_raw_tire": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "scooters:raw_tire"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "scooters:tire_vulcanization"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_raw_tire",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "scooters:tire_vulcanization"
+    ]
+  },
+  "sends_telemetry_event": false
+}

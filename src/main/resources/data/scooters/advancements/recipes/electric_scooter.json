@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_netherite_scrap": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:netherite_scrap"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_kick_scooter": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "scooters:kick_scooter"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_charging_station": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "scooters:charging_station"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_potato_battery": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "scooters:potato_battery"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "scooters:electric_scooter"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_netherite_scrap",
+      "has_charging_station",
+      "has_potato_battery",
+      "has_kick_scooter",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "scooters:electric_scooter"
+    ]
+  },
+  "sends_telemetry_event": false
+}
