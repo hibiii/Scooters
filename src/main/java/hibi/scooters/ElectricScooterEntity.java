@@ -64,10 +64,12 @@ extends ScooterEntity {
 				this.dischargeItem(64);
 				this.dataTracker.set(CHARGE_PROGRESS, 0f);
 				this.damage(this.getWorld().getDamageSources().drown(), Float.MAX_VALUE);
+				return;
 			}
 			if(this.isConnectedToCharger()) {
 				if(!this.hasValidCharger()) {
 					this.detachFromCharger();
+					return;
 				}
 				this.trackChargerPower();
 				if(this.dataTracker.get(CHARGER_IS_POWERED) && !this.items.getStack(SLOT_DISCHARGED).isEmpty()) {
