@@ -1,6 +1,7 @@
 {
 	"parent": "minecraft:item/generated",
 	"textures": {
-		"layer0": "scooters:item/electric_scooter"
+		"layer0": "scooters:item/electric_scooter",
+		"layer1": "scooters:item/scooter_color"
 	}
 }

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
@@ -141,6 +142,8 @@ public class Common implements ModInitializer {
 
 		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(kickScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
 		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(electricScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
+		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, kickScooter);
+		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, electricScooter);
 
 		LOGGER.debug("Common Init finished");
 	}
@@ -153,7 +156,7 @@ public class Common implements ModInitializer {
 			.build();
 		KICK_SCOOTER_ITEM = new ScooterItem(new QuiltItemSettings()
 			.maxCount(1)
-		);
+		, 0xD1CFCF);
 		KICK_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<KickScooterRecipe>(KickScooterRecipe::new);
 
 
@@ -164,7 +167,7 @@ public class Common implements ModInitializer {
 			.build();
 		ELECTRIC_SCOOTER_ITEM = new ScooterItem(new QuiltItemSettings()
 			.maxCount(1)
-		);
+		, 0x626662);
 		ELECTRIC_SCOOTER_CRAFTING_SERIALIZER = new SpecialRecipeSerializer<ElectricScooterRecipe>(ElectricScooterRecipe::new);
 
 

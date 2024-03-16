@@ -17,8 +17,11 @@ public class ScooterItem
 extends Item
 implements DyeableItem {
 
-	public ScooterItem(Settings settings) {
+	protected final int defaultColor;
+
+	public ScooterItem(Settings settings, int defaultColor) {
 		super(settings);
+		this.defaultColor = defaultColor;
 	}
 	
 	@Override
@@ -67,8 +70,7 @@ implements DyeableItem {
 		if (nbt != null && nbt.contains(ScooterEntity.NBT_KEY_BODY_COLOR, NbtElement.NUMBER_TYPE)) {
 			return nbt.getInt(ScooterEntity.NBT_KEY_BODY_COLOR);
 		} else {
-			// TODO: default color for scooters
-			return -1;
+			return this.defaultColor;
 		}
 	}
 
@@ -86,5 +88,13 @@ implements DyeableItem {
 	@Override
 	public void setColor(ItemStack stack, int color) {
 		stack.getOrCreateNbt().putInt(ScooterEntity.NBT_KEY_BODY_COLOR, color);
+	}
+
+	public static int colorItem(ItemStack stack, int index) {
+		if (index > 0) {
+			return ((DyeableItem)stack.getItem()).getColor(stack);
+		} else {
+			return -1;
+		}
 	}
 }
