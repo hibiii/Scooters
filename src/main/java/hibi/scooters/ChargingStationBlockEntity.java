@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public class ChargingStationBlockEntity
 extends BlockEntity {
 
-	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 2d, 0.5d, 2d);
+	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 1.5d, 0.5d, 1.5d);
 	private UUID chargee = null;
 
 	public ChargingStationBlockEntity(BlockPos pos, BlockState state) {
@@ -58,7 +58,7 @@ extends BlockEntity {
 				continue;
 			}
 			ChargingStationBlockEntity.attachScooter(state, world, pos, that, escooter);
-			escooter.attachToCharher(pos);
+			escooter.attachToCharger(pos);
 			return ActionResult.success(world.isClient());
 		}
 

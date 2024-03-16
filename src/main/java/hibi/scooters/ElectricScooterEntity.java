@@ -136,7 +136,7 @@ extends ScooterEntity {
 	 * Charging <b>must</b> be initialized from {@link ChargingStationBlockEntity}.attachScooter, as the charger is required to actually exist.
 	 * @param pos The position of the charger.
 	 */
-	public void attachToCharher(BlockPos pos) {
+	public void attachToCharger(BlockPos pos) {
 		BlockState blockState = this.getWorld().getBlockState(pos);
 		if(blockState.getBlock() != Common.CHARGING_STATION_BLOCK) {
 			return;
@@ -160,10 +160,9 @@ extends ScooterEntity {
 		BlockPos blockPos = optChargerPos.get();
 		World world = this.getWorld();
 		BlockEntity blockEntity = world.getBlockEntity(blockPos);
-		if (!(blockEntity instanceof ChargingStationBlockEntity)) {
-			return;
+		if (blockEntity instanceof ChargingStationBlockEntity charger) {
+			ChargingStationBlockEntity.detachScooter(world.getBlockState(blockPos), world, blockPos, charger);
 		}
-		ChargingStationBlockEntity.detachScooter(world.getBlockState(blockPos), world, blockPos, (ChargingStationBlockEntity) blockEntity);
 		this.dataTracker.set(CHARGER, Optional.empty());
 		this.playSound(Common.SOUND_CHARGER_DISCONNECT, 1.0f, 1.0f);
 	}
