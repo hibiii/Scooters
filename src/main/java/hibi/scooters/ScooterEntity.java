@@ -357,8 +357,8 @@ InventoryChangedListener {
 
 	@Override
 	public ItemStack getPickBlockStack() {
-		// Get the item WITH the nbt so it's easy to carry around in creative.
-		return this.asItemStack();
+		// TODO: find way to pickblock with NBT data
+		return this.item.getDefaultStack();
 	}
 
 	@Override
