@@ -2,9 +2,6 @@
 
 A mod that adds kick scooters and electric scooters to Minecraft.
 
-> **Warning**
-> This README is out of date.
-
 <p align="center">
 <img alt="Alex riding a kick scooter on a road through the woods" src=".pretty_readme/screenshot_alex.png" width="320px"/>
 <img alt="Lineup of a few scooters" src=".pretty_readme/screenshot_lineup.png" width="320px"/>
@@ -12,7 +9,7 @@ A mod that adds kick scooters and electric scooters to Minecraft.
 
 This mod is required on **both** the server and the client.
 
-To get going quickly, see the [Quick Start Guide][1]. For more information, see the [User's Manual][2]. If you still need help, check the ~~Discord~~.
+To get going quickly, see the [Quick Start Guide][1]. For more information, see the [User's Manual][2].
 
 ## Overview
 
@@ -33,14 +30,18 @@ But to ride a scooter, you need tires! Tires use wool and coal blocks in their c
 <img src=".pretty_readme/recipe_combine_tires.png">
 </p>
 
+Additionally, you can customize your scooter! You can change the color of the shaft and of the back wheel cover using dye.
+
+<!-- TODO: revisit screenshots -->
+
 ## Requirements
 
- - Fabric Loader or compatible
+ - Quilt Loader
  - Fabric API or compatible
 
 ## Links
 
- - [GitHub](https://github.com/Hibiii/Scooters)
+ - [GitHub](https://github.com/hibiii/Scooters)
  - [Quick Start Guide][1]
  - [User's Manual][2]
 
