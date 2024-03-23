@@ -7,10 +7,10 @@
 			"item": "minecraft:potato"
 		},
 		{
-			"item": "minecraft:iron_nugget"
+			"tag": "c:iron_nuggets"
 		},
 		{
-			"item": "scooters:copper_nugget"
+			"tag": "c:copper_nuggets"
 		}
 	],
 	"result": {
