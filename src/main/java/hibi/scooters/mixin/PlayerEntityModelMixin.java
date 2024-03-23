@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import hibi.scooters.ScooterEntity;
 import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Arm;
 
 @Mixin(PlayerEntityModel.class)
@@ -36,7 +36,7 @@ extends BipedEntityModelMixin {
 			this.rightPants.roll = -0.130899694f;
 			this.rightPants.yaw = 0f;
 			// Simulate leg dominance relationship with hand dominance
-			if(((ClientPlayerEntity)entity).getMainArm() == Arm.RIGHT) {
+			if(((PlayerEntity)entity).getMainArm() == Arm.RIGHT) {
 				this.leftLeg.pitch = 0.261799388f; // 15 deg
 				this.leftPants.pitch = 0.261799388f;
 				this.rightLeg.pitch = -0.261799388f;
