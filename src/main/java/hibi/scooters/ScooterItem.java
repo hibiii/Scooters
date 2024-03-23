@@ -55,6 +55,13 @@ implements DyeableItem {
 		list.add(tireCompound);
 		list.add(tireCompound);
 		stackNbt.put(ScooterEntity.NBT_KEY_TIRES, list);
+		if (this == Common.ELECTRIC_SCOOTER_ITEM) {
+			list = new NbtList();
+			NbtCompound batteryCompound = new NbtCompound();
+			new ItemStack(Common.POTATO_BATTERY_ITEM, Common.POTATO_BATTERY_ITEM.getMaxCount()).writeNbt(batteryCompound);
+			list.add(batteryCompound);
+			stackNbt.put(ElectricScooterEntity.NBT_KEY_BATTERIES, list);
+		}
 		return out;
 	}
 
