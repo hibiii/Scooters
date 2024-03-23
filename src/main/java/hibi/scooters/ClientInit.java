@@ -8,6 +8,7 @@ import org.quiltmc.loader.api.minecraft.ClientOnly;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking;
 
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -27,6 +28,8 @@ public class ClientInit implements ClientModInitializer {
 		EntityRendererRegistry.register(Common.KICK_SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		EntityRendererRegistry.register(Common.ELECTRIC_SCOOTER_ENTITY, ScooterEntityRenderer::new);
 		HandledScreens.register(Common.SCOOTER_SCREEN_HANDLER, ScooterScreen::new);
+		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, Common.KICK_SCOOTER_ITEM);
+		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, Common.ELECTRIC_SCOOTER_ITEM);
 
 		// Register Scooter Inventory Changed Packet
 		ClientPlayNetworking.registerGlobalReceiver(Common.PACKET_INVENTORY_CHANGED_ID, (client, handler, buf, responseSender) -> {

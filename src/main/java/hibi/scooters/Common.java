@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import hibi.scooters.recipes.ElectricScooterRecipe;
 import hibi.scooters.recipes.KickScooterRecipe;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.Block;
@@ -142,8 +141,6 @@ public class Common implements ModInitializer {
 
 		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(kickScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
 		CauldronBehavior.WATER_CAULDRON_BEHAVIOR.put(electricScooter, CauldronBehavior.CLEAN_DYEABLE_ITEM);
-		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, kickScooter);
-		ColorProviderRegistry.ITEM.register(ScooterItem::colorItem, electricScooter);
 
 		LOGGER.debug("Common Init finished");
 	}
