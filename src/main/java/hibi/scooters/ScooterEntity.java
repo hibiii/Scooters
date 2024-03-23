@@ -332,7 +332,8 @@ InventoryChangedListener {
 		ItemStack out = this.item.getDefaultStack();
 		this.writeCustomDataToNbt(nbt);
 		out.setNbt(nbt);
-		if(this.getCustomName() instanceof Text name) {
+		Text name = this.getCustomName();
+		if(name != null) {
 			out.setCustomName(name);
 		}
 		return out;
