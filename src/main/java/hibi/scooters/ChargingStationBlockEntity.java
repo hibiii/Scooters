@@ -20,6 +20,8 @@ public class ChargingStationBlockEntity
 extends BlockEntity {
 
 	private static final Box CHARGING_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 1.5d, 0.5d, 1.5d);
+	private static final Box FRONTAL_AREA = Box.of(Vec3d.ofBottomCenter(Vec3i.ZERO), 0.4d, 0.5d, 0.4d);
+
 	private UUID chargee = null;
 
 	public ChargingStationBlockEntity(BlockPos pos, BlockState state) {
@@ -49,7 +51,25 @@ extends BlockEntity {
 			return ActionResult.success(world.isClient());
 		}
 
-		for (Entity entity : world.getOtherEntities(null, CHARGING_AREA.offset(pos))) {
+		Box frontal_area = switch (state.get(ChargingStationBlock.FACING)) {
+			case EAST -> FRONTAL_AREA.offset(pos).offset(1, 0, 0);
+			case NORTH -> FRONTAL_AREA.offset(pos).offset(0, 0, -1);
+			case SOUTH -> FRONTAL_AREA.offset(pos).offset(0, 0, 1);
+			case WEST -> FRONTAL_AREA.offset(pos).offset(-1, 0, 0);
+			default -> throw new IllegalStateException("Charging station is not facing NEWS");
+		};
+
+		if(attachScooterInArea(that, state, world, pos, frontal_area)) {
+			return ActionResult.success(world.isClient());
+		} else if(attachScooterInArea(that, state, world, pos, CHARGING_AREA.offset(pos))) {
+			return ActionResult.success(world.isClient());
+		}
+
+		return ActionResult.PASS;
+	}
+
+	public static boolean attachScooterInArea(ChargingStationBlockEntity that, BlockState state, World world, BlockPos pos, Box area) {
+		for (Entity entity : world.getOtherEntities(null, area)) {
 			if(!(entity instanceof ElectricScooterEntity)) {
 				continue;
 			}
@@ -59,10 +79,9 @@ extends BlockEntity {
 			}
 			ChargingStationBlockEntity.attachScooter(state, world, pos, that, escooter);
 			escooter.attachToCharger(pos);
-			return ActionResult.success(world.isClient());
+			return true;
 		}
-
-		return ActionResult.PASS;
+		return false;
 	}
 
 	public static void detachScooter(BlockState state, World world, BlockPos pos, ChargingStationBlockEntity that) {
