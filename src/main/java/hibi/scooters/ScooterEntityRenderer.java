@@ -99,6 +99,4 @@ public class ScooterEntityRenderer extends EntityRenderer<ScooterEntity> {
 		float l = MathHelper.sqrt(i * i + j * j + k * k);
 		buffer.vertex(matrices.getModel(), f , g, h).color(0, 0, 0, 255).normal(matrices.getNormal(), i / l, j / l, k / l).next();
 	}
-
-	
 }

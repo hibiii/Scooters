@@ -56,6 +56,7 @@ InventoryChangedListener {
 	public static final int SLOT_REAR_TIRE = 1;
 	public static final String NBT_KEY_TIRES = "Tires";
 	public static final String NBT_KEY_BODY_COLOR = "BodyColor";
+	public static final String NBT_KEY_CUSTOM_NAME = "CustomName";
 
 	protected boolean keyW = false, keyA = false, keyS = false, keyD = false;
 	protected float yawVelocity, yawAccel;
@@ -119,12 +120,14 @@ InventoryChangedListener {
 		out.setYaw(context.getPlayerYaw());
 		ItemStack stack = context.getStack();
 		if(!stack.hasNbt()) {
-			// TODO Potatoes from using an item in creative
 			out.items.setStack(SLOT_FRONT_TIRE, Common.TIRE_ITEM.getDefaultStack());
 			out.items.setStack(SLOT_REAR_TIRE, Common.TIRE_ITEM.getDefaultStack());
 		}
 		else {
 			out.readCustomDataFromNbt(stack.getNbt());
+			if(stack.hasCustomName()) {
+				out.setCustomName(stack.getName());
+			}
 		}
 		return out;
 	}
@@ -329,6 +332,9 @@ InventoryChangedListener {
 		ItemStack out = this.item.getDefaultStack();
 		this.writeCustomDataToNbt(nbt);
 		out.setNbt(nbt);
+		if(this.getCustomName() instanceof Text name) {
+			out.setCustomName(name);
+		}
 		return out;
 	}
 
