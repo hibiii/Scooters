@@ -188,7 +188,7 @@ InventoryChangedListener {
 					this.wearTear(displ);
 				}
 			}
-			this.setPos(this.getX(), this.getY(), this.getZ());
+			// this.setPos(this.getX(), this.getY(), this.getZ());
 			// Assures the scooter doesn't slide around desynchronizedly
 			this.setVelocity(Vec3d.ZERO);
 		}
@@ -254,9 +254,9 @@ InventoryChangedListener {
 		double xoff = this.getX() + (this.x - this.getX()) / (double)this.interpTicks;
         double yoff = this.getY() + (this.y - this.getY()) / (double)this.interpTicks;
         double zoff = this.getZ() + (this.z - this.getZ()) / (double)this.interpTicks;
-        float yawoff = (float) MathHelper.wrapDegrees(this.yaw - (double)this.getYaw());
-		this.setYaw(this.getYaw() + yawoff / (float)this.interpTicks);
 		this.setPosition(xoff, yoff, zoff);
+        float yawoff = (float) MathHelper.wrapDegrees(this.yaw - (double)this.getYaw());
+		this.setRotation(this.getYaw() + yawoff / (float)this.interpTicks, this.getPitch());
 		this.interpTicks--;
 	}
 
@@ -266,7 +266,7 @@ InventoryChangedListener {
 		this.y = y;
 		this.z = z;
 		this.yaw = yaw;
-		this.interpTicks = 10;
+		// this.interpTicks = 10;
 	}
 
 	@Override
