@@ -187,13 +187,13 @@ InventoryChangedListener {
 					double displ = displx * displx + displz * displz;
 					this.wearTear(displ);
 				}
-				this.oldx = this.getX();
-				this.oldz = this.getZ();
 			}
 			this.setPos(this.getX(), this.getY(), this.getZ());
 			// Assures the scooter doesn't slide around desynchronizedly
 			this.setVelocity(Vec3d.ZERO);
 		}
+		this.oldx = this.getX();
+		this.oldz = this.getZ();
 		// Enforce scooters not being ridable underwater
 		if(this.hasPassengers() && this.isSubmergedInWater()) {
 			this.removeAllPassengers();
