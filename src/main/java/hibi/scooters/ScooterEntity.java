@@ -537,7 +537,7 @@ InventoryChangedListener {
 	
 		boolean markDirty = false;
 		for (int i = SLOT_FRONT_TIRE; i <= SLOT_REAR_TIRE; i++) {
-			ItemStack stack = this.items.getStack(SLOT_FRONT_TIRE);
+			ItemStack stack = this.items.getStack(i);
 			int damage = abrasive? 2 : 1;
 			boolean popped = stack.getDamage() == stack.getMaxDamage();
 			if(this.random.nextDouble() < 0.8d && stack.isOf(Common.TIRE_ITEM) && stack.getDamage() < stack.getMaxDamage())
